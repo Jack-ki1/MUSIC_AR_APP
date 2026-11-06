@@ -1,0 +1,2274 @@
+# MASTER BUILD PROMPT
+# BREAKOUT RADAR — AUTONOMOUS A&R INTELLIGENCE PLATFORM
+## Complete Product Rebuild, UI/UX Engineering, Data Intelligence, Automation and Production-Ready Implementation
+
+---
+
+# 1. YOUR ROLE AND THE MISSION
+
+You are acting as a principal software architect, senior full-stack engineer, data engineer, machine-learning engineer, product designer, A&R technology specialist and quality-assurance lead.
+
+Your assignment is to transform my existing project into a genuinely functional, modern, autonomous and continuously operating Artist & Repertoire (A&R) intelligence platform.
+
+The product is called:
+
+**BREAKOUT RADAR — A&R INTELLIGENCE**
+
+Repository:
+
+`https://github.com/Jack-ki1/ARTIST_BREAK_APP`
+
+This repository is the source of truth. Work inside this existing project. Do not create an unrelated replacement application, do not substitute a generic dashboard template, and do not use previous unrelated generated projects as your starting point.
+
+There is already a substantial amount of work in this repository, including a four-section interface, source directory, FastAPI backend, background collection worker and provider infrastructure. Inspect the latest repository, its branches, open pull requests and existing implementation before deciding what to preserve, replace, refactor or extend.
+
+There may be an existing v3.1.1 implementation in PR #5 and branch `automation/v3.1-reference-refresh-20261104`. Check the current state of these before starting. Do not blindly recreate work or overwrite changes that are already valid.
+
+## The actual goal
+
+I do not want a static dashboard that looks convincing but has no meaningful functionality.
+
+I want a working intelligence system that independently discovers emerging music artists, collects and tracks publicly accessible evidence, identifies promising patterns, assesses artists, generates explainable recommendations, and maintains a continuously updated research environment.
+
+Think of the system as a combination of:
+
+- A professional music-industry A&R research department.
+- A multi-source data intelligence platform.
+- An artist discovery and monitoring engine.
+- A social and digital performance analytics platform.
+- An evidence-driven recommendation system.
+- A structured artist evaluation and decision-management workspace.
+
+The finished product should help an A&R team answer:
+
+1. Which emerging artists are gaining traction before they become widely recognised?
+2. Which artists are growing organically rather than simply displaying large or suspicious numbers?
+3. Which artists are demonstrating consistent audience growth?
+4. Which platforms, locations, communities and content formats are driving their growth?
+5. Which artists have meaningful songwriting, vocal ability, originality, production quality and artistic identity?
+6. Which artists are worth monitoring, contacting, developing, meeting or pursuing?
+7. What has changed since the last review?
+8. What evidence supports each recommendation?
+9. What should the A&R team investigate next?
+
+The system should make those questions answerable using actual collected evidence, not fabricated analytics.
+
+**Build the product, not merely its appearance.**
+
+---
+
+# 2. NON-NEGOTIABLE PRODUCT REQUIREMENTS
+
+The product must have exactly four primary workspace sections:
+
+1. DISCOVERY
+2. ANALYSE
+3. RECOMMENDATIONS
+4. SETTINGS
+
+Do not introduce additional primary sidebar sections.
+
+Subpages, tabs, filters, artist profiles, drawers and configuration panels should live inside these four sections.
+
+The application must have:
+
+- A genuinely functional frontend.
+- A functional backend.
+- A properly structured relational database.
+- A real source registry and provider adapter layer.
+- Automated discovery.
+- Scheduled evidence and metric collection.
+- Historical data storage.
+- Artist identity matching and deduplication.
+- Transparent scoring.
+- Human-led artistic evaluation.
+- Recommendation management.
+- Provider credential management.
+- Real-time operational status.
+- Error handling and retry mechanisms.
+- A clear configuration system.
+- A reproducible local deployment.
+- Comprehensive documentation.
+- An automated test suite.
+- A complete deliverable ZIP.
+
+Every visible control must perform its advertised action.
+
+Do not create decorative buttons, fake charts, artificial API status indicators, hardcoded results, empty interactions or simulated background activity in the live application.
+
+Where actual provider access is unavailable, communicate that limitation honestly and provide a useful alternative state.
+
+---
+
+# 3. FIRST PHASE: DEEP REPOSITORY AUDIT
+
+Before writing code, inspect the complete repository.
+
+Do not restrict your inspection to the homepage or README.
+
+Inspect:
+
+- All frontend source files.
+- All backend source files.
+- Existing components and styling.
+- API routes.
+- Data models.
+- Database relationships.
+- Provider integrations.
+- The existing source catalogue.
+- Worker and scheduling logic.
+- Environment configuration.
+- Deployment files.
+- Existing tests.
+- Documentation.
+- Existing branches and pull requests.
+- GitHub Actions workflows.
+
+Identify:
+
+1. What already works.
+2. What only looks implemented.
+3. What has an incomplete backend.
+4. What has no real provider integration.
+5. What is duplicated.
+6. What is incorrectly connected.
+7. What is not persisted.
+8. What produces inaccurate or misleading results.
+9. What is preventing continuous operation.
+10. What is missing for a reliable deployment.
+
+Produce a concise internal engineering plan and then immediately execute it.
+
+Do not stop after producing an audit report.
+
+Do not rewrite working functionality merely to change its naming or directory structure. Refactor where it provides measurable benefits.
+
+Do not discard the existing source catalogue.
+
+Preserve the actual source identifiers and provider metadata wherever possible, because these may already be referenced by API payloads, database records and frontend settings.
+
+Create a safe working branch. Never force-push over existing work or overwrite the user's changes.
+
+---
+
+# 4. PRODUCT DESIGN AND VISUAL IDENTITY
+
+This is one of the most important parts of the assignment.
+
+The existing interface is not sufficiently developed. I expect a substantial improvement in visual quality, usability, information density and product consistency.
+
+Use the Settings screenshot supplied in the conversation as the primary structural reference.
+
+Do not copy it mechanically. Use its design logic and take the product much further.
+
+Also use professional product-design references and visual principles from:
+
+- Linear.
+- Stripe.
+- Notion.
+- Spotify for Artists.
+- Chartmetric.
+- Soundcharts.
+- Viberate.
+- Music analytics and artist intelligence products.
+- Premium analytics dashboards.
+- Modern SaaS administration platforms.
+
+Use these references for design inspiration and interaction patterns only. Do not copy proprietary layouts, logos, content or assets.
+
+## 4.1 Overall visual direction
+
+The product should feel like premium music-industry intelligence software.
+
+The interface should be:
+
+- Modern.
+- Colourful.
+- Premium.
+- Visually rich.
+- Professional.
+- Technically sophisticated.
+- Easy to navigate.
+- Highly organised.
+- Data-dense without becoming cluttered.
+- Consistent across all four sections.
+
+The default theme should be light.
+
+Use a predominantly white or very light cool-toned background, dark navy typography, clean borders and carefully selected accent colours.
+
+### Suggested design palette
+
+| Role | Colour |
+|---|---|
+| Primary ink | #10162B |
+| Secondary text | #66718D |
+| Main background | #F7F8FC |
+| Surface | #FFFFFF |
+| Primary violet | #7155F5 |
+| Deep violet | #5425D5 |
+| Electric blue | #397DF5 |
+| Cyan | #21B8D6 |
+| Emerald | #13B981 |
+| Lime accent | #C5F42B |
+| Coral | #F27A76 |
+| Amber | #F2A83B |
+| Border | #E5E9F3 |
+
+You may refine these colours, but maintain visual consistency.
+
+Use gradients selectively for major hero sections, active states, feature cards and key CTAs. Avoid turning every component into a gradient.
+
+Use meaningful colours for:
+
+- Discovery and scanning.
+- Artist performance.
+- Growth.
+- Provider status.
+- Risk and warnings.
+- Recommendation tiers.
+- A&R decisions.
+
+## 4.2 Main desktop layout
+
+Design for 1440px and 1680px desktop screens first, then make the experience responsive.
+
+### Sidebar
+
+Use a fixed, approximately 260–280px wide left sidebar.
+
+It should contain:
+
+**Top brand area**
+- Breakout Radar logo or a custom radar/music-inspired symbol.
+- Product name: BREAKOUT RADAR.
+- Subtitle: A&R INTELLIGENCE.
+
+**Primary navigation**
+
+Exactly four sections:
+
+- Discovery.
+- Analyse.
+- Recommendations.
+- Settings.
+
+Each item should have a relevant icon, clear label, appropriate hover state and a premium active state.
+
+The active item should be visually prominent without dominating the entire screen.
+
+**Bottom sidebar**
+- Workspace identity.
+- Current user/profile.
+- Workspace status.
+- Subscription or plan indicator if implemented.
+- Relevant account actions.
+
+### Main top navigation
+
+A persistent top navigation area should include:
+
+- Global search: "Search artist, city, genre..."
+- Keyboard shortcut hint.
+- Notification centre.
+- Theme switcher.
+- User profile.
+
+The global search must actually search the platform. It must not be a decorative field.
+
+Support Ctrl/Command + K to focus global search.
+
+### Content area
+
+Use a clean, responsive content canvas with sensible padding, clear page headings, compact but readable cards, useful spacing and proper information hierarchy.
+
+Avoid oversized cards that contain only one short line of text.
+
+Avoid giant empty sections.
+
+Avoid overly rounded components, excessive shadows and inconsistent typography.
+
+Use consistent spacing, typography, border radii and interaction patterns.
+
+## 4.3 Design-system implementation
+
+Create reusable design tokens for:
+
+- Colours.
+- Typography.
+- Font sizes.
+- Font weights.
+- Spacing.
+- Border radii.
+- Shadows.
+- Elevation.
+- Transitions.
+- Responsive breakpoints.
+- Chart typography.
+- Status colours.
+
+Create reusable components for:
+
+- Buttons.
+- Icon buttons.
+- Badges.
+- Status indicators.
+- Data cards.
+- Metric cards.
+- Search fields.
+- Select fields.
+- Tabs.
+- Tables.
+- Tooltips.
+- Modals.
+- Drawers.
+- Dropdown menus.
+- Charts.
+- Empty states.
+- Loading skeletons.
+- Error messages.
+- Toast notifications.
+- Pagination.
+- Provider cards.
+- Artist avatars.
+- Source indicators.
+
+Do not create a different visual implementation for every page.
+
+The four sections should look like one coherent software product.
+
+---
+
+# 5. PAGE ONE: DISCOVERY
+
+This is the primary intelligence-gathering workspace.
+
+Its purpose is to autonomously discover emerging artists across approved and configured data sources.
+
+It should feel like a live research operations centre.
+
+## 5.1 Page header
+
+Title:
+
+**Discover emerging artists before they break.**
+
+Supporting description:
+
+"Identify promising independent artists, uncover early momentum and monitor signals across the music ecosystem."
+
+Include:
+
+- Current discovery status.
+- Last scan time.
+- Next scheduled scan.
+- Number of sources available for searching.
+- Number of enabled sources.
+- Number of new candidates awaiting review.
+
+## 5.2 Discovery overview metrics
+
+Create compact KPI cards showing genuine database values:
+
+- Artists tracked.
+- New discoveries.
+- Candidates awaiting review.
+- Emerging artists detected.
+- Active identity-search sources.
+- Discovery runs completed.
+
+Each metric should be clickable where appropriate and lead to relevant filtered data.
+
+Do not hardcode the numbers in the interface.
+
+## 5.3 Discovery command centre
+
+Create a prominent search and discovery panel.
+
+Include:
+
+**Search query**
+
+Examples:
+- Emerging Kenyan R&B artists.
+- New Gengetone artists in Nairobi.
+- Independent Bongo Flava artists.
+- Upcoming African alternative music.
+- Independent female Afrobeats artists.
+- Underground hip-hop artists in Ghana.
+- Emerging Afro-fusion artists in Uganda.
+
+**Country or region**
+
+- Kenya.
+- Tanzania.
+- Uganda.
+- Rwanda.
+- Nigeria.
+- Ghana.
+- South Africa.
+- Ethiopia.
+- Zambia.
+- Senegal.
+- Cameroon.
+- Other supported countries.
+
+**Genre**
+
+Allow selection or custom entry.
+
+**Discovery source**
+
+- All eligible configured sources.
+- Specific providers.
+- Source categories.
+
+**Artist stage**
+
+- Emerging.
+- Independent.
+- Early growth.
+- Established independent.
+- Other configurable classifications.
+
+**Actions**
+
+- Run discovery.
+- Save search.
+- Add to recurring discovery.
+- Clear filters.
+
+A scan must create a real backend job or discovery run.
+
+The interface must show actual execution status.
+
+## 5.4 Autonomous discovery feed
+
+The application should not depend on the operator manually searching for every artist.
+
+Build an autonomous discovery engine that continuously uses configured search seeds.
+
+The discovery engine must:
+
+1. Load the approved discovery configuration.
+2. Identify enabled and operational provider adapters.
+3. Select the next eligible discovery seed.
+4. Respect provider request budgets.
+5. Send requests to eligible providers.
+6. Retrieve artist identities and available public metadata.
+7. Normalize provider responses.
+8. Identify duplicates.
+9. Group matching identities.
+10. Save source-specific evidence.
+11. Calculate preliminary discovery scores.
+12. Calculate confidence separately.
+13. Queue candidates for review.
+14. Record the run and its outcome.
+15. Schedule the next cycle.
+
+The discovery system must be able to rotate through seeds if provider quotas prevent all searches from completing in one cycle.
+
+No candidate should be permanently rejected just because one provider does not recognise the artist.
+
+## 5.5 Discovery results
+
+Display results in a premium, information-rich table or card layout.
+
+Each candidate should display:
+
+- Artist name.
+- Artist image when a legitimate image is available.
+- Country.
+- City where verified.
+- Genre.
+- Artist stage.
+- Source count.
+- Matched provider identities.
+- Discovery score.
+- Confidence score.
+- Latest observed growth signal.
+- First discovered date.
+- Last updated date.
+- Evidence freshness.
+
+Provide meaningful actions:
+
+- Open artist.
+- Analyse.
+- Accept.
+- Dismiss.
+- Add to watchlist.
+- Request more evidence.
+
+A candidate should have a visible explanation of why the system discovered it.
+
+Do not simply display "AI recommended".
+
+## 5.6 Discovery filters
+
+Include filters for:
+
+- Country.
+- City.
+- Genre.
+- Gender only when lawfully and reliably provided and explicitly relevant.
+- Source.
+- Discovery score.
+- Confidence.
+- First discovery date.
+- Growth trend.
+- Artist stage.
+- Candidate status.
+- Corroboration level.
+
+Do not infer sensitive personal characteristics from names, appearance or other unreliable metadata.
+
+## 5.7 Live scan activity
+
+Show:
+
+- Active scan.
+- Current provider.
+- Current query seed.
+- Requests completed.
+- Requests remaining within the run budget.
+- Candidates found.
+- Duplicates resolved.
+- Failed provider requests.
+- Scan start time.
+- Completion time.
+
+Allow cancellation where the backend supports safe cancellation.
+
+Display provider-specific errors instead of pretending every source succeeded.
+
+## 5.8 Discovery history
+
+Provide a searchable history of previous scans.
+
+Each run should show:
+
+- Date.
+- Query or seed.
+- Providers contacted.
+- Number of identities found.
+- Number of new artists.
+- Number of duplicates.
+- Provider failures.
+- Duration.
+- Final status.
+
+Opening a run should reveal its detailed execution record.
+
+---
+
+# 6. PAGE TWO: ANALYSE
+
+This section is the artist intelligence and performance analysis workspace.
+
+Its purpose is to understand each artist beyond their name and follower count.
+
+This should be one of the most detailed parts of the application.
+
+## 6.1 Page purpose
+
+Title:
+
+**Understand the artist. Understand the movement.**
+
+Supporting description:
+
+"Explore artistic identity, digital growth, audience signals, release activity, public evidence and performance over time."
+
+## 6.2 Artist directory
+
+Create a searchable artist directory.
+
+Support:
+
+- Search by artist name.
+- Filter by country.
+- Filter by genre.
+- Filter by source.
+- Filter by growth.
+- Filter by A&R review status.
+- Sort by discovery score.
+- Sort by recent activity.
+- Sort by latest evidence.
+- Sort by artistic rating.
+
+Display each artist with a concise profile and meaningful status.
+
+## 6.3 Artist profile workspace
+
+When an artist is selected, open a detailed artist profile.
+
+The profile should have:
+
+**Identity section**
+- Name.
+- Primary image or initials.
+- Country.
+- City.
+- Genres.
+- Artist stage.
+- Verified links.
+- External platform identifiers.
+- First discovered date.
+- Last updated date.
+
+**Artist summary**
+
+Generate an evidence-linked summary of:
+
+- Musical identity.
+- Public presence.
+- Release activity.
+- Observed growth.
+- Platform distribution.
+- Audience/community signals.
+- Potential opportunities.
+- Outstanding unknowns.
+
+Each factual statement must be traceable to a source.
+
+Do not invent biographies, locations, affiliations or achievements.
+
+## 6.4 Digital performance analysis
+
+Track metrics separately by platform.
+
+Possible supported metrics include:
+
+- Followers.
+- Subscribers.
+- Views.
+- Likes.
+- Comments.
+- Shares.
+- Releases.
+- Monthly listeners.
+- Playlist information.
+- Video uploads.
+- Public engagement indicators.
+
+Only display metrics that the provider actually exposes and permits the application to store and use.
+
+Never merge unrelated platform follower counts into a synthetic "total audience" figure without explicitly defining and validating the measurement.
+
+Create separate platform cards for:
+
+- Spotify.
+- YouTube.
+- Instagram.
+- TikTok.
+- Facebook.
+- Apple Music.
+- SoundCloud.
+- Other supported services.
+
+Where a provider is not connected, display an appropriate unavailable or not-authorised state.
+
+## 6.5 Growth analysis
+
+This is a core feature.
+
+For every artist, maintain historical observations and calculate meaningful changes.
+
+Examples:
+
+- 7-day growth.
+- 14-day growth.
+- 30-day growth.
+- 90-day growth.
+- Longer-term trends where enough history exists.
+
+For each metric, record:
+
+- Value.
+- Platform.
+- Collection timestamp.
+- Comparison period.
+- Absolute change.
+- Percentage change.
+- Data completeness.
+- Provider attribution.
+
+Charts must use genuine historical observations.
+
+Do not fabricate a time series to make a chart look active.
+
+If only one observation exists, say that a historical trend is not yet available.
+
+## 6.6 Audience analysis
+
+Where a provider legitimately exposes information, examine:
+
+- Geographic distribution.
+- Audience growth.
+- Engagement changes.
+- Core audience shifts.
+- Public community signals.
+- Content interests.
+- Market concentration.
+
+Provide clear dates and sources.
+
+Do not infer unavailable demographics or audience characteristics.
+
+Create a configurable recurring audience-analysis report, preferably weekly or fortnightly.
+
+The purpose is to identify how an artist's audience is changing over time, not simply to show a follower count.
+
+## 6.7 Release and content intelligence
+
+Capture available public information about:
+
+- New releases.
+- Release dates.
+- Singles and albums.
+- Public music videos.
+- Content frequency.
+- Release consistency.
+- Collaborations.
+- Featured artists.
+- Public playlist appearances where licensed.
+- Public event and performance information.
+
+Create a chronological release and content timeline.
+
+Where information is missing, display the gap rather than filling it with assumptions.
+
+## 6.8 Press, community and UGC intelligence
+
+Collect permitted public evidence from eligible sources.
+
+Look for:
+
+- Press mentions.
+- Interviews.
+- Independent reviews.
+- Public discussions.
+- Public user-generated content signals.
+- Public event mentions.
+- Collaborations.
+- Cultural and regional attention.
+
+Keep original source URLs, publication dates and summaries.
+
+Distinguish first-party platform metrics from third-party press and community evidence.
+
+## 6.9 Organic growth and artificial growth investigation
+
+This is strategically important.
+
+Build an evidence-based anomaly analysis module.
+
+Potential indicators:
+
+- Abrupt follower changes.
+- Unusual engagement ratios.
+- Inconsistent comment patterns.
+- Sudden geographic changes.
+- Repeated identical engagement.
+- Sudden unrelated spikes.
+- Contradictory activity across available sources.
+- A large audience with persistently weak public engagement.
+
+However:
+
+- Do not automatically label an artist as fake.
+- Do not treat one unusual metric as proof of manipulation.
+- Do not invent fraud detection accuracy.
+- Show indicators, supporting evidence, confidence and alternative explanations.
+- Use labels such as "Unusual pattern observed" rather than unsupported accusations.
+
+Provide an analyst review and annotation workflow.
+
+## 6.10 Artistic quality review
+
+This module must be clearly separated from automated digital-performance scoring.
+
+Build a professional human-led A&R scorecard.
+
+Suggested dimensions, each configurable:
+
+| Dimension | Evaluation |
+|---|---|
+| Songwriting | Structure, lyrical craft, clarity and storytelling |
+| Vocal identity | Tone, control, delivery and character |
+| Melody | Hooks, phrasing, memorability and harmony |
+| Production | Sound quality, arrangement and originality |
+| Originality | Distinctiveness and creative identity |
+| Performance | Stage presence and delivery |
+| Artistic direction | Vision, consistency and potential |
+| Market positioning | Audience fit and differentiating value |
+
+Use an explainable 0–5 rating scale with descriptive anchors.
+
+Each assessment should permit:
+
+- Score.
+- Reviewer.
+- Date.
+- Written observations.
+- Strengths.
+- Weaknesses.
+- Evidence links.
+- Review status.
+
+Allow multiple A&R reviewers to submit separate assessments.
+
+Store review history rather than overwriting the previous review.
+
+The system may assist with summaries and organising evidence, but must not pretend to have listened to music if no actual audio-analysis capability is implemented.
+
+## 6.11 Artist-to-artist comparison
+
+Allow the operator to compare two or more artists.
+
+Compare:
+
+- Release activity.
+- Platform presence.
+- Growth trends.
+- Engagement signals.
+- Public evidence.
+- Discovery scores.
+- Confidence.
+- Artistic review history.
+
+Ensure comparisons use equivalent periods and compatible metrics.
+
+Clearly identify unavailable or incomparable measures.
+
+---
+
+# 7. PAGE THREE: RECOMMENDATIONS
+
+This is the A&R decision-support workspace.
+
+It converts collected intelligence and human assessment into actionable recommendations.
+
+Title:
+
+**Turn evidence into A&R decisions.**
+
+Supporting description:
+
+"Prioritise artists using explainable signals, artistic assessment and documented research."
+
+## 7.1 Recommendation dashboard
+
+Display:
+
+- Artists worth pursuing.
+- Artists worth meeting.
+- Artists to watch.
+- Artists requiring more evidence.
+- Recently updated recommendations.
+- Pending A&R decisions.
+- Artists with significant new signals.
+
+All statistics must come from real database records.
+
+## 7.2 Recommendation tiers
+
+Provide configurable recommendation tiers.
+
+Suggested defaults:
+
+**PURSUE**
+Strong verified evidence, a compelling artistic review and clear reasons to engage.
+
+**MEET**
+Promising artistic and commercial indicators, worth arranging an introduction or closer review.
+
+**WATCH**
+Interesting potential, but not enough evidence for immediate action.
+
+**MORE EVIDENCE**
+Insufficient information to make a responsible recommendation.
+
+**HOLD**
+An explicit A&R decision to defer action.
+
+Do not treat a recommendation tier as a contractual decision or automatic signing instruction.
+
+## 7.3 Ranking interface
+
+Display ranked artist recommendations.
+
+Each entry should include:
+
+- Rank.
+- Artist identity.
+- Artist image.
+- Main genre.
+- Location.
+- Discovery index.
+- Artistic rating.
+- Combined recommendation score.
+- Confidence.
+- Most important positive signal.
+- Main unresolved concern.
+- Recommendation tier.
+- Last updated timestamp.
+
+Use sensible visual hierarchy.
+
+Clicking an artist opens the detailed recommendation explanation.
+
+## 7.4 Transparent recommendation engine
+
+Create a documented scoring system.
+
+Keep three concepts separate:
+
+1. Discovery score.
+2. Confidence score.
+3. Artistic evaluation.
+
+Suggested initial discovery-signal dimensions:
+
+- Momentum.
+- Independent source corroboration.
+- Release activity.
+- Live activity.
+- Public search interest.
+- Community attention.
+- Catalogue headroom.
+- Consistency of growth.
+
+Allow configurable weights that sum to 100%.
+
+Use sensible defaults and show the contribution of each factor to the final score.
+
+The system must not convert missing values into positive scores.
+
+Missing evidence should reduce confidence.
+
+The artistic share and discovery share should be configurable. A sensible initial default is 60% artistic evaluation and 40% discovery performance, with the ability to change it.
+
+Recommendation thresholds must also be configurable.
+
+The operator must be able to see exactly why an artist received a given recommendation.
+
+Do not describe discovery scores as statistically validated probabilities of commercial success.
+
+## 7.5 A&R decision management
+
+Provide explicit actions:
+
+- Pursue.
+- Arrange meeting.
+- Add to watchlist.
+- Request more information.
+- Defer.
+- Decline.
+- Mark as contacted.
+
+Each decision should allow:
+
+- Decision-maker.
+- Date.
+- Rationale.
+- Notes.
+- Supporting evidence.
+- Follow-up action.
+- Follow-up date.
+- Decision history.
+
+Store decisions permanently as an auditable history.
+
+A new recommendation must not silently erase previous decisions.
+
+## 7.6 Next-best-action recommendations
+
+The system can suggest what the A&R team should investigate next.
+
+Examples:
+
+- Collect another 30 days of platform history.
+- Verify the artist's official account.
+- Investigate a recent engagement spike.
+- Review the latest release.
+- Request a performance recording.
+- Check public live-performance activity.
+- Arrange an introductory conversation.
+
+These suggestions must be driven by actual missing evidence or observed changes.
+
+---
+
+# 8. PAGE FOUR: SETTINGS
+
+This page must follow the supplied Settings reference particularly closely.
+
+It must be a fully functional configuration centre.
+
+It should not be a basic form containing a list of provider names.
+
+## 8.1 Source configuration
+
+Create a professional provider directory.
+
+The existing source catalogue contains approximately 73 entries. Audit the actual catalogue and preserve its identifiers.
+
+Do not pretend every catalogue entry is a working live API integration.
+
+The current implementation should distinguish approximately:
+
+- 22 identity-search adapter paths.
+- Four evidence-enrichment adapter paths.
+- Other entries that may require approval, commercial licensing, artist authorisation, research eligibility, partner feeds, manual setup or client-side implementation.
+
+Verify these classifications against the actual repository.
+
+The catalogue must accurately communicate what is and is not available.
+
+## 8.2 Provider card design
+
+On desktop, use three columns of provider cards.
+
+Each card should include:
+
+- Enable/disable control.
+- Provider icon.
+- Provider name.
+- Category.
+- Integration status.
+- Short provider description.
+- Access requirement note.
+- Official documentation link.
+- Configuration/expand button.
+
+Expanded cards should display relevant configuration fields.
+
+Examples:
+
+**Spotify**
+- Client ID.
+- Client secret.
+- OAuth configuration where applicable.
+- Access status.
+- Scope information.
+
+**YouTube Data API**
+- Google Cloud API key.
+- Project name or reference.
+- Daily search budget.
+- Remaining quota.
+
+**Apple Music**
+- Developer token/JWT configuration.
+- Storefront where applicable.
+- Authorization status.
+
+**Last.fm**
+- API key.
+- Access status.
+
+Do not show fields that are irrelevant to a provider.
+
+The form must be generated from the provider schema rather than hardcoded separately for each card.
+
+## 8.3 Search and filtering
+
+Allow users to search providers by name, category and description.
+
+Provide category filters, such as:
+
+- Music catalogues.
+- Streaming platforms.
+- Video platforms.
+- Social media.
+- Search and knowledge sources.
+- Press and news.
+- Community sources.
+- Live performance and events.
+- Research and analytics.
+- Other.
+
+Show the number of matching providers.
+
+## 8.4 Accurate provider status
+
+Distinguish the following states:
+
+- Not implemented.
+- Disabled.
+- Not configured.
+- Configured, not tested.
+- Connecting.
+- Ready.
+- Degraded.
+- Authentication failed.
+- Rate limited.
+- Quota exhausted.
+- Approval required.
+- Commercial licence required.
+- Research-only.
+- Manual setup required.
+
+A provider must not display "Ready" simply because a key has been saved.
+
+A proper connection check must test the configured integration using a safe endpoint, then record:
+
+- Test timestamp.
+- Test result.
+- Error details.
+- Response time where available.
+- Credential validation state.
+
+## 8.5 Secret management
+
+All provider secrets must be handled by the backend.
+
+Requirements:
+
+- Encrypt secrets at rest.
+- Never return secret values to the frontend.
+- Mask configured values.
+- Do not write secrets into logs.
+- Provide update and clear-credential controls.
+- Use environment-specific encryption keys.
+- Validate inputs.
+- Restrict access to authorised workspace users.
+
+The user should see "Configured" or "Last validated" rather than the actual secret.
+
+## 8.6 Automation configuration
+
+Provide a clear automation control centre.
+
+Include:
+
+- Master automation switch.
+- Automatic discovery switch.
+- Evidence refresh switch.
+- Artist metrics refresh switch.
+- Provider health checks.
+- Scheduled reporting.
+- Discovery interval.
+- Evidence interval.
+- Number of artists per refresh cycle.
+- Daily provider-call budgets.
+- Discovery seed configuration.
+- Preferred regions.
+- Preferred genres.
+- Exclusion rules.
+- Maximum requests per provider.
+- Retry policy.
+- Timezone.
+
+Suggested initial schedules:
+
+- Discovery: every 6 hours.
+- Artist evidence refresh: every 24 hours.
+- Artist metric refresh: configurable, subject to the provider's access rules.
+- Provider health checks: daily.
+- Summary reports: weekly.
+
+These must be editable.
+
+Display:
+
+- Worker online/offline.
+- Last heartbeat.
+- Last successful discovery.
+- Next scheduled discovery.
+- Last successful evidence refresh.
+- Jobs waiting.
+- Jobs running.
+- Failed jobs.
+- Last worker error.
+
+Provide global pause/resume functionality and separate task switches.
+
+## 8.7 Discovery seed manager
+
+Allow users to create, edit and remove seeds.
+
+Example seeds:
+
+- Emerging Kenyan R&B.
+- Independent East African hip-hop.
+- New female Afrobeats artists.
+- Underground Tanzanian Bongo Flava.
+- African alternative music.
+- Emerging Ugandan Afro-fusion.
+- Independent Ghanaian rap.
+- New African electronic artists.
+
+Each seed should have:
+
+- Name.
+- Search phrase.
+- Genre.
+- Region.
+- Country.
+- Enabled status.
+- Priority.
+- Last run.
+- Last successful run.
+- Discovery yield.
+
+Seed management must persist through the API.
+
+## 8.8 Scoring controls
+
+Allow users to configure:
+
+- Discovery weights.
+- Artistic weights.
+- Artistic/discovery contribution.
+- Confidence thresholds.
+- Recommendation tiers.
+- Emerging-artist thresholds.
+- Minimum evidence.
+- Minimum observation period.
+
+Provide validation so invalid weights cannot be saved.
+
+Include a reset-to-default option.
+
+## 8.9 Workspace preferences
+
+Include:
+
+- Theme selection.
+- Default region.
+- Default date range.
+- Notification preferences.
+- Report preferences.
+- Timezone.
+- Data retention settings where applicable.
+
+All settings must persist in the database.
+
+---
+
+# 9. AUTONOMOUS INTELLIGENCE ENGINE
+
+This is the defining differentiator of Breakout Radar.
+
+The platform must operate continuously while its application, database and worker services are running.
+
+It must not require the operator to click "Run discovery" every time it needs to find artists.
+
+## 9.1 Architecture
+
+Build a separate worker service.
+
+Prefer a persistent PostgreSQL-backed job queue for the initial self-hosted architecture. Use database transactions, durable jobs, leases, retry handling and idempotency.
+
+Do not create a fragile scheduler that loses pending work after a restart.
+
+A dedicated Redis/Celery architecture is acceptable if there is a clear technical reason and it is implemented and documented completely.
+
+The API should not need to remain busy executing long-running discovery operations.
+
+The worker must:
+
+1. Read configured schedules.
+2. Identify due tasks.
+3. Claim an eligible job safely.
+4. Execute it.
+5. Store results.
+6. Handle errors.
+7. Update job status.
+8. Release or renew its lease.
+9. Update heartbeat.
+10. Schedule or enqueue subsequent work.
+
+Use UTC internally and display times in the user's configured timezone, initially Africa/Nairobi.
+
+## 9.2 Job types
+
+Implement distinct task types.
+
+Examples:
+
+- `discovery_seed_scan`
+- `manual_discovery_scan`
+- `refresh_artist_metrics`
+- `refresh_artist_evidence`
+- `provider_health_check`
+- `reconcile_artist_identities`
+- `generate_weekly_report`
+- `update_recommendations`
+
+Do not put all tasks into one giant, unstructured worker function.
+
+## 9.3 Job reliability
+
+Implement:
+
+- Job identifiers.
+- Idempotency keys.
+- Attempt counts.
+- Maximum retry attempts.
+- Exponential backoff.
+- Failure reasons.
+- Timeout handling.
+- Lease expiration.
+- Graceful shutdown.
+- Duplicate-job protection.
+- Recoverable pending work.
+
+Provider throttling should delay work rather than permanently discard it.
+
+## 9.4 Worker observability
+
+Provide a dedicated status endpoint and UI display.
+
+A worker heartbeat should be updated periodically, for example every 30 seconds.
+
+The UI should identify an expired heartbeat and mark a worker as offline instead of continuing to display a stale green online status.
+
+Record every scheduled and manual run.
+
+## 9.5 Autonomous discovery sequence
+
+An individual discovery task should execute the following sequence:
+
+1. Load discovery configuration.
+2. Select due seeds.
+3. Select eligible providers.
+4. Check current quotas.
+5. Check provider health.
+6. Execute permitted API requests.
+7. Normalize the returned identities.
+8. Match identities against stored artists.
+9. Save newly discovered identities.
+10. Store source observations.
+11. Reconcile duplicates.
+12. Recalculate discovery signals.
+13. Recalculate confidence.
+14. Update candidate status.
+15. Save a detailed run summary.
+16. Queue follow-up evidence collection.
+17. Mark the job successful, partially successful or failed.
+
+The sequence must not falsely report full success when some providers fail.
+
+## 9.6 Artist monitoring sequence
+
+When an artist is accepted into the tracked directory:
+
+1. Store their canonical identity.
+2. Link verified provider identities.
+3. Identify eligible public data sources.
+4. Collect the currently available baseline.
+5. Save the observation timestamp.
+6. Schedule the next eligible collection.
+7. Collect subsequent observations.
+8. Compare current values with historical values.
+9. Detect meaningful changes.
+10. Create alerts where justified.
+11. Update recommendations when new evidence materially changes the assessment.
+
+---
+
+# 10. SOURCE INTEGRATION AND PROVIDER ENGINEERING
+
+Build a proper provider adapter architecture.
+
+Do not write 30 unrelated API request functions directly inside the main API file.
+
+Use a standard provider interface.
+
+Each provider adapter should support the relevant subset of:
+
+- `search_artists`
+- `get_artist_identity`
+- `get_artist_profile`
+- `get_artist_metrics`
+- `get_releases`
+- `get_public_content`
+- `get_events`
+- `get_evidence`
+- `health_check`
+
+Each adapter must declare:
+
+- Provider ID.
+- Provider name.
+- Provider category.
+- Capabilities.
+- Authentication type.
+- Configuration schema.
+- Required credentials.
+- Access restrictions.
+- Quota rules.
+- Rate limits.
+- Retry behaviour.
+- Data fields returned.
+- Data retention requirements.
+- Official documentation URL.
+- Implementation status.
+
+Use typed, normalised output models.
+
+## 10.1 Important provider restrictions
+
+Do not treat all public-looking platforms as unrestricted data feeds.
+
+Implement an access policy for every source.
+
+### MusicBrainz
+
+Use its API responsibly.
+
+- Set a descriptive User-Agent.
+- Respect the one-request-per-second client limit.
+- Cache appropriate metadata.
+- Implement retry handling for HTTP 503 responses.
+- Do not burst concurrent requests against it.
+
+Documentation:
+https://musicbrainz.org/doc/MusicBrainz_API
+
+### YouTube Data API
+
+Build a real quota manager.
+
+Google currently documents a separate default bucket of 100 `search.list` calls per day, with the search query quota resetting at midnight Pacific Time. Pagination also consumes calls.
+
+Implementation requirements:
+
+- Persistent quota counters.
+- Pacific Time reset handling.
+- Configurable budgets below the provider's assigned allowance.
+- Request-cost tracking.
+- Search caching.
+- Quota-aware seed rotation.
+- No calls after budget exhaustion.
+- Display quota status in Settings.
+
+Official references:
+
+https://developers.google.com/youtube/data/determine_quota_cost
+
+https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits
+
+### Spotify
+
+Spotify's Development Mode is subject to material access restrictions.
+
+Do not use a Development Mode integration as the basis of a commercial A&R product.
+
+The current published restrictions include Premium requirements, a five-authorised-user limit and a reduced supported endpoint surface for Development Mode integrations.
+
+Implement a gated adapter:
+
+- Clearly distinguish Development Mode and approved commercial access.
+- Show current access mode.
+- Do not enable a commercially restricted workflow by default.
+- Do not bypass the platform's terms.
+- Only use the endpoint surface available to the configured access tier.
+
+Official references:
+
+https://developer.spotify.com/blog/2026-02-06-update-on-developer-access-and-platform-security
+
+https://developer.spotify.com/documentation/web-api/concepts/quota-modes
+
+### TikTok
+
+TikTok Research Tools are intended for qualified independent, non-commercial research under eligibility and approval requirements.
+
+Do not assume that a normal TikTok developer account authorises commercial artist discovery.
+
+Do not scrape restricted TikTok data.
+
+Keep Research Tools marked as research-only unless a separate valid commercial product and applicable permission are established.
+
+Official reference:
+
+https://developers.tiktok.com/products/research-api/
+
+### Reddit
+
+Commercial use of Reddit developer tools and data requires permission and an applicable agreement.
+
+Do not run Reddit enrichment as a commercial source unless the required permission has been obtained.
+
+Display the provider's restricted status accurately.
+
+Official reference:
+
+https://support.reddithelp.com/hc/en-us/articles/14945211791892-Developer-Platform-Accessing-Reddit-Data
+
+### Other providers
+
+For Apple Music, Meta platforms, Instagram, Facebook, Deezer, Last.fm, SoundCloud, Discogs, Twitch, Bluesky, Mastodon, Wikipedia, iTunes Search, GDELT, Flickr, Openverse and other catalogue sources:
+
+- Verify the current official API documentation.
+- Confirm allowed endpoints.
+- Confirm commercial-use rights.
+- Confirm authentication requirements.
+- Confirm rate limits.
+- Confirm permitted data storage and display.
+- Respect provider attribution and licensing requirements.
+
+Never use browser scraping or hidden/private endpoints to evade a provider restriction.
+
+## 10.2 Provider fallback behaviour
+
+When a provider is unavailable:
+
+- Record the failure.
+- Preserve existing records.
+- Continue with other eligible sources.
+- Retry according to policy.
+- Mark the source as degraded or unavailable.
+- Tell the operator what happened.
+
+A single provider outage must not break the entire discovery process.
+
+---
+
+# 11. DATA ENGINEERING AND DATABASE DESIGN
+
+Use PostgreSQL as the primary persistent database.
+
+Use SQLAlchemy 2 and Alembic for database models and migrations.
+
+Use UUID identifiers for core records.
+
+All important timestamps must be timezone-aware.
+
+Create sensible indexes, foreign keys, uniqueness rules and transaction boundaries.
+
+At minimum, model the following entities.
+
+## 11.1 Workspaces and users
+
+### `workspaces`
+
+- id
+- name
+- slug
+- timezone
+- configuration
+- created_at
+- updated_at
+
+### `users`
+
+- id
+- email
+- name
+- password_hash or external_auth_id
+- is_active
+- created_at
+- updated_at
+
+### `workspace_memberships`
+
+- id
+- workspace_id
+- user_id
+- role
+- created_at
+
+Implement workspace-scoped authorisation.
+
+Do not allow one workspace to access another workspace's records.
+
+## 11.2 Artist records
+
+### `artists`
+
+- id
+- workspace_id
+- canonical_name
+- slug
+- description
+- country
+- city
+- primary_genre
+- genres
+- stage
+- image_url
+- discovery_score
+- discovery_confidence
+- artistic_score
+- combined_score
+- recommendation_tier
+- review_status
+- first_discovered_at
+- last_observed_at
+- created_at
+- updated_at
+
+### `artist_identities`
+
+- id
+- artist_id
+- provider_id
+- external_id
+- profile_url
+- display_name
+- verified
+- match_confidence
+- match_method
+- created_at
+- updated_at
+
+Enforce uniqueness for the appropriate provider/external-ID combination.
+
+## 11.3 Source records
+
+### `provider_sources`
+
+- id
+- provider_id
+- category
+- enabled
+- implemented
+- access_class
+- capability
+- configuration
+- connection_status
+- last_tested_at
+- last_error
+- last_successful_request_at
+- created_at
+- updated_at
+
+### `provider_quota_usage`
+
+- id
+- provider_id
+- quota_name
+- period_start
+- period_end
+- used
+- limit
+- updated_at
+
+### `provider_sync_runs`
+
+- id
+- provider_id
+- task_type
+- started_at
+- finished_at
+- status
+- requests_made
+- records_received
+- records_saved
+- error_summary
+
+## 11.4 Artist observations
+
+### `metric_observations`
+
+- id
+- artist_id
+- provider_id
+- identity_id
+- metric_name
+- metric_value
+- metric_unit
+- observed_at
+- source_url
+- metadata
+
+Store each provider's metric observations separately.
+
+Do not combine metrics with different definitions or measurement periods.
+
+### `evidence_items`
+
+- id
+- artist_id
+- provider_id
+- evidence_type
+- title
+- description
+- source_url
+- publisher
+- published_at
+- collected_at
+- confidence
+- metadata
+
+Keep source URLs and timestamps.
+
+## 11.5 Discovery
+
+### `discovery_seeds`
+
+- id
+- workspace_id
+- name
+- query
+- country
+- region
+- genre
+- priority
+- enabled
+- last_run_at
+- created_at
+- updated_at
+
+### `discovery_runs`
+
+- id
+- workspace_id
+- seed_id
+- query
+- status
+- started_at
+- finished_at
+- providers_attempted
+- providers_succeeded
+- identities_found
+- new_artists
+- duplicates
+- errors
+- summary
+
+### `discovery_candidates`
+
+- id
+- workspace_id
+- artist_id
+- discovery_run_id
+- source_ids
+- source_count
+- discovery_score
+- confidence
+- review_status
+- created_at
+- updated_at
+
+## 11.6 A&R management
+
+### `artistic_reviews`
+
+- id
+- artist_id
+- reviewer_id
+- scores
+- overall_score
+- notes
+- strengths
+- weaknesses
+- reviewed_at
+
+### `artist_decisions`
+
+- id
+- artist_id
+- decision
+- decision_maker_id
+- rationale
+- notes
+- follow_up_at
+- created_at
+
+### `recommendations`
+
+- id
+- artist_id
+- discovery_score
+- artistic_score
+- combined_score
+- confidence
+- tier
+- explanation
+- generated_at
+
+## 11.7 Automation
+
+### `scheduled_jobs`
+
+- id
+- workspace_id
+- task_type
+- payload
+- status
+- priority
+- scheduled_for
+- started_at
+- finished_at
+- attempts
+- max_attempts
+- lease_until
+- idempotency_key
+- last_error
+- created_at
+
+### `automation_settings`
+
+- id
+- workspace_id
+- task_type
+- enabled
+- interval_seconds
+- next_run_at
+- configuration
+- updated_at
+
+### `worker_heartbeats`
+
+- id
+- worker_id
+- status
+- last_seen_at
+- current_job_id
+- metadata
+
+### `audit_logs`
+
+Track important actions, configuration changes and A&R decisions.
+
+Use additional tables where the implementation requires them.
+
+Do not force every piece of information into one giant JSON field.
+
+---
+
+# 12. ARTIST IDENTITY RESOLUTION
+
+Identity resolution is central to the product.
+
+An artist may appear with:
+
+- Slightly different names.
+- Alternative spellings.
+- Different social handles.
+- Different release names.
+- Multiple platform IDs.
+- Incomplete metadata.
+
+Build a matching engine that compares:
+
+- Provider external identifiers.
+- Verified official profile links.
+- Name similarity.
+- Country and location where available.
+- Genre compatibility.
+- Release metadata.
+- Associated artist information.
+
+Use deterministic identifiers first.
+
+Use fuzzy matching only as a supporting signal.
+
+A match should carry a confidence value and explanation.
+
+Do not automatically merge two artists solely because their display names match.
+
+Low-confidence matches should enter a review queue.
+
+Provide an operator action to link or separate identities.
+
+Store the identity-matching history.
+
+---
+
+# 13. MACHINE LEARNING AND AI
+
+Use AI to improve the research process, not to make unsupported claims.
+
+## 13.1 AI use cases
+
+Potential modules include:
+
+- Evidence summarisation.
+- Artist profile synthesis.
+- Public press clustering.
+- Search-query expansion.
+- Genre and scene classification.
+- Discovery-seed suggestions.
+- Anomaly investigation.
+- Recommendation explanations.
+- Research prioritisation.
+- Report generation.
+
+Use a provider abstraction for LLM integrations.
+
+Allow secure server-side configuration of approved models.
+
+Never expose model API keys to the browser.
+
+## 13.2 Grounding and citations
+
+Every AI-generated factual statement should be grounded in stored evidence.
+
+The system should:
+
+- Retrieve the supporting evidence.
+- Associate source URLs.
+- Preserve dates.
+- Identify missing information.
+- Separate fact from inference.
+- Mark uncertain output.
+- Avoid inventing metrics or biography details.
+
+Retrieved webpage content is untrusted data.
+
+Do not execute instructions found inside a webpage, social post, artist bio or other external content.
+
+Defend against prompt injection.
+
+## 13.3 Predictive analytics
+
+Do not claim to predict breakouts until there is enough historical data and a validated evaluation process.
+
+Build the infrastructure for future model development.
+
+Potential future features:
+
+- Historical artist snapshots.
+- Breakout-event labels.
+- Cohort analysis.
+- Time-based training datasets.
+- Walk-forward validation.
+- Backtesting.
+- Precision at K.
+- Recall.
+- Calibration.
+- Baseline comparisons.
+- Drift monitoring.
+
+Avoid random train/test splits that leak future information into the past.
+
+If there is not enough reliable data, use transparent heuristic scoring and state that predictive validation is not yet available.
+
+---
+
+# 14. API DESIGN
+
+Use FastAPI and structured API schemas.
+
+Keep route handlers thin.
+
+Move business logic into service layers.
+
+Use Pydantic request and response models.
+
+Support pagination, filtering, sorting and consistent error responses.
+
+Preserve existing API compatibility where practical. Version new APIs sensibly.
+
+Suggested route structure:
+
+## Health and operations
+
+- `GET /api/health`
+- `GET /api/automation/status`
+- `GET /api/automation/jobs`
+- `GET /api/automation/runs`
+- `POST /api/automation/pause`
+- `POST /api/automation/resume`
+
+## Discovery
+
+- `GET /api/discovery/candidates`
+- `POST /api/discovery/run`
+- `GET /api/discovery/runs`
+- `GET /api/discovery/runs/{run_id}`
+- `POST /api/discovery/candidates/{id}/review`
+- `GET /api/discovery/seeds`
+- `POST /api/discovery/seeds`
+- `PUT /api/discovery/seeds/{id}`
+- `DELETE /api/discovery/seeds/{id}`
+
+## Artists
+
+- `GET /api/artists`
+- `POST /api/artists`
+- `GET /api/artists/{id}`
+- `PUT /api/artists/{id}`
+- `GET /api/artists/{id}/identities`
+- `GET /api/artists/{id}/metrics`
+- `GET /api/artists/{id}/evidence`
+- `GET /api/artists/{id}/releases`
+- `GET /api/artists/{id}/growth`
+- `POST /api/artists/{id}/collect-evidence`
+
+## Analysis
+
+- `GET /api/artists/{id}/analysis`
+- `GET /api/artists/{id}/reviews`
+- `POST /api/artists/{id}/reviews`
+- `GET /api/artists/{id}/comparison`
+
+## Recommendations
+
+- `GET /api/recommendations`
+- `GET /api/recommendations/{id}`
+- `POST /api/recommendations/recalculate`
+- `GET /api/artists/{id}/decisions`
+- `POST /api/artists/{id}/decisions`
+
+## Settings and providers
+
+- `GET /api/sources`
+- `PUT /api/sources`
+- `POST /api/sources/{id}/test`
+- `DELETE /api/sources/{id}/credentials`
+- `GET /api/settings`
+- `PUT /api/settings`
+- `GET /api/settings/scoring`
+- `PUT /api/settings/scoring`
+- `GET /api/settings/automation`
+- `PUT /api/settings/automation`
+
+Implement the exact route contracts needed by the frontend.
+
+Do not leave unused routes or non-functional placeholders.
+
+---
+
+# 15. FRONTEND ARCHITECTURE AND FILE STRUCTURE
+
+Use the existing frontend as the starting point.
+
+The preferred frontend stack is:
+
+- React.
+- Vite.
+- TypeScript for new and substantially refactored modules.
+- Modern CSS using central design tokens.
+- A well-structured charting library.
+- React Router if routing is needed.
+- TanStack Query or an equivalent data-fetching/cache layer.
+- React Hook Form and Zod or equivalent validation where appropriate.
+
+Do not blindly upgrade every dependency.
+
+Keep the installed versions unless an upgrade solves a real problem.
+
+Migrate existing JSX to TypeScript in controlled, testable batches. Do not leave a half-migrated parallel frontend.
+
+Suggested organisation:
+
+```text
+frontend/
+├── public/
+│   ├── favicon.svg
+│   └── assets/
+│
+├── src/
+│   ├── app/
+│   │   ├── App.tsx
+│   │   ├── router.tsx
+│   │   ├── providers.tsx
+│   │   └── queryClient.ts
+│   │
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── AppShell.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── Topbar.tsx
+│   │   │   ├── PageHeader.tsx
+│   │   │   └── WorkspaceFooter.tsx
+│   │   │
+│   │   ├── ui/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Badge.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   ├── Drawer.tsx
+│   │   │   ├── DataTable.tsx
+│   │   │   ├── SearchInput.tsx
+│   │   │   ├── Select.tsx
+│   │   │   ├── Tabs.tsx
+│   │   │   ├── Tooltip.tsx
+│   │   │   ├── EmptyState.tsx
+│   │   │   ├── LoadingState.tsx
+│   │   │   └── ErrorState.tsx
+│   │   │
+│   │   ├── charts/
+│   │   │   ├── TrendChart.tsx
+│   │   │   ├── GrowthChart.tsx
+│   │   │   ├── DistributionChart.tsx
+│   │   │   └── ComparisonChart.tsx
+│   │   │
+│   │   └── artists/
+│   │       ├── ArtistAvatar.tsx
+│   │       ├── ArtistCard.tsx
+│   │       └── ArtistIdentityLinks.tsx
+│   │
+│   ├── features/
+│   │   ├── discovery/
+│   │   │   ├── DiscoveryPage.tsx
+│   │   │   ├── DiscoveryOverview.tsx
+│   │   │   ├── DiscoverySearch.tsx
+│   │   │   ├── DiscoveryFilters.tsx
+│   │   │   ├── CandidateList.tsx
+│   │   │   ├── CandidateCard.tsx
+│   │   │   ├── CandidateReview.tsx
+│   │   │   ├── DiscoveryRunPanel.tsx
+│   │   │   └── DiscoveryHistory.tsx
+│   │   │
+│   │   ├── analyse/
+│   │   │   ├── AnalysePage.tsx
+│   │   │   ├── ArtistDirectory.tsx
+│   │   │   ├── ArtistProfile.tsx
+│   │   │   ├── PerformanceOverview.tsx
+│   │   │   ├── PlatformMetrics.tsx
+│   │   │   ├── GrowthAnalysis.tsx
+│   │   │   ├── ReleaseTimeline.tsx
+│   │   │   ├── AudienceAnalysis.tsx
+│   │   │   ├── EvidencePanel.tsx
+│   │   │   ├── ArtisticReview.tsx
+│   │   │   └── ArtistComparison.tsx
+│   │   │
+│   │   ├── recommendations/
+│   │   │   ├── RecommendationsPage.tsx
+│   │   │   ├── RecommendationOverview.tsx
+│   │   │   ├── RecommendationBoard.tsx
+│   │   │   ├── RecommendationCard.tsx
+│   │   │   ├── ScoreBreakdown.tsx
+│   │   │   ├── DecisionDialog.tsx
+│   │   │   └── DecisionHistory.tsx
+│   │   │
+│   │   └── settings/
+│   │       ├── SettingsPage.tsx
+│   │       ├── SourceDirectory.tsx
+│   │       ├── ProviderCard.tsx
+│   │       ├── ProviderConfiguration.tsx
+│   │       ├── ProviderStatus.tsx
+│   │       ├── AutomationSettings.tsx
+│   │       ├── DiscoverySeedManager.tsx
+│   │       ├── ScoringSettings.tsx
+│   │       └── WorkspacePreferences.tsx
+│   │
+│   ├── hooks/
+│   │   ├── useArtists.ts
+│   │   ├── useDiscovery.ts
+│   │   ├── useRecommendations.ts
+│   │   ├── useSources.ts
+│   │   └── useAutomationStatus.ts
+│   │
+│   ├── services/
+│   │   ├── apiClient.ts
+│   │   ├── discoveryApi.ts
+│   │   ├── artistsApi.ts
+│   │   ├── recommendationsApi.ts
+│   │   ├── settingsApi.ts
+│   │   └── automationApi.ts
+│   │
+│   ├── types/
+│   │   ├── artist.ts
+│   │   ├── discovery.ts
+│   │   ├── provider.ts
+│   │   ├── recommendation.ts
+│   │   └── automation.ts
+│   │
+│   ├── utils/
+│   │   ├── dates.ts
+│   │   ├── numbers.ts
+│   │   ├── formatting.ts
+│   │   └── validation.ts
+│   │
+│   └── styles/
+│       ├── tokens.css
+│       ├── globals.css
+│       ├── layout.css
+│       ├── components.css
+│       ├── discovery.css
+│       ├── analyse.css
+│       ├── recommendations.css
+│       ├── settings.css
+│       └── responsive.css
+│
+├── tests/
+├── package.json
+├── package-lock.json
+├── tsconfig.json
+├── vite.config.ts
+├── Dockerfile
+└── nginx.conf
+```
+
+Adapt this tree to the existing repository where appropriate.
+
+Do not create empty files just to match the tree.
+
+Every component must have a clear responsibility.
+
+Keep API calls out of presentation components.
+
+Keep large business calculations out of JSX.
+
+Use reusable hooks and typed response models.
+
+---
+
+# 16. BACKEND ARCHITECTURE AND FILE STRUCTURE
+
+Preferred stack:
+
+- Python 3.12 or compatible version supported by the repository.
+- FastAPI.
+- Pydantic 2.
+- SQLAlchemy 2.
+- PostgreSQL.
+- Alembic.
+- httpx.
+- Cryptography for provider secrets.
+- pytest.
+- A separate worker process.
+- Structured logging.
+
+Suggested structure:
+
+```text
+backend/
+├── app/
+│   ├── main.py
+│   │
+│   ├── core/
+│   │   ├── config.py
+│   │   ├── security.py
+│   │   ├── logging.py
+│   │   └── exceptions.py
+│   │
+│   ├── db/
+│   │   ├── session.py
+│   │   ├── base.py
+│   │   └── migrations/
+│   │
+│   ├── models/
+│   │   ├── user.py
+│   │   ├── workspace.py
+│   │   ├── artist.py
+│   │   ├── identity.py
+│   │   ├── observation.py
+│   │   ├── evidence.py
+│   │   ├── provider.py
+│   │   ├── discovery.py
+│   │   ├── recommendation.py
+│   │   ├── review.py
+│   │   └── automation.py
+│   │
+│   ├── schemas/
+│   │   ├── artist.py
+│   │   ├── discovery.py
+│   │   ├── provider.py
+│   │   ├── settings.py
+│   │   ├── recommendation.py
+│   │   └── automation.py
+│   │
+│   ├── api/
+│   │   ├── router.py
+│   │   └── routes/
+│   │       ├── health.py
+│   │       ├── auth.py
+│   │       ├── artists.py
+│   │       ├── discovery.py
+│   │       ├── analysis.py
+│   │       ├── recommendations.py
+│   │       ├── sources.py
+│   │       ├── settings.py
+│   │       └── automation.py

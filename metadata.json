@@ -1,0 +1,6 @@
+{
+  "name": "Breakout Radar - A&R Intelligence",
+  "description": "Autonomous A&R intelligence platform to discover emerging music artists, analyze multi-platform growth, and generate explainable recommendations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
