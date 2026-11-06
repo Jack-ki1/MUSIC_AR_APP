@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "Artist": {
+      "title": "Artist",
+      "description": "Discovered emerging music artist profile, scoring models, and acoustic telemetry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "primaryGenre": { "type": "string" },
+        "country": { "type": "string" },
+        "city": { "type": "string" },
+        "discoveryScore": { "type": "number" },
+        "artisticScore": { "type": "number" },
+        "combinedScore": { "type": "number" },
+        "recommendationTier": { "type": "string" },
+        "stage": { "type": "string" },
+        "monthlyListeners": { "type": "number" },
+        "organicConfidence": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "discoveryScore"]
+    },
+    "Decision": {
+      "title": "Decision",
+      "description": "Formal A&R committee assessment and signing decision.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "artistId": { "type": "string" },
+        "decision": { "type": "string" },
+        "decisionMaker": { "type": "string" },
+        "rationale": { "type": "string" },
+        "dealType": { "type": "string" },
+        "recommendedAdvanceUsd": { "type": "number" },
+        "followUpDate": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "artistId", "decision", "decisionMaker"]
+    },
+    "DiscoveryScan": {
+      "title": "DiscoveryScan",
+      "description": "Audit record of autonomous discovery loop scan run.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "query": { "type": "string" },
+        "region": { "type": "string" },
+        "candidatesCount": { "type": "number" },
+        "durationMs": { "type": "number" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "timestamp", "candidatesCount"]
+    },
+    "WorkspaceConfig": {
+      "title": "WorkspaceConfig",
+      "description": "Configurable search regions, genres, seeds, and scoring weights.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "loopIntervalMinutes": { "type": "number" },
+        "isAutonomousActive": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id"]
+    }
+  },
+  "firestore": {
+    "/artists/{artistId}": {
+      "schema": "Artist",
+      "description": "Catalog of discovered emerging artists."
+    },
+    "/decisions/{decisionId}": {
+      "schema": "Decision",
+      "description": "A&R Committee decisions on artist pursuits."
+    },
+    "/discoveryScans/{scanId}": {
+      "schema": "DiscoveryScan",
+      "description": "History of autonomous discovery search iterations."
+    },
+    "/settings/{settingId}": {
+      "schema": "WorkspaceConfig",
+      "description": "Team workspace configuration parameters."
+    }
+  }
+}

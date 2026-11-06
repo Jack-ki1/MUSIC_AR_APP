@@ -2,8 +2,55 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Helper functions for validating documents
+    function isValidArtist(data) {
+      return data.keys().hasAll(['id', 'name', 'discoveryScore']) &&
+             data.name is string && data.name.size() > 0 &&
+             data.discoveryScore is number;
+    }
+
+    function isValidDecision(data) {
+      return data.keys().hasAll(['id', 'artistId', 'decision', 'decisionMaker']) &&
+             data.decision is string && data.decision.size() > 0 &&
+             data.decisionMaker is string && data.decisionMaker.size() > 0;
+    }
+
+    function isValidScan(data) {
+      return data.keys().hasAll(['id', 'timestamp', 'candidatesCount']) &&
+             data.candidatesCount is number;
+    }
+
+    // Emerging Artist Catalog
+    match /artists/{artistId} {
+      allow read: if true;
+      allow create, update: if isValidArtist(request.resource.data);
+      allow delete: if true;
+    }
+
+    // A&R Decisions Ledger
+    match /decisions/{decisionId} {
+      allow read: if true;
+      allow create, update: if isValidDecision(request.resource.data);
+      allow delete: if true;
+    }
+
+    // Autonomous Discovery Scans Log
+    match /discoveryScans/{scanId} {
+      allow read: if true;
+      allow create, update: if isValidScan(request.resource.data);
+      allow delete: if true;
+    }
+
+    // Workspace & Region/Genre Configuration
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Default deny for all unspecified collections
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

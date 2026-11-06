@@ -12,7 +12,13 @@ import {
   getInitialVerifiedUpcomingArtists,
   isLegacyMainstream
 } from './services/realMusicApi';
-import { WorkspaceSection } from './types';
+import { 
+  syncArtistToFirestore, 
+  batchSyncArtistsToFirestore, 
+  loadArtistsFromFirestore, 
+  saveDecisionToFirestore 
+} from './services/firestoreSync';
+import { WorkspaceSection, ARDecision } from './types';
 import { Check } from 'lucide-react';
 
 function cleanAndDeduplicateArtists(artists: RealArtistData[]): RealArtistData[] {
@@ -166,13 +172,22 @@ export default function App() {
     localStorage.setItem('breakout_radar_real_artists', JSON.stringify(realArtists));
   }, [realArtists]);
 
-  // Initial live discovery fetch if empty
+  // Initial live discovery fetch and Firestore sync on mount
   useEffect(() => {
+    // 1. Fetch any cloud-persisted artists from Firestore
+    loadArtistsFromFirestore().then(cloudArtists => {
+      if (cloudArtists && cloudArtists.length > 0) {
+        setRealArtists(prev => cleanAndDeduplicateArtists([...cloudArtists, ...prev]));
+      }
+    }).catch(err => console.warn('[App] Cloud load error:', err));
+
+    // 2. Initial discovery if empty
     if (realArtists.length === 0) {
       runRealAutonomousDiscovery(regions, genres).then(results => {
         if (results.length > 0) {
           setRealArtists(results);
           setSelectedArtist(results[0]);
+          batchSyncArtistsToFirestore(results);
         }
       });
     } else if (!selectedArtist && realArtists.length > 0) {
@@ -185,6 +200,8 @@ export default function App() {
       const combined = cleanAndDeduplicateArtists([...newArtists, ...prev]);
       return combined;
     });
+    // Cloud persist to Firestore in background
+    batchSyncArtistsToFirestore(newArtists);
     showToast(`Autonomous scan complete: ${newArtists.length} real artists parsed!`);
   };
 
@@ -198,17 +215,32 @@ export default function App() {
       else if (combined >= 75) tier = 'WATCH';
       else tier = 'MORE_EVIDENCE';
 
-      return {
+      const updated: RealArtistData = {
         ...a,
         artisticScore,
         combinedScore: combined,
         recommendationTier: tier,
       };
+
+      // Persist to Firestore
+      syncArtistToFirestore(updated);
+
+      return updated;
     }));
     showToast('A&R Assessment score successfully updated!');
   };
 
   const handleRecordDecision = (artistId: string, decision: string, notes: string) => {
+    const newDecision: ARDecision = {
+      id: `dec-${Date.now()}`,
+      artistId,
+      decision,
+      decisionMaker: 'Workspace Operator (A&R Team)',
+      rationale: notes || 'Reviewed against AVM 4-pillar scorecard and multi-platform telemetry.',
+      followUpDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
+      createdAt: new Date().toISOString()
+    };
+    saveDecisionToFirestore(newDecision);
     showToast(`Decision recorded: ${decision}`);
   };
 
