@@ -227,24 +227,24 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold tracking-wider text-[#7155F5] uppercase">
+          <span className="text-xs font-black tracking-wider text-[#3B6CFF] uppercase bg-[#DFE9FF] px-3 py-1 rounded-full">
             ARTISTIC VALUE MODEL (AVM) · 4-PILLAR DEEP DIVE
           </span>
-          <h1 className="text-xl font-extrabold text-[#0F172A] tracking-tight mt-0.5">
-            A&R Intelligence: {activeArtist.name}
+          <h1 className="text-2xl font-black text-[#0B1530] tracking-tight mt-1.5">
+            A&R Intelligence Dossier: {activeArtist.name}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5 max-w-2xl">
+          <p className="text-xs text-[#5F6B8A] mt-0.5 max-w-2xl leading-relaxed">
             Signal processing on isolated stems: vocal tessitura, pitch holding accuracy, multilingual writing arc, energy curve fit, and production polish headroom.
           </p>
         </div>
 
         {/* High Potential, Low Production Tag Banner */}
         {rollup?.highPotentialCount > 0 && (
-          <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FEF3C7] border border-[#F59E0B]/40 text-[#B45309] text-xs font-bold shadow-2xs">
-            <Sparkles className="w-4 h-4 text-[#D97706]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#EFFBC4] border border-[#C8F51F] text-[#0B1530] text-xs font-black shadow-xs">
+            <Sparkles className="w-4 h-4 text-[#FF8A3D]" />
             <div>
               <span>High Potential, Low Production Tag</span>
-              <p className="text-[10px] font-normal text-[#92400E]">Exceptional songwriting/vocal talent exceeds studio polish (Best A&R Alpha)</p>
+              <p className="text-[10px] font-medium text-[#5F6B8A]">Exceptional songwriting/vocal talent exceeds studio polish (Best A&R Alpha)</p>
             </div>
           </div>
         )}
@@ -253,28 +253,28 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
       {/* 2-Column Responsive Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Upcoming Artist Directory (4 cols) */}
-        <div className="lg:col-span-4 bg-white border border-[#E5E9F3] rounded-2xl p-4 shadow-2xs space-y-3">
+        <div className="lg:col-span-4 glass p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
+            <h3 className="text-xs font-black text-[#0B1530] uppercase tracking-wider">
               Upcoming Candidates ({filteredArtists.length})
             </h3>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#ECFDF5] text-[#059669]">
+            <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-[#ECFDF5] text-[#12B76A] border border-[#12B76A]/30">
               Underground / Indie
             </span>
           </div>
 
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-[#94A3B8] absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#5F6B8A] absolute left-3.5 top-2.5" />
             <input
               type="text"
               placeholder="Filter upcoming artists..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:border-[#7155F5]"
+              className="w-full bg-white/90 border border-[rgba(120,140,190,0.25)] rounded-full pl-9 pr-3.5 py-1.5 text-xs text-[#0B1530] placeholder-[#5F6B8A] focus:outline-none focus:border-[#3B6CFF] shadow-2xs"
             />
           </div>
 
-          <div className="space-y-1.5 max-h-[700px] overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-[700px] overflow-y-auto pr-1">
             {filteredArtists.map((artist, aIdx) => {
               const isSelected = artist.id === activeArtist.id;
               const hasHighPot = artist.avmRollup?.highPotentialCount > 0;
@@ -289,38 +289,44 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
                     setOverrideSong(null);
                     setOverrideComp(null);
                   }}
-                  className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                  className={`p-3 rounded-2xl border cursor-pointer transition-all flex items-center justify-between ${
                     isSelected
-                      ? 'bg-[#F5F3FF] border-[#7155F5] text-[#5425D5] shadow-xs'
-                      : 'bg-white hover:bg-[#F8FAFC] border-[#E2E8F0]'
+                      ? 'bg-white border-[#3B6CFF] text-[#0B1530] shadow-[0_14px_34px_-16px_rgba(59,92,170,0.35),inset_0_1px_0_#fff] ring-2 ring-[#3B6CFF]/30'
+                      : 'bg-white/70 hover:bg-white border-[rgba(120,140,190,0.2)]'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <img
                       src={artist.avatarUrl}
                       alt={artist.name}
-                      className="w-10 h-10 rounded-xl object-cover border border-[#E2E8F0]"
+                      className="w-10 h-10 rounded-xl object-cover border border-[rgba(120,140,190,0.25)] shadow-2xs"
                     />
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-[#0F172A]">{artist.name}</span>
+                        <span className="text-xs font-extrabold text-[#0B1530]">{artist.name}</span>
                         {hasHighPot && (
-                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#FEF3C7] text-[#B45309] font-bold">
+                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-[#EFFBC4] text-[#0B1530] font-black">
                             High Pot
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-[#64748B]">
+                      <p className="text-[10px] text-[#5F6B8A]">
                         {artist.city}, {artist.country} • {artist.tracks.length} releases
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-xs font-black font-mono text-[#0F172A] block">
+                    <span className="text-xs font-black font-mono text-[#0B1530] block">
                       AAV {artist.avmRollup ? artist.avmRollup.aav : (artist.artisticScore * 20).toFixed(1)}
                     </span>
-                    <span className="text-[9px] font-bold text-[#7155F5]">
+                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.2 rounded-full ${
+                      artist.recommendationTier === 'PURSUE'
+                        ? 'pill-sign'
+                        : artist.recommendationTier === 'MEET'
+                        ? 'pill-investigate'
+                        : 'pill-monitor'
+                    }`}>
                       {artist.recommendationTier}
                     </span>
                   </div>
@@ -333,50 +339,54 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
         {/* Right Column: Deep Song Dive & AVM Analysis (8 cols) */}
         <div className="lg:col-span-8 space-y-5">
           {/* Artist Rollup Card (AAV, Median, P75, Consistency, Trajectory) */}
-          <div className="bg-white border border-[#E5E9F3] rounded-2xl p-6 shadow-2xs space-y-4">
+          <div className="glass p-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <img
                   src={activeArtist.avatarUrl}
                   alt={activeArtist.name}
-                  className="w-16 h-16 rounded-2xl object-cover border border-[#E2E8F0] shadow-xs"
+                  className="w-16 h-16 rounded-2xl object-cover border border-[rgba(120,140,190,0.25)] shadow-xs"
                 />
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-xl font-extrabold text-[#0F172A]">{activeArtist.name}</h2>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#EEF2FF] text-[#4338CA] font-bold border border-[#C7D2FE]">
+                    <h2 className="text-xl font-black text-[#0B1530]">{activeArtist.name}</h2>
+                    <span className="text-xs px-3 py-0.5 rounded-full bg-[#DFE9FF] text-[#3B6CFF] font-extrabold border border-[#3B6CFF]/30">
                       {activeArtist.primaryGenre}
                     </span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#ECFDF5] text-[#059669] font-extrabold border border-[#A7F3D0]">
+                    <span className={`text-xs px-3 py-0.5 rounded-full font-black uppercase tracking-wider ${
+                      activeArtist.recommendationTier === 'PURSUE'
+                        ? 'pill-sign'
+                        : activeArtist.recommendationTier === 'MEET'
+                        ? 'pill-investigate'
+                        : 'pill-monitor'
+                    }`}>
                       {activeArtist.recommendationTier}
                     </span>
                   </div>
-                  <p className="text-xs text-[#64748B] mt-1">
+                  <p className="text-xs text-[#5F6B8A] mt-1 font-medium">
                     {activeArtist.city}, {activeArtist.country} • Stage: {activeArtist.stage} • {activeArtist.tracks.length} verified songs in catalog
                   </p>
                 </div>
               </div>
 
               {/* Action & AAV Score Block */}
-              <div className="flex items-center gap-3 sm:border-l sm:border-[#E2E8F0] sm:pl-4">
+              <div className="flex items-center gap-3 sm:border-l sm:border-[rgba(120,140,190,0.2)] sm:pl-4">
                 <button
                   onClick={() => setActiveTab('dive-in')}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs ${
-                    activeTab === 'dive-in'
-                      ? 'bg-[#0F172A] text-white ring-2 ring-[#7155F5]/40'
-                      : 'bg-[#EEF2FF] text-[#4338CA] hover:bg-[#7155F5] hover:text-white border border-[#C7D2FE]'
+                  className={`btn-blue text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                    activeTab === 'dive-in' ? 'ring-2 ring-[#C8F51F]' : ''
                   }`}
                 >
-                  <BarChart3 className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <BarChart3 className="w-3.5 h-3.5 text-[#C8F51F]" />
                   <span>Dive In</span>
                 </button>
 
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                  <span className="text-[10px] font-bold text-[#5F6B8A] uppercase tracking-wider block">
                     Artist Value (AAV)
                   </span>
-                  <div className="text-2xl font-black text-[#7155F5] font-mono">
-                    {rollup ? rollup.aav : 82.0} <span className="text-xs font-normal text-[#64748B]">/ 100</span>
+                  <div className="text-2xl font-black text-[#7C5CFF] font-mono">
+                    {rollup ? rollup.aav : 82.0} <span className="text-xs font-normal text-[#5F6B8A]">/ 100</span>
                   </div>
                 </div>
               </div>
@@ -384,42 +394,42 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
             {/* AVM Step 4 Rollup Metrics Grid */}
             {rollup && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#F1F5F9] text-xs">
-                <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                  <span className="text-[10px] text-[#64748B] font-semibold block">Median TAV (50%)</span>
-                  <span className="text-sm font-black text-[#0F172A] font-mono">{rollup.medianTAV}</span>
-                  <p className="text-[9px] text-[#94A3B8]">Central catalog quality</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[rgba(120,140,190,0.18)] text-xs">
+                <div className="p-3.5 rounded-2xl bg-white/80 border border-[rgba(120,140,190,0.2)] shadow-2xs">
+                  <span className="text-[10px] text-[#5F6B8A] font-bold block">Median TAV (50%)</span>
+                  <span className="text-sm font-black text-[#0B1530] font-mono">{rollup.medianTAV}</span>
+                  <p className="text-[9px] text-[#5F6B8A]">Central catalog quality</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                  <span className="text-[10px] text-[#64748B] font-semibold block">P75 Peak TAV (20%)</span>
-                  <span className="text-sm font-black text-[#2563EB] font-mono">{rollup.p75TAV}</span>
-                  <p className="text-[9px] text-[#94A3B8]">Upper quartile ability</p>
+                <div className="p-3.5 rounded-2xl bg-white/80 border border-[rgba(120,140,190,0.2)] shadow-2xs">
+                  <span className="text-[10px] text-[#5F6B8A] font-bold block">P75 Peak TAV (20%)</span>
+                  <span className="text-sm font-black text-[#3B6CFF] font-mono">{rollup.p75TAV}</span>
+                  <p className="text-[9px] text-[#5F6B8A]">Upper quartile ability</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                  <span className="text-[10px] text-[#64748B] font-semibold block">Consistency (15%)</span>
-                  <span className="text-sm font-black text-[#059669] font-mono">{rollup.consistency}</span>
-                  <p className="text-[9px] text-[#94A3B8]">100 - 2 × StdDev</p>
+                <div className="p-3.5 rounded-2xl bg-white/80 border border-[rgba(120,140,190,0.2)] shadow-2xs">
+                  <span className="text-[10px] text-[#5F6B8A] font-bold block">Consistency (15%)</span>
+                  <span className="text-sm font-black text-[#12B76A] font-mono">{rollup.consistency}</span>
+                  <p className="text-[9px] text-[#5F6B8A]">100 - 2 × StdDev</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                  <span className="text-[10px] text-[#64748B] font-semibold block">Trajectory (15%)</span>
-                  <span className="text-sm font-black text-[#D97706] font-mono">{rollup.trajectory}</span>
-                  <p className="text-[9px] text-[#94A3B8]">Slope per release (last 5)</p>
+                <div className="p-3.5 rounded-2xl bg-white/80 border border-[rgba(120,140,190,0.2)] shadow-2xs">
+                  <span className="text-[10px] text-[#5F6B8A] font-bold block">Trajectory (15%)</span>
+                  <span className="text-sm font-black text-[#FF8A3D] font-mono">{rollup.trajectory}</span>
+                  <p className="text-[9px] text-[#5F6B8A]">Slope per release (last 5)</p>
                 </div>
               </div>
             )}
           </div>
 
           {/* Catalog Releases Discography Bar */}
-          <div className="bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3">
+          <div className="glass p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
-                <Flame className="w-4 h-4 text-[#EA580C]" />
+              <h3 className="text-xs font-black text-[#0B1530] uppercase tracking-wider flex items-center gap-2">
+                <Flame className="w-4 h-4 text-[#FF8A3D]" />
                 <span>Catalog Releases & Stems ({activeArtist.tracks.length})</span>
               </h3>
-              <span className="text-xs text-[#64748B]">Click any song to dive into stem facts and waveform</span>
+              <span className="text-xs text-[#5F6B8A] font-medium">Click any song to dive into stem facts and waveform</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -436,10 +446,10 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
                       setOverrideSong(null);
                       setOverrideComp(null);
                     }}
-                    className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                    className={`p-3 rounded-2xl border cursor-pointer transition-all flex items-center justify-between ${
                       isSelected
-                        ? 'bg-[#EEF2FF] border-[#6366F1] shadow-xs'
-                        : 'bg-[#F8FAFC] hover:bg-[#F1F5F9] border-[#E2E8F0]'
+                        ? 'bg-white border-[#3B6CFF] shadow-[0_14px_34px_-16px_rgba(59,92,170,0.35),inset_0_1px_0_#fff] ring-2 ring-[#3B6CFF]/30'
+                        : 'bg-white/70 hover:bg-white border-[rgba(120,140,190,0.2)]'
                     }`}
                   >
                     <div className="flex items-center gap-3 truncate pr-2">
@@ -448,10 +458,10 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
                           e.stopPropagation();
                           handlePlaySong(song);
                         }}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
                           isPlaying
-                            ? 'bg-[#7155F5] text-white shadow-xs'
-                            : 'bg-white text-[#0F172A] border border-[#CBD5E1]'
+                            ? 'bg-[#3B6CFF] text-white shadow-xs'
+                            : 'bg-white text-[#0B1530] border border-[rgba(120,140,190,0.25)]'
                         }`}
                         title={isPlaying ? 'Pause' : 'Play 30s audio preview'}
                       >
@@ -462,20 +472,20 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
                         <img
                           src={song.artworkUrl}
                           alt={song.title}
-                          className="w-9 h-9 rounded-lg object-cover border border-[#E2E8F0] shrink-0"
+                          className="w-9 h-9 rounded-xl object-cover border border-[rgba(120,140,190,0.25)] shrink-0"
                         />
                       )}
 
                       <div className="truncate">
-                        <p className="text-xs font-bold text-[#0F172A] truncate">{song.title}</p>
-                        <p className="text-[10px] text-[#64748B]">
+                        <p className="text-xs font-extrabold text-[#0B1530] truncate">{song.title}</p>
+                        <p className="text-[10px] text-[#5F6B8A]">
                           {song.releaseDate} • {song.collectionName}
                         </p>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <span className="text-xs font-black font-mono text-[#7155F5]">
+                      <span className="text-xs font-black font-mono text-[#3B6CFF]">
                         TAV {song.avm ? song.avm.tav : 80}
                       </span>
                     </div>
@@ -487,54 +497,46 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
           {/* Deep Track Inspection Section */}
           {currentSong && avm && (
-            <div className="bg-white border border-[#E5E9F3] rounded-2xl p-6 shadow-2xs space-y-6">
+            <div className="glass p-6 space-y-6">
               {/* Track Title, Genre Profile, and TAV Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#F1F5F9]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[rgba(120,140,190,0.18)]">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#64748B] uppercase">Inspecting Track:</span>
-                    <span className="text-base font-extrabold text-[#0F172A]">{currentSong.title}</span>
+                    <span className="text-xs font-bold text-[#5F6B8A] uppercase">Inspecting Track:</span>
+                    <span className="text-base font-black text-[#0B1530]">{currentSong.title}</span>
                   </div>
-                  <p className="text-xs text-[#64748B] mt-0.5">
-                    Genre Profile: <strong className="text-[#0F172A]">{avm.genreProfile}</strong> • Confidence Range: [{avm.tavRange[0]} – {avm.tavRange[1]}]
+                  <p className="text-xs text-[#5F6B8A] mt-0.5">
+                    Genre Profile: <strong className="text-[#0B1530]">{avm.genreProfile}</strong> • Confidence Range: [{avm.tavRange[0]} – {avm.tavRange[1]}]
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="p-2 px-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-center">
-                    <span className="text-[10px] text-[#64748B] font-bold block">Production Index</span>
-                    <span className="text-sm font-black text-[#0F172A] font-mono">{avm.productionIndex} / 100</span>
-                    <span className="text-[9px] text-[#059669] font-bold">PB: +{avm.productionBonus} pts</span>
+                  <div className="p-2.5 px-3.5 rounded-2xl bg-white/80 border border-[rgba(120,140,190,0.2)] text-center shadow-2xs">
+                    <span className="text-[10px] text-[#5F6B8A] font-bold block">Production Index</span>
+                    <span className="text-sm font-black text-[#0B1530] font-mono">{avm.productionIndex} / 100</span>
+                    <span className="text-[9px] text-[#12B76A] font-black">PB: +{avm.productionBonus} pts</span>
                   </div>
 
-                  <div className="p-2 px-3 rounded-xl bg-[#F5F3FF] border border-[#7155F5]/30 text-center">
-                    <span className="text-[10px] text-[#5425D5] font-bold block">Track Artistic Value (TAV)</span>
-                    <span className="text-2xl font-black text-[#7155F5] font-mono">{recalculatedTAV}</span>
+                  <div className="p-2.5 px-3.5 rounded-2xl bg-[#EDE7FF] border border-[#7C5CFF]/30 text-center shadow-2xs">
+                    <span className="text-[10px] text-[#7C5CFF] font-black block">Track Artistic Value (TAV)</span>
+                    <span className="text-2xl font-black text-[#7C5CFF] font-mono">{recalculatedTAV}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Navigation Tabs for Deep AVM Exploration */}
-              <div className="flex items-center gap-1 overflow-x-auto border-b border-[#E2E8F0] pb-2 text-xs">
+              {/* Navigation Tabs for Deep AVM Exploration matching .chip */}
+              <div className="flex items-center gap-2 overflow-x-auto border-b border-[rgba(120,140,190,0.2)] pb-3 text-xs">
                 <button
                   onClick={() => setActiveTab('dive-in')}
-                  className={`px-3.5 py-1.5 rounded-xl font-black flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'dive-in'
-                      ? 'bg-[#0F172A] text-white shadow-xs border border-[#334155]'
-                      : 'text-[#7155F5] hover:text-[#0F172A] bg-[#EEF2FF] border border-[#6366F1]/30'
-                  }`}
+                  className={`chip ${activeTab === 'dive-in' ? 'on' : ''} flex items-center gap-1.5`}
                 >
-                  <BarChart3 className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <BarChart3 className="w-3.5 h-3.5 text-[#3B6CFF]" />
                   <span>Dive In (10 D3 Visualizations · 8 KPIs)</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('scorecard')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'scorecard'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'scorecard' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <Award className="w-3.5 h-3.5" />
                   <span>4-Pillar Scorecard</span>
@@ -542,11 +544,7 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
                 <button
                   onClick={() => setActiveTab('vocals')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'vocals'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'vocals' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <Mic2 className="w-3.5 h-3.5" />
                   <span>Vocal Tessitura & Pitch ($P_V$)</span>
@@ -554,11 +552,7 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
                 <button
                   onClick={() => setActiveTab('energy')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'energy'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'energy' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <Activity className="w-3.5 h-3.5" />
                   <span>Energy Curve & Structure ($P_S$)</span>
@@ -566,11 +560,7 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
                 <button
                   onClick={() => setActiveTab('lyrics')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'lyrics'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'lyrics' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <PenTool className="w-3.5 h-3.5" />
                   <span>Lyrics & Code-Switch ($P_W$)</span>
@@ -578,11 +568,7 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
                 <button
                   onClick={() => setActiveTab('composition')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'composition'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'composition' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <Music className="w-3.5 h-3.5" />
                   <span>Composition & Stems ($P_C$)</span>
@@ -590,11 +576,7 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
                 <button
                   onClick={() => setActiveTab('performance')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'performance'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'performance' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <BarChart3 className="w-3.5 h-3.5" />
                   <span>Digital Performance & Growth</span>
@@ -602,11 +584,7 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
                 <button
                   onClick={() => setActiveTab('anomaly')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'anomaly'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'anomaly' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <ShieldAlert className="w-3.5 h-3.5" />
                   <span>Organic vs Bot Audit</span>
@@ -614,11 +592,7 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
                 <button
                   onClick={() => setActiveTab('human-scorecard')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'human-scorecard'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'human-scorecard' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <UserCheck className="w-3.5 h-3.5" />
                   <span>8-Dim A&R Scorecard</span>
@@ -626,11 +600,7 @@ export const AnalyseSection: React.FC<AnalyseSectionProps> = ({
 
                 <button
                   onClick={() => setActiveTab('override')}
-                  className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    activeTab === 'override'
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#64748B] hover:text-[#0F172A] bg-[#F8FAFC]'
-                  }`}
+                  className={`chip ${activeTab === 'override' ? 'on' : ''} flex items-center gap-1.5`}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span>A&R Override / Audit</span>

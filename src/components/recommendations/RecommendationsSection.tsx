@@ -255,27 +255,27 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
   return (
     <div className="space-y-6 pb-28">
       {/* 1. Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-[#E5E9F3] rounded-2xl p-6 shadow-2xs">
+      <div className="glass p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider text-[#7155F5] uppercase bg-[#EEF2FF] px-2.5 py-0.5 rounded-full border border-[#6366F1]/20">
+          <span className="text-[11px] font-black tracking-wider text-[#3B6CFF] uppercase bg-[#DFE9FF] px-3 py-1 rounded-full">
             A&R DECISION SUPPORT & PIPELINE
           </span>
-          <h1 className="text-2xl font-black text-[#0F172A] tracking-tight mt-1">
+          <h1 className="text-2xl font-black text-[#0B1530] tracking-tight mt-1.5">
             Turn Evidence into A&R Signing Decisions
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5 max-w-2xl leading-relaxed">
+          <p className="text-xs text-[#5F6B8A] mt-0.5 max-w-2xl leading-relaxed">
             Prioritise emerging artists using explainable acoustic signals, four-pillar AVM profiles, and documented contractual decision history.
           </p>
         </div>
 
         {/* Top Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {comparisonIds.length > 0 && (
             <button
               onClick={() => setActiveSubTab('comparison')}
-              className="px-3.5 py-2 rounded-xl bg-[#EEF2FF] border border-[#6366F1]/30 text-[#4338CA] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs hover:bg-[#E0E7FF]"
+              className="btn-soft text-xs font-extrabold flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <Scale className="w-3.5 h-3.5" />
+              <Scale className="w-3.5 h-3.5 text-[#3B6CFF]" />
               <span>Compare ({comparisonIds.length})</span>
             </button>
           )}
@@ -287,15 +287,15 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                 setShowExportModal(true);
               }
             }}
-            className="px-3.5 py-2 rounded-xl bg-white border border-[#CBD5E1] text-[#0F172A] hover:bg-[#F8FAFC] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
+            className="btn-soft text-xs font-extrabold flex items-center gap-1.5 cursor-pointer shadow-2xs"
           >
-            <FileText className="w-3.5 h-3.5 text-[#2563EB]" />
+            <FileText className="w-3.5 h-3.5 text-[#3B6CFF]" />
             <span>Executive Dossier</span>
           </button>
 
           <button
             onClick={handleExportDecisionsCsv}
-            className="px-3.5 py-2 rounded-xl bg-[#7155F5] hover:bg-[#5E3EE4] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
+            className="btn-lime text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
@@ -303,99 +303,101 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
         </div>
       </div>
 
-      {/* 2. Top Metric KPI Filter Cards */}
+      {/* 2. Top Metric KPI Pipeline Cards matching .pipe from index.html */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
         <button
           onClick={() => { setSelectedTier('PURSUE'); setActiveSubTab('matrix'); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
             selectedTier === 'PURSUE'
-              ? 'bg-[#ECFDF5] border-[#10B981] shadow-xs'
-              : 'bg-white border-[#E2E8F0] hover:border-[#10B981]/50'
+              ? 'bg-white border-[#7C5CFF] shadow-[0_14px_34px_-16px_rgba(124,92,255,0.4),inset_0_1px_0_#fff] ring-2 ring-[#7C5CFF]/30'
+              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#7C5CFF]/50'
           }`}
         >
-          <span className="text-[10px] font-black text-[#059669] uppercase tracking-wider block">PURSUE</span>
-          <div className="text-xl font-black text-[#0F172A] mt-0.5 font-mono">{pursueCount}</div>
-          <p className="text-[9px] text-[#64748B]">High-conviction signings</p>
+          <span className="w-1 h-6 bg-[#7C5CFF] rounded-r absolute left-0 top-4"></span>
+          <span className="text-[10px] font-black text-[#7C5CFF] uppercase tracking-wider block">PURSUE</span>
+          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{pursueCount}</div>
+          <p className="text-[9px] text-[#5F6B8A]">High-conviction signings</p>
         </button>
 
         <button
           onClick={() => { setSelectedTier('MEET'); setActiveSubTab('matrix'); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
             selectedTier === 'MEET'
-              ? 'bg-[#EEF2FF] border-[#6366F1] shadow-xs'
-              : 'bg-white border-[#E2E8F0] hover:border-[#6366F1]/50'
+              ? 'bg-white border-[#C8F51F] shadow-[0_14px_34px_-16px_rgba(200,245,31,0.5),inset_0_1px_0_#fff] ring-2 ring-[#C8F51F]/40'
+              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#C8F51F]/50'
           }`}
         >
-          <span className="text-[10px] font-black text-[#4338CA] uppercase tracking-wider block">MEET</span>
-          <div className="text-xl font-black text-[#0F172A] mt-0.5 font-mono">{meetCount}</div>
-          <p className="text-[9px] text-[#64748B]">Showcase / Introduction</p>
+          <span className="w-1 h-6 bg-[#C8F51F] rounded-r absolute left-0 top-4"></span>
+          <span className="text-[10px] font-black text-[#0B1530] uppercase tracking-wider block">MEET</span>
+          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{meetCount}</div>
+          <p className="text-[9px] text-[#5F6B8A]">Showcase / Introduction</p>
         </button>
 
         <button
           onClick={() => { setSelectedTier('WATCH'); setActiveSubTab('matrix'); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
             selectedTier === 'WATCH'
-              ? 'bg-[#FFFBEB] border-[#F59E0B] shadow-xs'
-              : 'bg-white border-[#E2E8F0] hover:border-[#F59E0B]/50'
+              ? 'bg-white border-[#3B6CFF] shadow-[0_14px_34px_-16px_rgba(59,92,170,0.35),inset_0_1px_0_#fff] ring-2 ring-[#3B6CFF]/30'
+              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#3B6CFF]/50'
           }`}
         >
-          <span className="text-[10px] font-black text-[#B45309] uppercase tracking-wider block">WATCH</span>
-          <div className="text-xl font-black text-[#0F172A] mt-0.5 font-mono">{watchCount}</div>
-          <p className="text-[9px] text-[#64748B]">Monitor trajectory</p>
+          <span className="w-1 h-6 bg-[#3B6CFF] rounded-r absolute left-0 top-4"></span>
+          <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">WATCH</span>
+          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{watchCount}</div>
+          <p className="text-[9px] text-[#5F6B8A]">Monitor trajectory</p>
         </button>
 
         <button
           onClick={() => { setSelectedTier('MORE_EVIDENCE'); setActiveSubTab('matrix'); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
             selectedTier === 'MORE_EVIDENCE'
-              ? 'bg-[#F8FAFC] border-[#64748B] shadow-xs'
-              : 'bg-white border-[#E2E8F0] hover:border-[#64748B]/50'
+              ? 'bg-white border-[#5F6B8A] shadow-xs ring-2 ring-[#5F6B8A]/30'
+              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#5F6B8A]/50'
           }`}
         >
-          <span className="text-[10px] font-black text-[#475569] uppercase tracking-wider block">EVIDENCE</span>
-          <div className="text-xl font-black text-[#0F172A] mt-0.5 font-mono">{moreEvidenceCount}</div>
-          <p className="text-[9px] text-[#64748B]">Need stems / audio</p>
+          <span className="w-1 h-6 bg-[#5F6B8A] rounded-r absolute left-0 top-4"></span>
+          <span className="text-[10px] font-black text-[#5F6B8A] uppercase tracking-wider block">EVIDENCE</span>
+          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{moreEvidenceCount}</div>
+          <p className="text-[9px] text-[#5F6B8A]">Need stems / audio</p>
         </button>
 
         <button
           onClick={() => { setSelectedTier('HIGH_POTENTIAL'); setActiveSubTab('matrix'); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
             selectedTier === 'HIGH_POTENTIAL'
-              ? 'bg-[#FEF3C7] border-[#D97706] shadow-xs'
-              : 'bg-white border-[#E2E8F0] hover:border-[#D97706]/50'
+              ? 'bg-[#EFFBC4] border-[#C8F51F] shadow-[0_14px_34px_-16px_rgba(200,245,31,0.5),inset_0_1px_0_#fff] ring-2 ring-[#C8F51F]'
+              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#FF8A3D]/50'
           }`}
         >
-          <span className="text-[10px] font-black text-[#B45309] uppercase tracking-wider block flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-[#D97706]" />
+          <span className="w-1 h-6 bg-[#FF8A3D] rounded-r absolute left-0 top-4"></span>
+          <span className="text-[10px] font-black text-[#0B1530] uppercase tracking-wider block flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-[#FF8A3D]" />
             HIGH POTENTIAL
           </span>
-          <div className="text-xl font-black text-[#D97706] mt-0.5 font-mono">{highPotentialCount}</div>
-          <p className="text-[9px] text-[#92400E]">Low Production Gems</p>
+          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{highPotentialCount}</div>
+          <p className="text-[9px] text-[#0B1530] font-semibold">Low Production Gems</p>
         </button>
 
         <button
           onClick={() => { setSelectedTier('ALL'); setActiveSubTab('matrix'); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
             selectedTier === 'ALL'
-              ? 'bg-[#F1F5F9] border-[#0F172A] shadow-xs'
-              : 'bg-white border-[#E2E8F0]'
+              ? 'bg-white border-[#0B1530] shadow-[0_14px_34px_-16px_rgba(11,21,48,0.35),inset_0_1px_0_#fff] ring-2 ring-[#0B1530]/20'
+              : 'bg-white/80 border-[rgba(120,140,190,0.2)]'
           }`}
         >
-          <span className="text-[10px] font-black text-[#0F172A] uppercase tracking-wider block">ALL ROSTER</span>
-          <div className="text-xl font-black text-[#0F172A] mt-0.5 font-mono">{artists.length}</div>
-          <p className="text-[9px] text-[#64748B]">View complete pipeline</p>
+          <span className="w-1 h-6 bg-[#0B1530] rounded-r absolute left-0 top-4"></span>
+          <span className="text-[10px] font-black text-[#0B1530] uppercase tracking-wider block">ALL ROSTER</span>
+          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{artists.length}</div>
+          <p className="text-[9px] text-[#5F6B8A]">View complete pipeline</p>
         </button>
       </div>
 
-      {/* 3. Sub-Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#E2E8F0] pb-2 text-xs">
+      {/* 3. Sub-Navigation Tabs matching .chip in index.html */}
+      <div className="flex items-center gap-2 overflow-x-auto border-b border-[rgba(120,140,190,0.2)] pb-3 text-xs">
         <button
           onClick={() => setActiveSubTab('matrix')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'matrix'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'matrix' ? 'on' : ''} flex items-center gap-2`}
         >
           <TableIcon className="w-3.5 h-3.5" />
           <span>Ranked Priority Matrix ({filteredArtists.length})</span>
@@ -403,11 +405,7 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
         <button
           onClick={() => setActiveSubTab('pipeline-board')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'pipeline-board'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'pipeline-board' ? 'on' : ''} flex items-center gap-2`}
         >
           <Kanban className="w-3.5 h-3.5" />
           <span>A&R Kanban Board</span>
@@ -415,11 +413,7 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
         <button
           onClick={() => setActiveSubTab('decisions')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'decisions'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'decisions' ? 'on' : ''} flex items-center gap-2`}
         >
           <UserCheck className="w-3.5 h-3.5" />
           <span>Committee Decision Ledger ({decisionHistory.length})</span>
@@ -427,11 +421,7 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
         <button
           onClick={() => setActiveSubTab('comparison')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'comparison'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'comparison' ? 'on' : ''} flex items-center gap-2`}
         >
           <Scale className="w-3.5 h-3.5" />
           <span>Comparative Benchmark ({comparisonIds.length})</span>
@@ -439,11 +429,7 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
         <button
           onClick={() => setActiveSubTab('next-actions')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'next-actions'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'next-actions' ? 'on' : ''} flex items-center gap-2`}
         >
           <CheckSquare className="w-3.5 h-3.5" />
           <span>Next-Best-Action Queue</span>
@@ -452,10 +438,10 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
       {/* 4. TAB 1: RANKED PRIORITY MATRIX */}
       {activeSubTab === 'matrix' && (
-        <div className="bg-white border border-[#E5E9F3] rounded-2xl overflow-hidden shadow-2xs">
+        <div className="glass overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#64748B] font-bold uppercase tracking-wider text-[10px]">
+              <thead className="bg-white/60 border-b border-[rgba(120,140,190,0.2)] text-[#5F6B8A] font-bold uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="py-3 px-3 w-8">#</th>
                   <th className="py-3 px-3">Artist Candidate</th>
@@ -467,21 +453,21 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                   <th className="py-3 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9]">
+              <tbody className="divide-y divide-[rgba(120,140,190,0.15)]">
                 {filteredArtists.map((artist, idx) => {
                   const primarySong = artist.tracks[0];
                   const isPlaying = playingSongId === primarySong?.id;
                   const isCompared = comparisonIds.includes(artist.id);
 
                   return (
-                    <tr key={`rec-art-${artist.id}-${idx}`} className="hover:bg-[#F8FAFC] transition-colors">
+                    <tr key={`rec-art-${artist.id}-${idx}`} className="hover:bg-white/50 transition-colors">
                       {/* Compare checkbox & Rank */}
                       <td className="py-3.5 px-3">
                         <input
                           type="checkbox"
                           checked={isCompared}
                           onChange={() => toggleCompareArtist(artist.id)}
-                          className="rounded accent-[#7155F5] cursor-pointer"
+                          className="rounded accent-[#3B6CFF] cursor-pointer"
                           title="Select to compare up to 3 candidates"
                         />
                       </td>
@@ -489,15 +475,15 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                       {/* Artist Details */}
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
-                          <span className="font-extrabold text-sm text-[#94A3B8] w-5">
+                          <span className="font-extrabold text-sm text-[#5F6B8A] w-5">
                             #{idx + 1}
                           </span>
 
                           {primarySong && (
                             <button
                               onClick={() => handlePlaySong(primarySong)}
-                              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
-                                isPlaying ? 'bg-[#7155F5] text-white' : 'bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A]'
+                              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+                                isPlaying ? 'bg-[#3B6CFF] text-white' : 'bg-white text-[#5F6B8A] hover:text-[#0B1530] border border-[rgba(120,140,190,0.25)]'
                               }`}
                               title={isPlaying ? 'Pause' : 'Play 30s preview'}
                             >
@@ -508,14 +494,14 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                           <img
                             src={artist.avatarUrl}
                             alt={artist.name}
-                            className="w-10 h-10 rounded-xl object-cover border border-[#E2E8F0]"
+                            className="w-10 h-10 rounded-xl object-cover border border-[rgba(120,140,190,0.25)] shadow-xs"
                           />
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-[#0F172A] text-sm">{artist.name}</span>
-                              {artist.verified && <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] fill-current" />}
+                              <span className="font-extrabold text-[#0B1530] text-sm">{artist.name}</span>
+                              {artist.verified && <CheckCircle2 className="w-3.5 h-3.5 text-[#3B6CFF] fill-current" />}
                             </div>
-                            <span className="text-[10px] text-[#64748B] block">
+                            <span className="text-[10px] text-[#5F6B8A] block font-medium">
                               {artist.stage} • {artist.primaryGenre}
                             </span>
                           </div>
@@ -524,29 +510,29 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
                       {/* Location */}
                       <td className="py-3.5 px-3">
-                        <span className="font-medium text-[#0F172A]">{artist.city}, {artist.country}</span>
-                        <span className="text-[10px] text-[#64748B] block">
+                        <span className="font-semibold text-[#0B1530]">{artist.city}, {artist.country}</span>
+                        <span className="text-[10px] text-[#5F6B8A] block">
                           {(artist.monthlyListeners / 1000).toFixed(0)}k listeners
                         </span>
                       </td>
 
                       {/* AAV */}
-                      <td className="py-3.5 px-3 font-mono font-bold text-[#7155F5]">
+                      <td className="py-3.5 px-3 font-mono font-black text-[#7C5CFF]">
                         {artist.avmRollup ? artist.avmRollup.aav : (artist.artisticScore * 20).toFixed(1)}
                       </td>
 
                       {/* Discovery */}
-                      <td className="py-3.5 px-3 font-mono font-bold text-[#0F172A]">
+                      <td className="py-3.5 px-3 font-mono font-bold text-[#0B1530]">
                         {artist.discoveryScore.toFixed(1)}
                       </td>
 
                       {/* Combined Score */}
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-black text-base text-[#0F172A]">
+                          <span className="font-mono font-black text-base text-[#0B1530]">
                             {artist.combinedScore.toFixed(1)}
                           </span>
-                          <span className="text-[10px] font-bold text-[#059669]">
+                          <span className="text-[10px] font-black text-[#12B76A]">
                             +{artist.growthSignal30d}%
                           </span>
                         </div>
@@ -555,18 +541,18 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                       {/* Tier & High Potential */}
                       <td className="py-3.5 px-3">
                         <div className="space-y-1">
-                          <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider inline-block ${
+                          <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-block ${
                             artist.recommendationTier === 'PURSUE'
-                              ? 'bg-[#ECFDF5] text-[#059669] border border-[#10B981]/30'
+                              ? 'pill-sign'
                               : artist.recommendationTier === 'MEET'
-                              ? 'bg-[#EEF2FF] text-[#4338CA] border border-[#6366F1]/30'
-                              : 'bg-[#FFFBEB] text-[#B45309] border border-[#F59E0B]/30'
+                              ? 'pill-investigate'
+                              : 'pill-monitor'
                           }`}>
                             {artist.recommendationTier}
                           </span>
 
                           {artist.avmRollup?.highPotentialCount > 0 && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#FEF3C7] text-[#92400E] block w-fit">
+                            <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-[#EFFBC4] text-[#0B1530] block w-fit">
                               High Potential (Low Prod)
                             </span>
                           )}
@@ -578,7 +564,7 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => onSelectArtist(artist)}
-                            className="px-2.5 py-1.5 rounded-lg bg-[#F1F5F9] hover:bg-[#EEF2FF] text-[#475569] hover:text-[#4338CA] font-bold transition-all cursor-pointer"
+                            className="px-3 py-1.5 rounded-full bg-white/80 hover:bg-white text-[#5F6B8A] hover:text-[#0B1530] border border-[rgba(120,140,190,0.25)] font-extrabold transition-all cursor-pointer shadow-2xs"
                             title="Inspect in Analyse section"
                           >
                             Analyse
@@ -586,7 +572,7 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
                           <button
                             onClick={() => handleOpenDecision(artist)}
-                            className="px-3 py-1.5 rounded-lg bg-[#7155F5] hover:bg-[#5E3EE4] text-white font-bold transition-all cursor-pointer shadow-2xs"
+                            className="btn-lime text-xs font-black cursor-pointer shadow-2xs"
                           >
                             Sign Decision
                           </button>

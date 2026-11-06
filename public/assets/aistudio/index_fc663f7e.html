@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Breakout Radar</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--ink:#0B1530;--mut:#5F6B8A;--ln:rgba(120,140,190,.2);--lime:#C8F51F;--blue:#3B6CFF;--vio:#7C5CFF;--cy:#1FB6E8;--org:#FF8A3D;--rose:#F0457A;--grn:#12B76A;--gl:rgba(255,255,255,.72);--sh:0 14px 34px -16px rgba(59,92,170,.35),inset 0 1px 0 #fff}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0)}
+body{margin:0;color:var(--ink);background:#fff;font:500 15px/1.45 "Plus Jakarta Sans",system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 420px at 8% 0,#DCE8FF 0,transparent 70%),radial-gradient(520px 420px at 100% 12%,#E9E2FF 0,transparent 70%),radial-gradient(500px 400px at 60% 100%,#EFFBC4 0,transparent 70%),#fff}
+button{font:inherit;cursor:pointer;border:0;color:inherit;background:none}h1,h2,h3,p{margin:0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--vio);outline-offset:2px}
+.glass{background:var(--gl);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.95);border-radius:24px;box-shadow:var(--sh);padding:20px;min-width:0}
+.btn{padding:12px 22px;border-radius:999px;font-weight:800;background:var(--lime);color:var(--ink);box-shadow:0 8px 20px -8px rgba(160,200,0,.7)}
+.btn.blue{background:linear-gradient(135deg,var(--blue),var(--vio));color:#fff;box-shadow:0 10px 22px -8px rgba(59,108,255,.6)}.btn.soft{background:#fff;box-shadow:var(--sh)}
+.wrap{max-width:1180px;margin:auto;padding:0 24px}
+.lnav{display:flex;justify-content:space-between;align-items:center;padding:20px 0}
+.brand{display:flex;gap:10px;align-items:center;font-weight:800;font-size:18px}.brand i{width:36px;height:36px;border-radius:11px;background:var(--ink);display:grid;place-items:center}
+.big{font-size:clamp(40px,7.4vw,92px);line-height:.95;font-weight:800;letter-spacing:-.04em;text-transform:uppercase;margin:34px 0 18px}
+.big b{display:block;background:linear-gradient(90deg,var(--blue),var(--vio) 60%,var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{max-width:520px;color:var(--mut);font-size:17px;margin-bottom:24px}
+.faces{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:36px 0 12px}
+.face{border-radius:26px;aspect-ratio:3/4;position:relative;overflow:hidden;box-shadow:0 20px 36px -18px rgba(11,21,48,.5);display:grid;place-items:center;color:#fff;font-size:44px;font-weight:800}
+.face img,.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.face figcaption{position:absolute;left:12px;bottom:12px;right:12px;background:rgba(11,21,48,.55);backdrop-filter:blur(8px);border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700;display:flex;justify-content:space-between}
+.lens{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:12px 0 40px}
+.lc{border-radius:28px;padding:28px;color:#fff;min-height:230px;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;text-align:left;box-shadow:0 22px 40px -22px rgba(11,21,48,.55);transition:transform .2s}.lc:hover{transform:translateY(-4px)}
+.lc h3{font-size:30px;font-weight:800;letter-spacing:-.02em}.lc span{opacity:.9}
+.cta{border-radius:32px;background:radial-gradient(500px 300px at 90% 0,#7C5CFF 0,transparent 60%),var(--ink);color:#fff;padding:44px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin:40px 0}
+.cta h2{font-size:clamp(26px,3.6vw,40px);font-weight:800;max-width:560px;letter-spacing:-.03em}.cta em{font-style:normal;color:var(--lime)}
+.app{display:grid;grid-template-columns:240px 1fr;gap:20px;padding:16px;min-height:100vh}
+aside.sb{position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column;gap:6px}
+.sb button.nv{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;font-weight:700;color:var(--mut);text-align:left}
+.sb button.nv.on{background:linear-gradient(135deg,#DFE9FF,#EDE7FF);color:var(--blue);box-shadow:var(--sh)}
+.sb .card2{margin-top:auto;border-radius:18px;padding:14px;background:rgba(255,255,255,.7);box-shadow:var(--sh);font-size:13px}
+.main{min-width:0;display:flex;flex-direction:column;gap:18px}
+.bar0{display:flex;gap:12px;align-items:center}.bar0 input{flex:1;border-radius:999px;border:0;padding:14px 20px;background:var(--gl);box-shadow:var(--sh);font:inherit}
+.greet{display:flex;flex-direction:column;gap:16px;background:linear-gradient(135deg,rgba(223,233,255,.9),rgba(255,255,255,.7))}
+.greet h2{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tile{background:#fff;border-radius:20px;padding:16px;box-shadow:var(--sh)}.tile b{font-size:28px;font-weight:800;display:block}.tile span{color:var(--mut);font-size:13px}
+.up{color:var(--grn);font-weight:800}
+.g{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}.c4{grid-column:span 4}.c5{grid-column:span 5}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+h3.t{font-size:18px;font-weight:800;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.ra{display:grid;grid-template-columns:46px 1.4fr 56px 1fr 112px;gap:14px;align-items:center;padding:10px;border-radius:16px;width:100%;text-align:left}.ra:hover{background:rgba(255,255,255,.85)}
+.av{width:44px;height:44px;border-radius:50%;position:relative;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;border:2px solid #fff;box-shadow:0 4px 10px -4px rgba(11,21,48,.4);flex:none}
+.sub{color:var(--mut);font-size:13px}
+.pill{padding:7px 14px;border-radius:999px;font-weight:800;font-size:13px;text-align:center;display:inline-block}
+.Sign{background:var(--vio);color:#fff}.Investigate{background:var(--lime);color:var(--ink)}.Monitor{background:#DDF1FF;color:#0A6F96}.Watch{background:#ECEFF6;color:var(--mut)}
+.mini{height:8px;border-radius:9px;background:#E6EBF7;overflow:hidden}.mini i{display:block;height:100%;border-radius:9px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.chip{padding:9px 16px;border-radius:999px;background:#fff;font-weight:700;color:var(--mut);box-shadow:var(--sh)}.chip.on{background:var(--blue);color:#fff}
+.qa{display:flex;gap:12px;align-items:center;padding:11px;border-radius:16px;background:#fff;box-shadow:var(--sh);margin-bottom:10px;width:100%;text-align:left}.qa i{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-style:normal;background:#E8EEFF}
+.br{display:grid;grid-template-columns:84px 1fr 34px;gap:10px;align-items:center;margin:11px 0;font-size:14px}
+.drawer{position:fixed;inset:12px 12px 12px auto;width:min(440px,calc(100% - 24px));z-index:20;overflow:auto;animation:in .25s ease;background:rgba(255,255,255,.92)}
+@keyframes in{from{transform:translateX(30px);opacity:0}}.scrim{position:fixed;inset:0;background:rgba(11,21,48,.4);z-index:19}
+.x{float:right;width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:var(--sh)}
+.why{list-style:none;padding:0;margin:8px 0 14px}.why li{padding:6px 0 6px 26px;position:relative}.why li:before{content:"✓";position:absolute;left:0;color:var(--grn);font-weight:800}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.pk{border-radius:28px;padding:22px;color:#fff;display:flex;flex-direction:column;gap:12px;min-height:300px;position:relative;overflow:hidden;box-shadow:0 22px 40px -22px rgba(11,21,48,.6)}
+.pk .av{width:84px;height:84px;font-size:26px}.pk .why li:before{color:var(--lime)}
+.pipe{display:flex;gap:10px;overflow-x:auto}.pipe div{flex:1;min-width:96px;background:#fff;border-radius:18px;padding:14px;text-align:center;box-shadow:var(--sh)}.pipe b{display:block;font-size:26px}.pipe div:last-child{background:var(--lime)}
+.set{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--ln)}.set:last-child{border:0}
+.sw{width:48px;height:28px;border-radius:99px;background:#CBD3E4;position:relative;flex:none}.sw.on{background:var(--blue)}.sw:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}.sw.on:after{left:23px}
+.lg{display:grid;grid-template-columns:1.1fr 1fr;min-height:100vh}.lg .l{background:radial-gradient(500px 400px at 80% 10%,#7C5CFF 0,transparent 60%),radial-gradient(500px 400px at 10% 100%,#F0457A 0,transparent 55%),var(--ink);color:#fff;padding:56px;display:flex;flex-direction:column;justify-content:flex-end}
+.lg h1{font-size:clamp(34px,4.6vw,60px);line-height:1;font-weight:800;letter-spacing:-.03em;text-transform:uppercase}.lg h1 b{color:var(--lime);display:block}
+.lg .r{display:grid;place-items:center;padding:28px}.lg form{width:min(380px,100%);display:grid;gap:14px}
+input,select{width:100%;padding:14px 18px;border-radius:16px;border:1.5px solid var(--ln);font:inherit;background:#fff}
+@media(max-width:960px){.app{grid-template-columns:1fr;padding:10px}aside.sb{position:static;height:auto;flex-direction:row;overflow-x:auto;padding:10px}.sb .brand,.sb .card2{display:none}.sb .nv{white-space:nowrap}.tiles{grid-template-columns:repeat(2,1fr)}.c4,.c5,.c7,.c8{grid-column:span 12}.picks,.lens{grid-template-columns:1fr}.faces{grid-template-columns:repeat(2,1fr)}.ra{grid-template-columns:44px 1fr 56px 100px}.ra .hd{display:none}.lg{grid-template-columns:1fr}.lg .l{padding:32px;min-height:240px}.cta{padding:28px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div id="root"></div>
+<script>
+const D=['Songwriting','Vocals','Key & harmony','Production','Originality','Live'],COL=['#7C5CFF','#3B6CFF','#FF8A3D','#12B76A','#F0457A','#1FB6E8','#C026D3','#5B6CFF'],
+GR=[['#7C5CFF','#3B6CFF'],['#FF8A3D','#F0457A'],['#12B76A','#1FB6E8'],['#3B6CFF','#1FB6E8'],['#F0457A','#7C5CFF']];
+const FB=[['Nia Kamau','Kenya','R&B / Soul',92,186,94,[88,90,84,80,86,78],28.4,'women/44'],['Sage Mwangi','Kenya','Afrobeat',88,142,89,[80,84,78,86,82,88],16.7,'men/52'],['Khalil Ouma','Uganda','Hip-Hop',85,121,86,[90,70,66,74,87,72],42.1,'men/75'],['Amara Tesha','Tanzania','Afro-Pop',83,118,90,[76,90,80,72,70,84],19.8,'women/65'],['Jabari Nkusi','Rwanda','R&B',79,104,88,[74,78,82,70,68,60],12.5,'men/41'],['Zuri Adeyemi','Ghana','Alté',77,96,84,[70,72,74,80,92,66],9.4,'women/68'],['Zawadi Otieno','Kenya','Gengetone',75,90,82,[68,72,70,76,74,80],8.8,'women/21'],['Chidi Okeke','Nigeria','Amapiano',74,88,70,[66,70,72,84,76,78],21.3,'men/17']].map((r,i)=>({id:i,n:r[0],cn:r[1],gn:r[2],g:r[3],gr:r[4],real:r[5],art:r[6],l:r[7],img:'https://randomuser.me/api/portraits/'+r[8]+'.jpg'}));
+const st={v:'land',page:'home',sel:0,open:null,flt:'All',q:'',acc:{},rev:{},run:0,set:{sweep:1,alerts:1,ads:0},thr:80,tok:null};let A=[];
+const avg=a=>Math.round(a.reduce((x,y)=>x+y)/a.length),ACT=s=>s>=90?'Sign':s>=82?'Investigate':s>=75?'Monitor':'Watch';
+function prep(raw){A=raw.map((r,i)=>{const sc=r.score??Math.round(.4*r.g+.2*r.real+.4*avg(r.art)),b=r.art.indexOf(Math.max(...r.art));return{...r,s:sc,a:ACT(sc),col:COL[i%8],h:[...Array(10)].map((_,k)=>Math.round(r.l*(.3+.7*Math.pow(k/9,1.7))*10)/10),why:[`Up ${r.gr}% in 30 days`,`${r.real}% of growth looks organic`,`Strongest craft: ${D[b]}`]}})}
+async function api(p,o={}){try{const r=await fetch(p,{...o,headers:{'Content-Type':'application/json',...(st.tok?{Authorization:'Bearer '+st.tok}:{})}});if(!r.ok)throw 0;return await r.json()}catch(e){return null}}
+const ini=n=>n.split(' ').map(w=>w[0]).join('');
+const av=(a,z)=>`<span class="av" style="${z?`width:${z}px;height:${z}px;`:''}background:linear-gradient(135deg,${a.col},#0B1530)"><span>${ini(a.n)}</span><img src="${a.img}" alt="${a.n}" loading="lazy" onerror="this.remove()"></span>`;
+const ring=(v,c,z=46)=>`<svg width="${z}" height="${z}" viewBox="0 0 36 36" role="img" aria-label="Score ${v}"><circle cx="18" cy="18" r="15.9" fill="none" stroke="#E6EBF7" stroke-width="3.4"/><circle cx="18" cy="18" r="15.9" fill="none" stroke="${c}" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="${v} 100" transform="rotate(-90 18 18)"/><text x="18" y="21.5" text-anchor="middle" font-size="10" font-weight="800" fill="#0B1530">${v}</text></svg>`;
+const line=(h,c,w=420,ht=140)=>{const m=Math.max(...h),p=h.map((v,i)=>[i*w/(h.length-1),ht-8-v/m*(ht-24)]),d=p.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' '),id='g'+c.slice(1);return `<svg viewBox="0 0 ${w} ${ht}" width="100%" role="img" aria-label="Audience trend"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".3"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs><path d="${d} L${w} ${ht} L0 ${ht}Z" fill="url(#${id})"/><path d="${d}" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${p.at(-1)[0]}" cy="${p.at(-1)[1]}" r="5" fill="${c}"/></svg>`};
+const radar=(q,c)=>{const pt=(i,r)=>{const t=-Math.PI/2+i*Math.PI/3;return[110+Math.cos(t)*r,105+Math.sin(t)*r]},po=r=>q.map((_,i)=>pt(i,r).join(',')).join(' ');return `<svg viewBox="-30 0 280 210" width="100%" style="max-width:340px;display:block;margin:auto" role="img" aria-label="Artistry radar">${[20,40,60,80].map(r=>`<polygon points="${po(r)}" fill="none" stroke="#DCE3F3"/>`).join('')}<polygon points="${q.map((v,i)=>pt(i,v*.8).join(',')).join(' ')}" fill="${c}" fill-opacity=".25" stroke="${c}" stroke-width="2.5"/>${q.map((v,i)=>{const[x,y]=pt(i,97);return`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#5F6B8A">${D[i]}</text>`}).join('')}</svg>`};
+const bars=r=>r.map(([l,v,c])=>`<div class="br"><span>${l}</span><div class="mini"><i style="width:${v}%;background:${c}"></i></div><b>${v}</b></div>`).join('');
+const pill=a=>`<span class="pill ${a}">${a}</span>`;
+const row=a=>`<button class="ra" data-open="${a.id}">${av(a)}<span><b>${a.n}</b><br><span class="sub">${a.cn} · ${a.gn}</span></span>${ring(a.s,a.col)}<span class="hd"><span class="up">+${a.gr}%</span><div class="mini"><i style="width:${Math.min(a.gr/2,100)}%;background:${a.col}"></i></div></span>${pill(a.a)}</button>`;
+const logo=`<svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="#C8F51F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8h3l2-6 3 12 3-10 2 4h7"/></svg>`;
+const brand=`<div class="brand"><i>${logo}</i><span>Breakout Radar</span></div>`;
+const lens=[['Discovery','Finds rising artists on its own.','discovery',0],['Analyse','Judges the craft, every week.','analyse',1],['Recommendations','Tells you who to pick.','recommend',2]];
+
+function land(){const F=A.slice(0,5);return `<div class="wrap"><div class="lnav">${brand}<div style="display:flex;gap:10px"><button class="btn soft" data-v="login">Log in</button><button class="btn" data-v="login">Get started</button></div></div>
+<h1 class="big">Find the next big artist<b>before the world does.</b></h1><p class="lead">Real talent, real opportunity. Breakout Radar discovers, judges and ranks rising African artists for you.</p><div style="display:flex;gap:12px"><button class="btn blue" data-v="login">Open the radar</button><button class="btn soft" data-v="login">Watch demo</button></div>
+<div class="faces">${F.map((a,i)=>`<figure class="face" style="margin:0;background:linear-gradient(160deg,${GR[i][0]},${GR[i][1]})"><span>${ini(a.n)}</span><img src="${a.img}" alt="${a.n}" onerror="this.remove()"><figcaption><span>${a.n}</span><span>${a.s}</span></figcaption></figure>`).join('')}</div>
+<h2 style="font-size:28px;font-weight:800;margin:44px 0 16px">Three steps. One radar.</h2><div class="lens">${lens.map((l,i)=>`<button class="lc" data-v="login" style="background:linear-gradient(150deg,${GR[i][0]},${GR[i][1]})"><span>0${i+1}</span><h3>${l[0]}</h3><span>${l[1]}</span></button>`).join('')}</div>
+<div class="glass tiles" style="grid-template-columns:repeat(4,1fr)">${[['1,284','Artists monitored'],['87','New signals'],['34','Breakout candidates'],['12','Ready to review']].map(t=>`<div class="tile"><b>${t[0]}</b><span>${t[1]}</span></div>`).join('')}</div>
+<div class="cta"><h2>Sign the next star <em>before anyone else.</em></h2><button class="btn" data-v="login">Get started</button></div><p class="sub" style="text-align:center;padding-bottom:30px">© 2026 Breakout Radar · Demo data is simulated</p></div>`}
+
+function loginV(){return `<div class="lg"><div class="l">${brand.replace('class="brand"','class="brand" style="color:#fff;margin-bottom:30px"')}<h1>Find the next big artist <b>before the world does.</b></h1></div><div class="r"><form id="lf"><h2 style="font-size:28px;font-weight:800">Welcome back</h2><p class="sub">Sign in to your A&amp;R workspace.</p><input value="scout@label.com" type="email" aria-label="Email"><input value="demo1234" type="password" aria-label="Password"><button class="btn blue" style="padding:15px">Sign in</button><button type="button" class="btn soft" data-v="land">Back</button></form></div></div>`}
+
+function home(){const t=A.slice(0,5),au=avg(A.map(a=>a.real));return `<section class="glass greet"><div><h2>Good morning, Scout 👋</h2><p class="sub">12 artists are ready for your review this week.</p></div><div class="tiles">${[['1,284','Artists monitored','◉'],['87','New signals','⚡'],['34','Breakout candidates','↗'],['12','Ready to review','★']].map(x=>`<div class="tile"><b>${x[0]}</b><span>${x[2]} ${x[1]}</span></div>`).join('')}</div></section>
+<div class="g"><div class="glass c8"><h3 class="t">Today’s breakouts <button class="chip" data-go="discovery">View all</button></h3>${t.map(row).join('')}</div>
+<div class="g c4" style="display:flex;flex-direction:column"><div class="glass"><h3 class="t">Quick actions</h3>${[['◎','Run weekly sweep','sw'],['♫','Review shortlist','analyse'],['★','Open this week’s picks','recommend']].map(q=>`<button class="qa" ${q[2]=='sw'?'id="sw"':`data-go="${q[2]}"`}><i>${q[0]}</i><b>${q[1]}</b></button>`).join('')}</div>
+<div class="glass"><h3 class="t">Real growth</h3><div style="display:flex;gap:16px;align-items:center">${ring(au,'#12B76A',92)}<p class="sub">${au}% of this week’s growth looks organic.</p></div></div></div></div>`}
+
+function discovery(){const cs=['All',...new Set(A.map(a=>a.cn))],L=A.filter(a=>(st.flt=='All'||a.cn==st.flt)&&a.n.toLowerCase().includes(st.q)),by={};A.forEach(a=>by[a.cn]=(by[a.cn]||0)+1);
+return `<div class="glass" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><h2 style="font-size:26px;font-weight:800">Discovery</h2><p class="sub">Weekly sweep across trusted sources.</p></div><button class="btn blue" id="sw">${st.run?'Sweeping…':'Run sweep'}</button></div>
+<div class="tiles">${[['1,284','Scanned'],['87','Flagged'],['34','Candidates'],['12','Shortlisted']].map(x=>`<div class="tile"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
+<div class="g"><div class="glass c7"><h3 class="t">New candidates per week</h3>${line([12,14,13,18,22,21,27,31,30,34],'#3B6CFF',560,170)}</div><div class="glass c5"><h3 class="t">By country</h3>${bars(Object.entries(by).map(([k,v],i)=>[k,v*25,COL[i]]))}</div></div>
+<div class="glass"><h3 class="t">Mapped artists</h3><div class="chips">${cs.map(c=>`<button class="chip ${c==st.flt?'on':''}" data-f="${c}">${c}</button>`).join('')}</div>${L.map(row).join('')||'<p class="sub">No matches.</p>'}</div>`}
+
+function analyse(){const a=A[st.sel],m=avg(a.art);return `<div class="glass"><h2 style="font-size:26px;font-weight:800">Analyse</h2><p class="sub">The craft behind the numbers.</p></div>
+<div class="chips">${A.slice(0,6).map((x,i)=>`<button class="chip ${i==st.sel?'on':''}" data-sel="${i}">${x.n}</button>`).join('')}</div>
+<div class="g"><div class="glass c5"><h3 class="t">Artistry <span class="up">${m}</span></h3>${radar(a.art,a.col)}</div><div class="glass c7"><h3 class="t">Scores</h3>${bars(D.map((d,i)=>[d,a.art[i],a.col]))}</div>
+<div class="glass c8"><h3 class="t">Audience (thousand)</h3>${line(a.h,a.col,640,150)}</div><div class="glass c4" style="background:var(--ink);color:#fff"><h3 class="t">This week</h3><p style="font-size:38px;font-weight:800;color:var(--lime)">+${a.gr}%</p><p class="sub" style="color:#C9D1EA;margin:6px 0 18px">${a.why[2]}</p><button class="btn" id="rv">${st.rev[st.sel]?'Reviewed ✓':'Mark reviewed'}</button></div></div>`}
+
+function recommend(){const t=[...A].sort((x,y)=>y.s-x.s).slice(0,3);return `<div class="glass"><h2 style="font-size:26px;font-weight:800">Recommendations</h2><p class="sub">Who we should pick this week.</p></div>
+<div class="picks">${t.map((a,k)=>`<div class="pk" style="background:linear-gradient(155deg,${GR[k][0]},${GR[k][1]})"><div style="display:flex;justify-content:space-between;align-items:center">${av(a)}<span class="pill ${a.a}">${a.a}</span></div><div><h3 style="font-size:24px;font-weight:800">${a.n}</h3><span style="opacity:.85">${a.cn} · ${a.gn}</span></div><ul class="why">${a.why.map(w=>`<li>${w}</li>`).join('')}</ul><button class="btn" style="margin-top:auto" data-acc="${a.id}">${st.acc[a.id]?'In pipeline ✓':'Add to pipeline'}</button></div>`).join('')}</div>
+<div class="glass"><h3 class="t">Pipeline</h3><div class="pipe">${[['Watch',24],['Investigate',9+Object.keys(st.acc).length],['Contact',5],['Audition',3],['Sign',1]].map(p=>`<div><b>${p[1]}</b>${p[0]}</div>`).join('')}</div></div>
+<div class="glass"><h3 class="t">Also on the radar</h3>${A.slice(3).map(row).join('')}</div>`}
+
+function settings(){const S=(k,l,d)=>`<div class="set"><span><b>${l}</b><br><span class="sub">${d}</span></span><button class="sw ${st.set[k]?'on':''}" role="switch" aria-checked="${!!st.set[k]}" aria-label="${l}" data-sw="${k}"></button></div>`;
+return `<div class="glass"><h2 style="font-size:26px;font-weight:800">Settings</h2><p class="sub">Make the radar work your way.</p></div><div class="g"><div class="glass c5" style="grid-column:span 6"><h3 class="t">Discovery</h3>${S('sweep','Weekly sweep','Every Monday')}${S('ads','Include ad activity','Adds campaign signals')}</div><div class="glass" style="grid-column:span 6"><h3 class="t">Alerts</h3>${S('alerts','Breakout alerts','Email on a high score')}<div class="set"><span><b>Alert score</b><br><span class="sub" id="tl">Notify at ${st.thr}+</span></span><input type="range" min="60" max="95" value="${st.thr}" id="thr" style="width:140px;padding:0" aria-label="Alert score"></div></div></div>`}
+
+function drawer(a){return `<div class="scrim" id="sc"></div><aside class="glass drawer" role="dialog" aria-label="${a.n}"><button class="x" id="cl" aria-label="Close">✕</button><div style="display:flex;gap:14px;align-items:center;margin-bottom:14px">${av(a,68)}<div><h2 style="font-size:24px;font-weight:800">${a.n}</h2><span class="sub">${a.cn} · ${a.gn}</span></div></div><div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">${ring(a.s,a.col,58)}${pill(a.a)}<span class="pill Monitor">${a.real}% organic</span></div>${line(a.h,a.col,380,100)}<h3 style="margin-top:8px">Why now</h3><ul class="why">${a.why.map(w=>`<li>${w}</li>`).join('')}</ul>${radar(a.art,a.col)}<div style="display:flex;gap:10px;margin-top:16px"><button class="btn blue" data-an="${a.id}">Analyse</button><button class="btn" data-acc="${a.id}">${st.acc[a.id]?'In pipeline ✓':'Add to pipeline'}</button></div></aside>`}
+
+const NAV=[['home','Home','⌂'],['discovery','Discovery','◎'],['analyse','Analyse','♫'],['recommend','Recommendations','★'],['settings','Settings','⚙']];
+function render(){const R=document.getElementById('root');let h;
+if(st.v=='land')h=land();else if(st.v=='login')h=loginV();else{const P={home,discovery,analyse,recommend,settings}[st.page]();
+h=`<div class="app"><aside class="glass sb">${brand}<div style="height:14px"></div>${NAV.map(n=>`<button class="nv ${st.page==n[0]?'on':''}" data-go="${n[0]}" ${st.page==n[0]?'aria-current="page"':''}><span aria-hidden="true">${n[2]}</span>${n[1]}</button>`).join('')}<div class="card2"><b>Weekly sweep</b><br><span class="sub">Mondays, 06:00</span></div></aside><div class="main"><div class="bar0"><input id="q" placeholder="Search artists" value="${st.q}" aria-label="Search artists"><button class="btn soft" data-v="land">Sign out</button></div>${P}</div></div>${st.open!=null?drawer(A[st.open]):''}`}
+R.innerHTML=h;const q=(s,f)=>R.querySelectorAll(s).forEach(f);
+q('[data-v]',b=>b.onclick=()=>{st.v=b.dataset.v;render();scrollTo(0,0)});
+q('[data-go]',b=>b.onclick=()=>{st.page=b.dataset.go;st.open=null;render();scrollTo(0,0)});
+q('[data-open]',b=>b.onclick=()=>{st.open=+b.dataset.open;render()});
+q('[data-f]',b=>b.onclick=()=>{st.flt=b.dataset.f;render()});
+q('[data-sel]',b=>b.onclick=()=>{st.sel=+b.dataset.sel;render()});
+q('[data-acc]',b=>b.onclick=()=>{st.acc[b.dataset.acc]=1;api('/api/decisions',{method:'POST',body:JSON.stringify({artist_id:+b.dataset.acc,decision:'accept'})});render()});
+q('[data-an]',b=>b.onclick=()=>{st.sel=Math.min(+b.dataset.an,5);st.page='analyse';st.open=null;render()});
+q('[data-sw]',b=>b.onclick=()=>{st.set[b.dataset.sw]^=1;render()});
+const lf=R.querySelector('#lf');if(lf)lf.onsubmit=async e=>{e.preventDefault();const t=await api('/api/login',{method:'POST',body:JSON.stringify({email:lf[0].value,password:lf[1].value})});if(t)st.tok=t.token;const d=await api('/api/artists');prep(Array.isArray(d)?d:FB);st.v='app';render()};
+const t=R.querySelector('#thr');if(t)t.oninput=()=>{st.thr=t.value;R.querySelector('#tl').textContent='Notify at '+t.value+'+'};
+const rv=R.querySelector('#rv');if(rv)rv.onclick=()=>{st.rev[st.sel]=1;render()};
+const sw=R.querySelector('#sw');if(sw)sw.onclick=async()=>{st.run=1;render();await api('/api/sweep',{method:'POST'});setTimeout(()=>{st.run=0;render()},1500)};
+const qi=R.querySelector('#q');if(qi)qi.oninput=()=>{st.q=qi.value.toLowerCase();if(st.page!='discovery'){st.page='discovery'}const p=qi.selectionStart;render();const n=document.getElementById('q');n.focus();n.setSelectionRange(p,p)};
+['#sc','#cl'].forEach(s=>{const e=R.querySelector(s);if(e)e.onclick=()=>{st.open=null;render()}})}
+prep(FB);render();
+</script></body></html>

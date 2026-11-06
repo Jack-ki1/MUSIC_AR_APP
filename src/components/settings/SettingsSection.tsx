@@ -296,37 +296,33 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
   return (
     <div className="space-y-6 pb-28">
       {/* Top Header matching screenshot */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-[#E5E9F3] rounded-2xl p-6 shadow-2xs">
+      <div className="glass p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider text-[#7155F5] uppercase bg-[#EEF2FF] px-2.5 py-0.5 rounded-full border border-[#6366F1]/20">
+          <span className="text-[11px] font-black tracking-wider text-[#3B6CFF] uppercase bg-[#DFE9FF] px-3 py-1 rounded-full">
             A&R SYSTEM CONFIGURATION & PROVIDER REGISTRY
           </span>
-          <h1 className="text-2xl font-black text-[#0F172A] tracking-tight mt-1">
+          <h1 className="text-2xl font-black text-[#0B1530] tracking-tight mt-1.5">
             Engine Settings & Source Catalog
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5 max-w-2xl leading-relaxed">
+          <p className="text-xs text-[#5F6B8A] mt-0.5 max-w-2xl leading-relaxed">
             Manage data providers, autonomous scan schedules, discovery seed rotation, and the mathematical AVM calibration weights.
           </p>
         </div>
 
         <button
           onClick={handleSaveSettings}
-          className="flex items-center gap-2 bg-[#7155F5] hover:bg-[#5E3EE4] text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
+          className="btn-lime text-xs font-black flex items-center gap-2 cursor-pointer shadow-sm shrink-0"
         >
           <Save className="w-3.5 h-3.5" />
           <span>Save All Settings</span>
         </button>
       </div>
 
-      {/* Sub-Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#E2E8F0] pb-2 text-xs">
+      {/* Sub-Navigation Tabs matching .chip in index.html */}
+      <div className="flex items-center gap-2 overflow-x-auto border-b border-[rgba(120,140,190,0.2)] pb-3 text-xs">
         <button
           onClick={() => setActiveSubTab('providers')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'providers'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'providers' ? 'on' : ''} flex items-center gap-2`}
         >
           <Database className="w-3.5 h-3.5" />
           <span>Data Providers ({providers.length})</span>
@@ -334,11 +330,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
 
         <button
           onClick={() => setActiveSubTab('automation')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'automation'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'automation' ? 'on' : ''} flex items-center gap-2`}
         >
           <Clock className="w-3.5 h-3.5" />
           <span>Automation & Scheduler</span>
@@ -346,11 +338,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
 
         <button
           onClick={() => setActiveSubTab('seeds')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'seeds'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'seeds' ? 'on' : ''} flex items-center gap-2`}
         >
           <Radio className="w-3.5 h-3.5" />
           <span>Discovery Seeds ({seeds.length})</span>
@@ -358,11 +346,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
 
         <button
           onClick={() => setActiveSubTab('scoring')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'scoring'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'scoring' ? 'on' : ''} flex items-center gap-2`}
         >
           <Award className="w-3.5 h-3.5" />
           <span>AVM Weights & Scoring</span>
@@ -370,11 +354,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
 
         <button
           onClick={() => setActiveSubTab('workspace')}
-          className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${
-            activeSubTab === 'workspace'
-              ? 'bg-[#7155F5] text-white shadow-xs'
-              : 'text-[#64748B] hover:text-[#0F172A] bg-white border border-[#E2E8F0]'
-          }`}
+          className={`chip ${activeSubTab === 'workspace' ? 'on' : ''} flex items-center gap-2`}
         >
           <User className="w-3.5 h-3.5" />
           <span>Workspace Preferences</span>
@@ -385,15 +365,15 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
       {activeSubTab === 'providers' && (
         <div className="space-y-4">
           {/* Search & Category Filter Bar */}
-          <div className="bg-white border border-[#E5E9F3] rounded-2xl p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="glass p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="relative flex-1 min-w-[240px] max-w-md">
-              <Search className="w-3.5 h-3.5 text-[#94A3B8] absolute left-3 top-2.5" />
+              <Search className="w-3.5 h-3.5 text-[#5F6B8A] absolute left-3.5 top-2.5" />
               <input
                 type="text"
                 placeholder="Search provider name or category..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:border-[#7155F5]"
+                className="w-full bg-white/90 border border-[rgba(120,140,190,0.25)] rounded-full pl-9 pr-3.5 py-1.5 text-xs text-[#0B1530] placeholder-[#5F6B8A] focus:outline-none focus:border-[#3B6CFF] shadow-2xs"
               />
             </div>
 
@@ -402,10 +382,10 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     selectedCategory === cat
-                      ? 'bg-[#7155F5] text-white shadow-2xs'
-                      : 'bg-[#F8FAFC] text-[#64748B] hover:text-[#0F172A] border border-[#E2E8F0]'
+                      ? 'bg-[#3B6CFF] text-white shadow-xs'
+                      : 'bg-white/80 text-[#5F6B8A] hover:text-[#0B1530] border border-[rgba(120,140,190,0.2)]'
                   }`}
                 >
                   {cat}
@@ -423,7 +403,7 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
               return (
                 <div
                   key={prov.id}
-                  className="bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs flex flex-col justify-between space-y-4 hover:border-[#CBD5E1] transition-all"
+                  className="glass-card p-5 flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
@@ -432,25 +412,25 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
                           type="checkbox"
                           checked={prov.enabled}
                           onChange={() => handleToggleProvider(prov.id)}
-                          className="mt-1 rounded accent-[#7155F5] cursor-pointer"
+                          className="mt-1 rounded accent-[#3B6CFF] cursor-pointer"
                         />
 
-                        <div className="w-9 h-9 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-center shrink-0 text-[#7155F5]">
+                        <div className="w-9 h-9 rounded-xl bg-white border border-[rgba(120,140,190,0.25)] flex items-center justify-center shrink-0 text-[#3B6CFF] shadow-2xs">
                           {prov.iconType === 'database' ? <Database className="w-4 h-4" /> : <Music className="w-4 h-4" />}
                         </div>
 
                         <div>
-                          <h3 className="text-sm font-bold text-[#0F172A] leading-tight">{prov.name}</h3>
-                          <span className="text-[10px] text-[#64748B] font-medium">{prov.category}</span>
+                          <h3 className="text-sm font-extrabold text-[#0B1530] leading-tight">{prov.name}</h3>
+                          <span className="text-[10px] text-[#5F6B8A] font-semibold">{prov.category}</span>
                         </div>
                       </div>
 
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
                         isReady
-                          ? 'bg-[#ECFDF5] text-[#059669]'
+                          ? 'bg-[#EFFBC4] text-[#0B1530] border border-[#C8F51F]'
                           : prov.status === 'Quota Limited'
                           ? 'bg-[#FEF3C7] text-[#B45309]'
-                          : 'bg-[#F1F5F9] text-[#64748B]'
+                          : 'bg-slate-100 text-[#5F6B8A]'
                       }`}>
                         {prov.status}
                       </span>

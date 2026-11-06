@@ -245,8 +245,8 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#F7F8FC] text-[#10162B] font-sans selection:bg-[#7155F5] selection:text-white">
-      {/* 1. Left Sidebar matching screenshot */}
+    <div className="flex h-screen w-screen overflow-hidden bg-transparent text-[#0B1530] font-sans selection:bg-[#7C5CFF] selection:text-white">
+      {/* 1. Left Sidebar matching design system */}
       <Sidebar
         currentSection={currentSection}
         onSelectSection={(sec) => setCurrentSection(sec)}
@@ -254,7 +254,7 @@ export default function App() {
       />
 
       {/* 2. Main Canvas */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F7F8FC]">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-transparent">
         {/* Topbar with ⌘K search and API connected indicator */}
         <Topbar
           onOpenGlobalSearch={() => setIsGlobalSearchOpen(true)}

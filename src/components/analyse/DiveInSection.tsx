@@ -433,25 +433,31 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* =======================================================================
           TOP CONTROL PANEL & HORIZON SLICERS
          ======================================================================= */}
-      <div className="bg-[#0F172A] text-white rounded-2xl p-6 shadow-xl border border-[#1E293B] space-y-4">
+      <div 
+        className="rounded-3xl p-6 shadow-xl space-y-4 border border-[rgba(255,255,255,0.15)] text-white"
+        style={{
+          background: 'radial-gradient(600px 320px at 90% 0, #7C5CFF 0, transparent 65%), #0B1530',
+          boxShadow: '0 14px 34px -16px rgba(59, 92, 170, 0.4)'
+        }}
+      >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-[#7155F5]/30 text-[#A78BFA] border border-[#7155F5]/50 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
-                <BarChart3 className="w-3 h-3 text-[#A78BFA]" />
+              <span className="px-3 py-1 rounded-full bg-white/10 text-[#C8F51F] border border-[#C8F51F]/40 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                <BarChart3 className="w-3 h-3 text-[#C8F51F]" />
                 DIVE IN · EXECUTIVE A&R INTELLIGENCE ENGINE
               </span>
-              <span className="text-[10px] text-[#10B981] font-mono flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping"></span>
+              <span className="text-[10px] text-[#C8F51F] font-mono flex items-center gap-1 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C8F51F] animate-ping"></span>
                 LIVE D3 TELEMETRY READY
               </span>
             </div>
 
             <h2 className="text-2xl font-black tracking-tight mt-1 text-white flex items-center gap-2">
               <span>{artist.name}</span>
-              <span className="text-sm font-semibold text-[#94A3B8]">({artist.city}, {artist.country})</span>
+              <span className="text-sm font-semibold text-[#DFE9FF]">({artist.city}, {artist.country})</span>
             </h2>
-            <p className="text-xs text-[#94A3B8] max-w-2xl leading-relaxed mt-0.5">
+            <p className="text-xs text-[#DFE9FF]/80 max-w-2xl leading-relaxed mt-0.5">
               Multi-channel streaming progression, platform concentration, daily engagement anomalies, vocal tessitura cent distributions, and forensic organic repeat retention.
             </p>
           </div>
@@ -459,16 +465,16 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
           {/* Slicers & Export */}
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Timeframe Slicer */}
-            <div className="flex items-center bg-[#1E293B] border border-[#334155] p-1 rounded-xl text-xs">
-              <span className="text-[10px] font-bold text-[#94A3B8] px-2 uppercase">Horizon:</span>
+            <div className="flex items-center bg-white/10 border border-white/20 p-1 rounded-full text-xs backdrop-blur-md">
+              <span className="text-[10px] font-bold text-[#DFE9FF] px-2.5 uppercase">Horizon:</span>
               {(['7D', '30D', '90D', '180D', '1Y'] as const).map(t => (
                 <button
                   key={t}
                   onClick={() => setTimeHorizon(t)}
-                  className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-full font-extrabold text-xs transition-all cursor-pointer ${
                     timeHorizon === t
-                      ? 'bg-[#7155F5] text-white shadow-xs'
-                      : 'text-[#94A3B8] hover:text-white'
+                      ? 'bg-[#3B6CFF] text-white shadow-xs'
+                      : 'text-[#DFE9FF] hover:text-white'
                   }`}
                 >
                   {t}
@@ -479,7 +485,7 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
             {/* Export JSON Dossier */}
             <button
               onClick={handleExportDossier}
-              className="px-3.5 py-2 rounded-xl bg-[#7155F5] hover:bg-[#5E3EE4] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+              className="btn-lime text-xs flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export Dossier (JSON)</span>
@@ -488,15 +494,15 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
         </div>
 
         {/* Cohort Benchmark Slicer */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#1E293B] text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/15 text-xs">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-[#94A3B8] uppercase">Benchmark Peer Cohort:</span>
+            <span className="text-[10px] font-bold text-[#DFE9FF]/80 uppercase">Benchmark Peer Cohort:</span>
             {(['East Africa Indie', 'Afrobeats / Amapiano', 'Global Underground'] as const).map(c => (
               <button
                 key={c}
                 onClick={() => setSelectedCohort(c)}
-                className={`px-2.5 py-0.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
-                  selectedCohort === c ? 'bg-white text-[#0F172A] font-bold' : 'text-[#94A3B8] hover:text-white'
+                className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-colors ${
+                  selectedCohort === c ? 'bg-white text-[#0B1530]' : 'text-[#DFE9FF] hover:text-white'
                 }`}
               >
                 {c}
@@ -504,8 +510,8 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
             ))}
           </div>
 
-          <div className="text-[11px] text-[#94A3B8]">
-            Cohort Size: <strong className="text-white">142 Emerging Artists</strong> • Confidence Interval: <strong className="text-[#10B981]">95%</strong>
+          <div className="text-[11px] text-[#DFE9FF]/80">
+            Cohort Size: <strong className="text-white">142 Emerging Artists</strong> • Confidence Interval: <strong className="text-[#C8F51F]">95%</strong>
           </div>
         </div>
       </div>
@@ -515,11 +521,11 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
          ======================================================================= */}
       <div>
         <div className="flex items-center justify-between mb-2.5">
-          <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#7155F5]" />
+          <h3 className="text-xs font-black text-[#0B1530] uppercase tracking-wider flex items-center gap-2">
+            <Activity className="w-4 h-4 text-[#3B6CFF]" />
             <span>Executive Growth Dashboard · Key Performance Indicators</span>
           </h3>
-          <span className="text-[11px] text-[#64748B]">
+          <span className="text-[11px] text-[#5F6B8A]">
             Telemetry benchmarked across DSPs and UGC audio engines
           </span>
         </div>
@@ -528,21 +534,21 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
           {growthKpis.map(kpi => (
             <div
               key={kpi.id}
-              className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs space-y-1 hover:border-[#CBD5E1] transition-all"
+              className="p-3.5 rounded-2xl bg-white border border-[rgba(120,140,190,0.2)] shadow-[0_14px_34px_-16px_rgba(59,92,170,0.22),inset_0_1px_0_#fff] space-y-1 hover:border-[#3B6CFF] transition-all"
               title={kpi.tooltip}
             >
-              <span className="text-[10px] font-bold text-[#64748B] uppercase block truncate">
+              <span className="text-[10px] font-bold text-[#5F6B8A] uppercase block truncate">
                 {kpi.label}
               </span>
-              <div className="text-lg font-black text-[#0F172A] font-mono tracking-tight">
+              <div className="text-lg font-black text-[#0B1530] font-mono tracking-tight">
                 {kpi.value}
               </div>
               <div className="flex items-center justify-between pt-0.5">
-                <span className="flex items-center gap-0.5 text-[10px] font-bold text-[#059669]">
-                  <TrendingUp className="w-3 h-3 text-[#059669]" />
+                <span className="flex items-center gap-0.5 text-[10px] font-extrabold text-[#12B76A]">
+                  <TrendingUp className="w-3 h-3 text-[#12B76A]" />
                   <span>+{kpi.changePercent.toFixed(1)}%</span>
                 </span>
-                <span className="text-[9px] text-[#94A3B8] truncate">{kpi.periodLabel}</span>
+                <span className="text-[9px] text-[#5F6B8A] truncate font-medium">{kpi.periodLabel}</span>
               </div>
             </div>
           ))}
@@ -556,17 +562,17 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 1: Visualizations 1 & 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 1: Monthly Stream Progression (8 cols) */}
-        <div className="lg:col-span-8 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3">
+        <div className="lg:col-span-8 glass p-5 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[rgba(120,140,190,0.2)] pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
                 VISUALIZATION 01 · TIME-SERIES TRAJECTORY
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 Monthly Stream Progression ({timeHorizon} Telemetry)
               </h3>
             </div>
-            <span className="text-xs font-mono font-bold text-[#059669] bg-[#ECFDF5] px-2 py-0.5 rounded-md border border-[#A7F3D0]">
+            <span className="text-xs font-mono font-bold text-[#12B76A] bg-[#EFFBC4] px-2.5 py-0.5 rounded-full border border-[#C8F51F]">
               +68.4% Net MoM Growth
             </span>
           </div>
@@ -579,12 +585,12 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
         </div>
 
         {/* Visualization 2: Platform Audience Share Distribution (4 cols) */}
-        <div className="lg:col-span-4 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-4 flex flex-col justify-between">
-          <div className="border-b border-[#F1F5F9] pb-3">
-            <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+        <div className="lg:col-span-4 glass p-5 space-y-4 flex flex-col justify-between">
+          <div className="border-b border-[rgba(120,140,190,0.2)] pb-3">
+            <span className="text-[10px] font-black text-[#7C5CFF] uppercase tracking-wider block">
               VISUALIZATION 02 · DSP AUDIENCE SHARE
             </span>
-            <h3 className="text-sm font-extrabold text-[#0F172A]">
+            <h3 className="text-sm font-extrabold text-[#0B1530]">
               Platform Audience Distribution (Pie / Donut)
             </h3>
           </div>
@@ -594,7 +600,7 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
             size={220}
           />
 
-          <div className="text-[11px] text-[#64748B] pt-2 border-t border-[#F1F5F9]">
+          <div className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
             Dominant presence on <strong>Spotify (42%)</strong> with accelerated UGC discovery through <strong>TikTok audio usage (18%)</strong>.
           </div>
         </div>
@@ -603,17 +609,17 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 2: Visualizations 3 & 4 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 3: Daily Engagement Spikes (8 cols) */}
-        <div className="lg:col-span-8 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
+        <div className="lg:col-span-8 glass p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
                 VISUALIZATION 03 · 90-DAY VOLATILITY & OUTLIER DETECTION
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 Daily Engagement Spikes Over the Last 90 Days
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#FEF3C7] text-[#B45309]">
+            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[#EFFBC4] text-[#0B1530] border border-[#C8F51F]">
               3 Confirmed Viral Breakouts
             </span>
           </div>
@@ -625,13 +631,13 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
         </div>
 
         {/* Visualization 4: TikTok & Reels UGC Virality Timeline (4 cols) */}
-        <div className="lg:col-span-4 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3 flex flex-col justify-between">
+        <div className="lg:col-span-4 glass p-5 space-y-3 flex flex-col justify-between">
           <div>
-            <div className="border-b border-[#F1F5F9] pb-3">
-              <span className="text-[10px] font-black text-[#EC4899] uppercase tracking-wider block">
+            <div className="border-b border-[rgba(120,140,190,0.2)] pb-3">
+              <span className="text-[10px] font-black text-[#F0457A] uppercase tracking-wider block">
                 VISUALIZATION 04 · SHORT-FORM VIRALITY
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 TikTok & Reels UGC Creations Velocity
               </h3>
             </div>
@@ -640,10 +646,10 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
             </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-[#FDF2F8] border border-[#FBCFE8] text-xs space-y-1">
-            <span className="text-[10px] font-bold text-[#BE185D] uppercase block">UGC Creation Lift</span>
-            <div className="text-sm font-black text-[#9D174D] font-mono">+210% Week-over-Week</div>
-            <p className="text-[10px] text-[#64748B]">Over 2,640 new user videos created with this artist's sound snippet.</p>
+          <div className="p-3.5 rounded-2xl bg-white/70 border border-[rgba(120,140,190,0.2)] text-xs space-y-1">
+            <span className="text-[10px] font-bold text-[#F0457A] uppercase block">UGC Creation Lift</span>
+            <div className="text-sm font-black text-[#0B1530] font-mono">+210% Week-over-Week</div>
+            <p className="text-[10px] text-[#5F6B8A]">Over 2,640 new user videos created with this artist's sound snippet.</p>
           </div>
         </div>
       </div>
@@ -651,47 +657,47 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 3: Visualizations 5 & 6 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 5: Regional Listener Concentration (6 cols) */}
-        <div className="lg:col-span-6 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
+        <div className="lg:col-span-6 glass p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
                 VISUALIZATION 05 · GEOGRAPHIC TERRITORY FOOTPRINT
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 Regional Listener Concentration (East Africa Hubs)
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#ECFDF5] text-[#059669]">
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#ECFDF5] text-[#12B76A] border border-[#12B76A]/30">
               Nairobi Metropolitan Core
             </span>
           </div>
 
           <RegionalListenerConcentrationChart cities={regionalCities} />
 
-          <p className="text-[11px] text-[#64748B] pt-2 border-t border-[#F1F5F9]">
+          <p className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
             Strong grassroot anchor in <strong>Nairobi (46%)</strong> with organic cross-border penetration into <strong>Mombasa, Dar es Salaam, and Kampala</strong>.
           </p>
         </div>
 
         {/* Visualization 6: AVM 4-Pillar Spider Radar Chart (6 cols) */}
-        <div className="lg:col-span-6 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
+        <div className="lg:col-span-6 glass p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+              <span className="text-[10px] font-black text-[#7C5CFF] uppercase tracking-wider block">
                 VISUALIZATION 06 · AVM 4-PILLAR RADAR PROFILE
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 Acoustic & Artistic Competence Spider Radar
               </h3>
             </div>
-            <span className="text-xs font-mono font-black text-[#7155F5]">
+            <span className="text-xs font-mono font-black text-[#7C5CFF]">
               AAV {rollup ? rollup.aav : 84.5}
             </span>
           </div>
 
           <AvmRadarChart metrics={radarMetrics} size={250} />
 
-          <p className="text-[11px] text-[#64748B] pt-2 border-t border-[#F1F5F9]">
+          <p className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
             Artist competence significantly outperforms the 142-peer cohort in <strong>Vocal Holding ($P_V$)</strong> and <strong>Multilingual Writing Arc ($P_W$)</strong>.
           </p>
         </div>
@@ -700,58 +706,58 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 4: Visualizations 7 & 8 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 7: Vocal F0 Cent Error Distribution Histogram (6 cols) */}
-        <div className="lg:col-span-6 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
+        <div className="lg:col-span-6 glass p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
                 VISUALIZATION 07 · VOCAL PITCH INTONATION ACCURACY
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 CREPE Cent Deviation Histogram (-50¢ to +50¢)
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#DCFCE7] text-[#15803D]">
+            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[#EFFBC4] text-[#0B1530] border border-[#C8F51F]">
               89.4% in Strict Key
             </span>
           </div>
 
           <VocalPitchHistogramChart bins={pitchBins} />
 
-          <p className="text-[11px] text-[#64748B] pt-1">
+          <p className="text-[11px] text-[#5F6B8A] pt-1">
             Psychoacoustic evaluation validates that <strong>89.4% of vocal audio frames</strong> stay within the narrow $\pm 20$ cents threshold without heavy pitch correction artifacts.
           </p>
         </div>
 
         {/* Visualization 8: Dynamic 1-Pt/Sec Track Energy & Section Lift (6 cols) */}
-        <div className="lg:col-span-6 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
+        <div className="lg:col-span-6 glass p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
                 VISUALIZATION 08 · DYNAMIC 1-PT/SEC TRACK ENERGY CURVE ($P_S$)
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 Loudness Jump, Section Lift & Waveform Dynamics
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#EEF2FF] text-[#4338CA]">
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#DFE9FF] text-[#3B6CFF]">
               {primaryTrack?.title || 'Catalog Single'}
             </span>
           </div>
 
           <DynamicEnergyWaveformChart points={energyPoints} />
 
-          <div className="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-[#F1F5F9]">
+          <div className="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-[rgba(120,140,190,0.18)]">
             <div>
-              <span className="text-[10px] text-[#64748B] block">Time to First Hook</span>
-              <strong className="text-[#0F172A] font-mono">14.0s (Optimal)</strong>
+              <span className="text-[10px] text-[#5F6B8A] block font-semibold">Time to First Hook</span>
+              <strong className="text-[#0B1530] font-mono">14.0s (Optimal)</strong>
             </div>
             <div>
-              <span className="text-[10px] text-[#64748B] block">Chorus Lift Delta</span>
-              <strong className="text-[#059669] font-mono">+6.2 dB RMS</strong>
+              <span className="text-[10px] text-[#5F6B8A] block font-semibold">Chorus Lift Delta</span>
+              <strong className="text-[#12B76A] font-mono">+6.2 dB RMS</strong>
             </div>
             <div>
-              <span className="text-[10px] text-[#64748B] block">Spectral Contrast</span>
-              <strong className="text-[#7155F5] font-mono">0.84 High</strong>
+              <span className="text-[10px] text-[#5F6B8A] block font-semibold">Spectral Contrast</span>
+              <strong className="text-[#7C5CFF] font-mono">0.84 High</strong>
             </div>
           </div>
         </div>
@@ -760,47 +766,47 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 5: Visualizations 9 & 10 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 9: Stream-to-Follower Organic Conversion Scatter Plot (6 cols) */}
-        <div className="lg:col-span-6 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
+        <div className="lg:col-span-6 glass p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
                 VISUALIZATION 09 · ORGANIC CONVERSION BENCHMARK
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 Stream-to-Follower Repeat Scatter (Bot vs Organic Corridor)
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#DCFCE7] text-[#15803D]">
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#ECFDF5] text-[#12B76A] border border-[#12B76A]/30">
               Verified Safe Zone
             </span>
           </div>
 
           <OrganicConversionScatterPlot peers={organicPeers} />
 
-          <p className="text-[11px] text-[#64748B] pt-2 border-t border-[#F1F5F9]">
+          <p className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
             {artist.name} demonstrates a <strong>3.42x stream replay ratio</strong> with <strong>94% organic confidence</strong>, confirming strong fan loyalty rather than artificial click-farming.
           </p>
         </div>
 
         {/* Visualization 10: Discography Trajectory (TAV vs Production per Release) (6 cols) */}
-        <div className="lg:col-span-6 bg-white border border-[#E5E9F3] rounded-2xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
+        <div className="lg:col-span-6 glass p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7155F5] uppercase tracking-wider block">
+              <span className="text-[10px] font-black text-[#7C5CFF] uppercase tracking-wider block">
                 VISUALIZATION 10 · DISCOGRAPHY TRAJECTORY
               </span>
-              <h3 className="text-sm font-extrabold text-[#0F172A]">
+              <h3 className="text-sm font-extrabold text-[#0B1530]">
                 TAV Progression Across Verified Singles
               </h3>
             </div>
-            <span className="text-xs font-mono font-bold text-[#059669]">
+            <span className="text-xs font-mono font-bold text-[#12B76A]">
               +{rollup ? rollup.trajectory : 76.5} Slope
             </span>
           </div>
 
           <DiscographyTrajectoryChart releases={discographyProgression} />
 
-          <p className="text-[11px] text-[#64748B] pt-2 border-t border-[#F1F5F9]">
+          <p className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
             Successive releases show marked compound improvement in both songwriting cohesion ($P_S$) and vocal maturity ($P_V$).
           </p>
         </div>
