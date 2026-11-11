@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import * as d3 from 'd3';
+import { primary, chart, platform, series, sectionBands } from '../../../shared/theme/chartPalette';
 import { 
   TimeSeriesPoint, 
   PlatformShareSlice, 
@@ -96,44 +97,47 @@ export const MonthlyStreamProgressionChart: React.FC<MonthlyStreamProgressionPro
     <div className="space-y-3">
       {/* Header with channel filter pills */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Platform Scope:</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-2xs font-mono font-semibold uppercase tracking-[0.1em] text-purple-500 shrink-0">Platform scope</span>
+          <div className="inline-flex items-center rounded-sm border border-line overflow-hidden bg-surface">
           {(['all', 'spotify', 'tiktokUgc', 'youtube', 'appleMusic'] as const).map(channel => (
             <button
               key={channel}
               onClick={() => setActiveChannel(channel)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all ${
+              aria-pressed={activeChannel === channel}
+              className={`px-2.5 py-1 text-2xs font-mono font-semibold uppercase tracking-[0.06em] cursor-pointer transition-colors border-l border-line first:border-l-0 ${
                 activeChannel === channel
-                  ? 'bg-[#0F172A] text-white shadow-2xs'
-                  : 'bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A]'
+                  ? 'bg-brand-500 text-navy-900'
+                  : 'text-purple-500 hover:bg-purple-100 hover:text-navy-700'
               }`}
             >
               {channel === 'all' ? 'All Channels' : channel === 'spotify' ? 'Spotify' : channel === 'tiktokUgc' ? 'TikTok UGC' : channel === 'youtube' ? 'YouTube' : 'Apple'}
             </button>
           ))}
+          </div>
         </div>
 
         {activePoint && (
-          <div className="text-xs font-mono font-semibold text-[#0F172A] flex items-center gap-3">
-            <span className="text-[#64748B]">{activePoint.date}:</span>
-            <span className="text-[#7155F5] font-black">{activePoint.total.toLocaleString()} total streams</span>
-            <span className="text-[#10B981] text-[10px]">({activePoint.spotify.toLocaleString()} Spotify)</span>
+          <div className="text-xs font-mono font-semibold text-navy-700 flex items-center gap-3">
+            <span className="text-purple-500">{activePoint.date}:</span>
+            <span className="text-brand-600 font-semibold">{activePoint.total.toLocaleString()} total streams</span>
+            <span className="text-success-600 text-2xs">({activePoint.spotify.toLocaleString()} Spotify)</span>
           </div>
         )}
       </div>
 
       {/* D3 SVG Canvas */}
-      <div className="relative w-full overflow-hidden rounded-xl bg-white border border-[#E2E8F0] p-2">
+      <div className="relative w-full overflow-hidden rounded-card bg-surface border border-line p-2">
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
           <defs>
             <linearGradient id="streamAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#7155F5" stopOpacity="0.32" />
-              <stop offset="65%" stopColor="#7155F5" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#7155F5" stopOpacity="0.00" />
+              <stop offset="0%" stopColor={primary} stopOpacity="0.14" />
+              <stop offset="65%" stopColor={primary} stopOpacity="0.04" />
+              <stop offset="100%" stopColor={primary} stopOpacity="0.00" />
             </linearGradient>
             <linearGradient id="spotifyAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+              <stop offset="0%" stopColor={platform.spotify} stopOpacity="0.25" />
+              <stop offset="100%" stopColor={platform.spotify} stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -141,8 +145,8 @@ export const MonthlyStreamProgressionChart: React.FC<MonthlyStreamProgressionPro
             {/* Horizontal Grid lines */}
             {yTicks.map((tick, i) => (
               <g key={i} transform={`translate(0, ${yScale(tick)})`}>
-                <line x1={0} x2={innerWidth} y1={0} y2={0} stroke="#F1F5F9" strokeWidth="1" strokeDasharray="3 3" />
-                <text x={-10} y={4} textAnchor="end" fill="#94A3B8" fontSize="10" fontFamily="monospace">
+                <line x1={0} x2={innerWidth} y1={0} y2={0} stroke={chart.grid} strokeWidth="1" strokeDasharray="3 3" />
+                <text x={-10} y={4} textAnchor="end" fill={chart.axisLabel} fontSize="10" fontFamily="monospace">
                   {(tick / 1000).toFixed(0)}k
                 </text>
               </g>
@@ -155,7 +159,7 @@ export const MonthlyStreamProgressionChart: React.FC<MonthlyStreamProgressionPro
                 x={xScale(date)}
                 y={innerHeight + 20}
                 textAnchor="middle"
-                fill="#94A3B8"
+                fill={chart.axisLabel}
                 fontSize="10"
                 fontFamily="sans-serif"
               >
@@ -172,29 +176,29 @@ export const MonthlyStreamProgressionChart: React.FC<MonthlyStreamProgressionPro
             {(activeChannel === 'all') && (
               <path d={d3.line<TimeSeriesPoint>().x(d => xScale(new Date(d.timestamp))).y(d => yScale(d.total)).curve(d3.curveMonotoneX)(data) || ''}
                 fill="none"
-                stroke="#7155F5"
+                stroke={primary}
                 strokeWidth="2.75"
               />
             )}
 
             {/* Spotify Line */}
             {(activeChannel === 'all' || activeChannel === 'spotify') && (
-              <path d={spotifyLine} fill="none" stroke="#10B981" strokeWidth={activeChannel === 'spotify' ? '3' : '2'} />
+              <path d={spotifyLine} fill="none" stroke={platform.spotify} strokeWidth={activeChannel === 'spotify' ? '3' : '2'} />
             )}
 
             {/* TikTok UGC Line */}
             {(activeChannel === 'all' || activeChannel === 'tiktokUgc') && (
-              <path d={tiktokLine} fill="none" stroke="#0F172A" strokeWidth={activeChannel === 'tiktokUgc' ? '3' : '1.75'} strokeDasharray={activeChannel === 'all' ? '4 3' : 'none'} />
+              <path d={tiktokLine} fill="none" stroke={platform.tiktok} strokeWidth={activeChannel === 'tiktokUgc' ? '3' : '1.75'} strokeDasharray={activeChannel === 'all' ? '4 3' : 'none'} />
             )}
 
             {/* YouTube Line */}
             {(activeChannel === 'all' || activeChannel === 'youtube') && (
-              <path d={ytLine} fill="none" stroke="#EF4444" strokeWidth={activeChannel === 'youtube' ? '3' : '1.5'} />
+              <path d={ytLine} fill="none" stroke={platform.youtube} strokeWidth={activeChannel === 'youtube' ? '3' : '1.5'} />
             )}
 
             {/* Apple Music Line */}
             {(activeChannel === 'all' || activeChannel === 'appleMusic') && (
-              <path d={appleLine} fill="none" stroke="#F43F5E" strokeWidth={activeChannel === 'appleMusic' ? '3' : '1.5'} strokeDasharray="3 2" />
+              <path d={appleLine} fill="none" stroke={platform.apple} strokeWidth={activeChannel === 'appleMusic' ? '3' : '1.5'} strokeDasharray="3 2" />
             )}
 
             {/* Interactive Crosshair & Hover Overlay */}
@@ -222,7 +226,7 @@ export const MonthlyStreamProgressionChart: React.FC<MonthlyStreamProgressionPro
                   x2={xScale(new Date(activePoint.timestamp))}
                   y1={0}
                   y2={innerHeight}
-                  stroke="#7155F5"
+                  stroke={primary}
                   strokeWidth="1.5"
                   strokeDasharray="2 2"
                 />
@@ -230,16 +234,16 @@ export const MonthlyStreamProgressionChart: React.FC<MonthlyStreamProgressionPro
                   cx={xScale(new Date(activePoint.timestamp))}
                   cy={yScale(activePoint.total)}
                   r="5"
-                  fill="#7155F5"
-                  stroke="#FFFFFF"
+                  fill={primary}
+                  stroke={chart.surface}
                   strokeWidth="2.5"
                 />
                 <circle
                   cx={xScale(new Date(activePoint.timestamp))}
                   cy={yScale(activePoint.spotify)}
                   r="4"
-                  fill="#10B981"
-                  stroke="#FFFFFF"
+                  fill={platform.spotify}
+                  stroke={chart.surface}
                   strokeWidth="2"
                 />
               </g>
@@ -249,26 +253,26 @@ export const MonthlyStreamProgressionChart: React.FC<MonthlyStreamProgressionPro
       </div>
 
       {/* Legend & Insights */}
-      <div className="flex flex-wrap items-center justify-between text-xs text-[#64748B] pt-1">
+      <div className="flex flex-wrap items-center justify-between text-xs text-purple-500 pt-1">
         <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5 font-semibold text-[#7155F5]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#7155F5]"></span> Total Aggregate
+          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
+            <span className="w-2.5 h-2.5 rounded-sm bg-brand-500"></span> Total
           </span>
-          <span className="flex items-center gap-1.5 font-semibold text-[#10B981]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span> Spotify
+          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: platform.spotify }}></span> Spotify
           </span>
-          <span className="flex items-center gap-1.5 font-semibold text-[#0F172A]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#0F172A]"></span> TikTok Audio
+          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: platform.tiktok }}></span> TikTok Audio
           </span>
-          <span className="flex items-center gap-1.5 font-semibold text-[#EF4444]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]"></span> YouTube
+          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: platform.youtube }}></span> YouTube
           </span>
-          <span className="flex items-center gap-1.5 font-semibold text-[#F43F5E]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#F43F5E]"></span> Apple Music
+          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: platform.apple }}></span> Apple Music
           </span>
         </div>
-        <div className="text-[11px] text-[#059669] font-bold">
-          {timeRangeLabel} Velocity: +68.4%
+        <div className="text-2xs font-mono font-semibold tabular-nums uppercase tracking-wide text-success-600">
+          {timeRangeLabel} velocity +68.4%
         </div>
       </div>
     </div>
@@ -326,7 +330,7 @@ export const PlatformAudiencePieChart: React.FC<PlatformAudiencePieProps> = ({
     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
       {/* SVG Donut */}
       <div className="relative flex items-center justify-center shrink-0">
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible select-none">
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="max-w-full h-auto overflow-visible select-none">
           <g transform={`translate(${radius}, ${radius})`}>
             {pieData.map((d, i) => {
               const isHovered = hoveredPlatform === d.data.platform;
@@ -348,11 +352,11 @@ export const PlatformAudiencePieChart: React.FC<PlatformAudiencePieProps> = ({
 
         {/* Center Callout */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Primary Share</span>
-          <span className="text-xl font-black text-[#0F172A] font-mono leading-none mt-0.5">
+          <span className="text-2xs font-bold uppercase tracking-wider text-purple-500">Primary Share</span>
+          <span className="text-xl font-semibold text-navy-700 font-mono leading-none mt-0.5">
             {activeSlice ? `${activeSlice.sharePercentage}%` : '42%'}
           </span>
-          <span className="text-xs font-bold text-[#7155F5] mt-0.5">
+          <span className="text-xs font-bold text-brand-600 mt-0.5">
             {activeSlice ? activeSlice.platform : 'Spotify'}
           </span>
         </div>
@@ -367,27 +371,27 @@ export const PlatformAudiencePieChart: React.FC<PlatformAudiencePieProps> = ({
               key={i}
               onMouseEnter={() => setHoveredPlatform(slice.platform)}
               onMouseLeave={() => setHoveredPlatform(null)}
-              className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+              className={`p-2.5 rounded border transition-all cursor-pointer flex items-center justify-between ${
                 isSelected 
-                  ? 'bg-[#F8FAFC] border-[#7155F5] shadow-xs' 
-                  : 'bg-white border-[#E2E8F0] hover:border-[#CBD5E1]'
+                  ? 'bg-surface-subtle border-series-1 ' 
+                  : 'bg-surface border-line hover:border-line-strong'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: slice.color }}></span>
                 <div>
-                  <span className="text-xs font-extrabold text-[#0F172A] block">{slice.platform}</span>
-                  <span className="text-[10px] text-[#64748B]">
+                  <span className="text-xs font-semibold text-navy-700 block">{slice.platform}</span>
+                  <span className="text-2xs text-purple-500">
                     ~{(slice.streamCount / 1000).toFixed(0)}k est. monthly streams
                   </span>
                 </div>
               </div>
 
               <div className="text-right">
-                <span className="text-sm font-black font-mono text-[#0F172A]">
+                <span className="text-sm font-semibold font-mono text-navy-700">
                   {slice.sharePercentage}%
                 </span>
-                <span className="text-[10px] block text-[#059669] font-bold">Verified</span>
+                <span className="text-2xs block text-success-600 font-bold">Verified</span>
               </div>
             </div>
           );
@@ -450,29 +454,29 @@ export const DailyEngagementSpikesChart: React.FC<DailyEngagementSpikesProps> = 
     <div className="space-y-3">
       {/* Header and Callout info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-        <div className="text-[#64748B]">
+        <div className="text-purple-500">
           Daily interaction spikes (comments, shares, UGC video sound uses, playlist saves) across 90 days.
         </div>
         {hoveredDay ? (
-          <div className="font-mono text-[#0F172A] font-bold bg-[#FEF3C7] text-[#B45309] px-2.5 py-1 rounded-lg border border-[#FDE68A]">
+          <div className="font-mono text-navy-700 font-bold bg-warning-50 text-warning-700 px-2 py-0.5 rounded-sm border border-warning-100 font-mono text-2xs">
             {hoveredDay.dateStr}: {hoveredDay.engagementScore.toFixed(0)} score ({hoveredDay.creationsCount} creations) {hoveredDay.spikeReason ? `• ${hoveredDay.spikeReason}` : ''}
           </div>
         ) : (
-          <div className="font-mono text-[#059669] font-bold">
+          <div className="font-mono text-success-600 font-bold">
             Peak Day: {maxPoint?.dateStr} (+{maxPoint?.creationsCount} creations)
           </div>
         )}
       </div>
 
       {/* SVG Canvas */}
-      <div className="relative w-full overflow-hidden rounded-xl bg-white border border-[#E2E8F0] p-2">
+      <div className="relative w-full overflow-hidden rounded bg-surface border border-line p-2">
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
           <g transform={`translate(${margin.left}, ${margin.top})`}>
             {/* Horizontal baseline grids */}
             {[0, 25, 50, 75, 100].map((tick, i) => (
               <g key={i} transform={`translate(0, ${yScale(tick)})`}>
-                <line x1={0} x2={innerWidth} y1={0} y2={0} stroke="#F1F5F9" strokeWidth="1" strokeDasharray="3 3" />
-                <text x={-8} y={4} textAnchor="end" fill="#94A3B8" fontSize="10" fontFamily="monospace">
+                <line x1={0} x2={innerWidth} y1={0} y2={0} stroke={chart.grid} strokeWidth="1" strokeDasharray="3 3" />
+                <text x={-8} y={4} textAnchor="end" fill={chart.axisLabel} fontSize="10" fontFamily="monospace">
                   {tick}
                 </text>
               </g>
@@ -488,7 +492,7 @@ export const DailyEngagementSpikesChart: React.FC<DailyEngagementSpikesProps> = 
                   y={0}
                   width={xScale.bandwidth()}
                   height={innerHeight}
-                  fill="#F8FAFC"
+                  fill={chart.surfaceSubtle}
                   opacity={0.7}
                 />
               );
@@ -506,7 +510,7 @@ export const DailyEngagementSpikesChart: React.FC<DailyEngagementSpikesProps> = 
                     y={yScale(s.engagementScore)}
                     width={xScale.bandwidth()}
                     height={barHeight}
-                    fill={s.isSpike ? '#F59E0B' : '#7155F5'}
+                    fill={s.isSpike ? series[5] : primary}
                     fillOpacity={s.isSpike ? 0.95 : 0.65}
                     rx={2}
                     className="cursor-pointer hover:opacity-100 transition-opacity"
@@ -518,7 +522,7 @@ export const DailyEngagementSpikesChart: React.FC<DailyEngagementSpikesProps> = 
                       cx={xPos + xScale.bandwidth() / 2}
                       cy={yScale(s.engagementScore) - 4}
                       r="2.5"
-                      fill="#EF4444"
+                      fill={platform.youtube}
                     />
                   )}
                 </g>
@@ -529,7 +533,7 @@ export const DailyEngagementSpikesChart: React.FC<DailyEngagementSpikesProps> = 
             <path
               d={trendlinePath}
               fill="none"
-              stroke="#0F172A"
+              stroke={platform.tiktok}
               strokeWidth="2"
               strokeOpacity="0.75"
             />
@@ -541,7 +545,7 @@ export const DailyEngagementSpikesChart: React.FC<DailyEngagementSpikesProps> = 
                 x={(xScale(s.dayIndex) || 0) + xScale.bandwidth() / 2}
                 y={innerHeight + 20}
                 textAnchor="middle"
-                fill="#94A3B8"
+                fill={chart.axisLabel}
                 fontSize="10"
                 fontFamily="sans-serif"
               >
@@ -552,16 +556,16 @@ export const DailyEngagementSpikesChart: React.FC<DailyEngagementSpikesProps> = 
         </svg>
       </div>
 
-      <div className="flex items-center justify-between text-xs text-[#64748B]">
+      <div className="flex items-center justify-between text-xs text-purple-500">
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 font-bold text-[#F59E0B]">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B]"></span> Viral Spike (&gt;2.5σ Deviation)
+          <span className="flex items-center gap-1.5 font-bold text-warning-600">
+            <span className="w-2.5 h-2.5 rounded-sm bg-warning-600"></span> Viral Spike (&gt;2.5σ Deviation)
           </span>
-          <span className="flex items-center gap-1.5 font-bold text-[#7155F5]">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#7155F5]"></span> Steady Organic Baselines
+          <span className="flex items-center gap-1.5 font-bold text-brand-600">
+            <span className="w-2.5 h-2.5 rounded-sm bg-brand-500"></span> Steady Organic Baselines
           </span>
         </div>
-        <span className="text-[11px] font-mono text-[#475569]">
+        <span className="text-2xs font-mono text-purple-700">
           Weekend Velocity Factor: <strong>1.42x uplift</strong>
         </span>
       </div>
@@ -614,20 +618,20 @@ export const UgcViralityTimelineChart: React.FC<{ points: { day: string; videoCr
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
         <defs>
           <linearGradient id="ugcAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#EC4899" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#EC4899" stopOpacity="0.0" />
+            <stop offset="0%" stopColor={chart.virality} stopOpacity="0.16" />
+            <stop offset="100%" stopColor={chart.virality} stopOpacity="0.0" />
           </linearGradient>
         </defs>
         <g transform={`translate(${margin.left}, ${margin.top})`}>
           <path d={areaPath} fill="url(#ugcAreaGrad)" />
-          <path d={linePath} fill="none" stroke="#EC4899" strokeWidth="2.5" />
+          <path d={linePath} fill="none" stroke={chart.virality} strokeWidth="2.5" />
           {points.filter((_, i) => i % 2 === 0).map((p, i) => (
             <text
               key={i}
               x={(xScale((i * 2).toString()) || 0) + xScale.bandwidth() / 2}
               y={innerH + 16}
               textAnchor="middle"
-              fill="#94A3B8"
+              fill={chart.axisLabel}
               fontSize="9"
               fontFamily="monospace"
             >
@@ -654,27 +658,27 @@ export const RegionalListenerConcentrationChart: React.FC<{ cities: RegionalConc
         return (
           <div key={idx} className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-[#0F172A] flex items-center gap-1.5">
+              <span className="font-bold text-navy-700 flex items-center gap-1.5">
                 {city.isAnchorMarket && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-success-600 animate-pulse"></span>
                 )}
                 {city.city}, {city.country}
               </span>
-              <span className="text-[#64748B] font-mono text-[11px]">
+              <span className="text-purple-500 font-mono text-2xs">
                 {city.percentage}% • {city.estimatedListeners.toLocaleString()} fans
               </span>
             </div>
 
-            <div className="h-2.5 bg-[#F1F5F9] rounded-full overflow-hidden relative">
+            <div className="h-2 bg-surface-sunken rounded-sm overflow-hidden relative">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${
+                className={`h-full rounded-sm transition-all duration-500 ${
                   idx === 0 
-                    ? 'bg-[#7155F5]' 
+                    ? 'bg-brand-500' 
                     : idx === 1 
-                    ? 'bg-[#38BDF8]' 
+                    ? 'bg-platform-boomplay' 
                     : idx === 2 
-                    ? 'bg-[#10B981]' 
-                    : 'bg-[#94A3B8]'
+                    ? 'bg-success-600' 
+                    : 'bg-purple-300'
                 }`}
                 style={{ width: `${barWidth}%` }}
               ></div>
@@ -718,7 +722,7 @@ export const AvmRadarChart: React.FC<{ metrics: RadarCompetencePoint[]; size?: n
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible select-none">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="max-w-full h-auto overflow-visible select-none">
         {/* Concentric Grid Polygons */}
         {[25, 50, 75, 100].map((level, idx) => {
           const gridPoints = metrics.map((_, i) => {
@@ -732,7 +736,7 @@ export const AvmRadarChart: React.FC<{ metrics: RadarCompetencePoint[]; size?: n
               key={idx}
               points={gridPoints}
               fill="none"
-              stroke="#E2E8F0"
+              stroke={chart.gridStrong}
               strokeWidth="1"
               strokeDasharray="2 2"
             />
@@ -749,12 +753,12 @@ export const AvmRadarChart: React.FC<{ metrics: RadarCompetencePoint[]; size?: n
 
           return (
             <g key={i}>
-              <line x1={center} y1={center} x2={x} y2={y} stroke="#E2E8F0" strokeWidth="1" />
+              <line x1={center} y1={center} x2={x} y2={y} stroke={chart.gridStrong} strokeWidth="1" />
               <text
                 x={labelX}
                 y={labelY + 4}
                 textAnchor="middle"
-                fill="#0F172A"
+                fill={platform.tiktok}
                 fontSize="9"
                 fontWeight="700"
               >
@@ -767,9 +771,9 @@ export const AvmRadarChart: React.FC<{ metrics: RadarCompetencePoint[]; size?: n
         {/* Peer Benchmark Polygon */}
         <polygon
           points={benchmarkPoints}
-          fill="#94A3B8"
+          fill={chart.axisLabel}
           fillOpacity="0.15"
-          stroke="#94A3B8"
+          stroke={chart.axisLabel}
           strokeWidth="1.5"
           strokeDasharray="3 2"
         />
@@ -777,9 +781,9 @@ export const AvmRadarChart: React.FC<{ metrics: RadarCompetencePoint[]; size?: n
         {/* Artist Score Polygon */}
         <polygon
           points={artistPoints}
-          fill="#7155F5"
+          fill={primary}
           fillOpacity="0.3"
-          stroke="#7155F5"
+          stroke={primary}
           strokeWidth="2.5"
         />
 
@@ -793,20 +797,20 @@ export const AvmRadarChart: React.FC<{ metrics: RadarCompetencePoint[]; size?: n
               cx={center + r * Math.cos(angle)}
               cy={center + r * Math.sin(angle)}
               r="4"
-              fill="#7155F5"
-              stroke="#FFFFFF"
+              fill={primary}
+              stroke={chart.surface}
               strokeWidth="2"
             />
           );
         })}
       </svg>
 
-      <div className="flex items-center gap-4 text-[11px] text-[#64748B] mt-2">
-        <span className="flex items-center gap-1 font-bold text-[#7155F5]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#7155F5]"></span> Target Artist
+      <div className="flex items-center gap-4 text-2xs text-purple-500 mt-2">
+        <span className="flex items-center gap-1 font-bold text-brand-600">
+          <span className="w-2.5 h-2.5 rounded-full bg-brand-500"></span> Target Artist
         </span>
-        <span className="flex items-center gap-1 font-semibold text-[#94A3B8]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#94A3B8]"></span> Cohort Benchmark (142 peers)
+        <span className="flex items-center gap-1 font-semibold text-purple-300">
+          <span className="w-2.5 h-2.5 rounded-full bg-purple-300"></span> Cohort Benchmark (142 peers)
         </span>
       </div>
     </div>
@@ -830,24 +834,24 @@ export const VocalPitchHistogramChart: React.FC<{ bins: PitchCentHistogramBin[] 
               <div
                 className={`w-full rounded-t-md transition-all ${
                   bin.isWithinTolerantRange
-                    ? 'bg-[#10B981] group-hover:bg-[#059669]'
-                    : 'bg-[#EF4444]/65 group-hover:bg-[#DC2626]'
+                    ? 'bg-success-600 group-hover:bg-success-600'
+                    : 'bg-series-8/65 group-hover:bg-danger-600'
                 }`}
                 style={{ height: `${heightPercent}%` }}
               >
-                <div className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-[#0F172A] text-white text-[9px] px-1 rounded font-mono pointer-events-none transition-opacity">
+                <div className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-2xs px-1 rounded font-mono pointer-events-none transition-opacity">
                   {bin.percentage}%
                 </div>
               </div>
-              <span className="text-[8px] text-[#64748B] font-mono">{bin.centBin}¢</span>
+              <span className="text-2xs text-purple-500 font-mono">{bin.centBin}¢</span>
             </div>
           );
         })}
       </div>
 
-      <div className="flex items-center justify-between text-[11px] text-[#64748B] pt-2 border-t border-[#F1F5F9]">
-        <span className="text-[#059669] font-bold">Green = Within ±20¢ psychoacoustic tolerance</span>
-        <span className="font-mono text-[#0F172A]">89.4% in key</span>
+      <div className="flex items-center justify-between text-2xs text-purple-500 pt-2 border-t border-line">
+        <span className="text-success-600 font-bold">Green = Within ±20¢ psychoacoustic tolerance</span>
+        <span className="font-mono text-navy-700">89.4% in key</span>
       </div>
     </div>
   );
@@ -897,26 +901,26 @@ export const DynamicEnergyWaveformChart: React.FC<{ points: DynamicEnergyPoint[]
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
         <defs>
           <linearGradient id="d3EnergyGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7155F5" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#7155F5" stopOpacity="0.02" />
+            <stop offset="0%" stopColor={primary} stopOpacity="0.2" />
+            <stop offset="100%" stopColor={primary} stopOpacity="0.02" />
           </linearGradient>
         </defs>
 
         <g transform={`translate(${margin.left}, ${margin.top})`}>
           {/* Section Boxes */}
-          <rect x={0} y={0} width={innerW * 0.18} height={innerH} fill="#F8FAFC" rx={3} />
-          <rect x={innerW * 0.18} y={0} width={innerW * 0.32} height={innerH} fill="#EEF2FF" rx={3} />
-          <rect x={innerW * 0.50} y={0} width={innerW * 0.35} height={innerH} fill="#FEF3C7" rx={3} />
-          <rect x={innerW * 0.85} y={0} width={innerW * 0.15} height={innerH} fill="#F8FAFC" rx={3} />
+          <rect x={0} y={0} width={innerW * 0.18} height={innerH} fill={sectionBands.rest.fill} rx={3} />
+          <rect x={innerW * 0.18} y={0} width={innerW * 0.32} height={innerH} fill={sectionBands.verse.fill} rx={3} />
+          <rect x={innerW * 0.50} y={0} width={innerW * 0.35} height={innerH} fill={sectionBands.hook.fill} rx={3} />
+          <rect x={innerW * 0.85} y={0} width={innerW * 0.15} height={innerH} fill={sectionBands.rest.fill} rx={3} />
 
-          <text x={innerW * 0.09} y={12} textAnchor="middle" fill="#64748B" fontSize="8" fontWeight="bold">INTRO</text>
-          <text x={innerW * 0.34} y={12} textAnchor="middle" fill="#4338CA" fontSize="8" fontWeight="bold">VERSE 1</text>
-          <text x={innerW * 0.67} y={12} textAnchor="middle" fill="#B45309" fontSize="8" fontWeight="bold">HOOK / CHORUS (+6.2dB)</text>
-          <text x={innerW * 0.92} y={12} textAnchor="middle" fill="#64748B" fontSize="8" fontWeight="bold">OUTRO</text>
+          <text x={innerW * 0.09} y={12} textAnchor="middle" fill={chart.textMuted} fontSize="8" fontWeight="bold">INTRO</text>
+          <text x={innerW * 0.34} y={12} textAnchor="middle" fill={sectionBands.verse.text} fontSize="8" fontWeight="bold">VERSE 1</text>
+          <text x={innerW * 0.67} y={12} textAnchor="middle" fill={sectionBands.hook.text} fontSize="8" fontWeight="bold">HOOK / CHORUS (+6.2dB)</text>
+          <text x={innerW * 0.92} y={12} textAnchor="middle" fill={chart.textMuted} fontSize="8" fontWeight="bold">OUTRO</text>
 
           {/* Area & Wave Line */}
           <path d={areaPath} fill="url(#d3EnergyGrad)" />
-          <path d={linePath} fill="none" stroke="#7155F5" strokeWidth="2.75" />
+          <path d={linePath} fill="none" stroke={primary} strokeWidth="2.75" />
         </g>
       </svg>
     </div>
@@ -929,10 +933,10 @@ export const DynamicEnergyWaveformChart: React.FC<{ points: DynamicEnergyPoint[]
 // ============================================================================
 export const OrganicConversionScatterPlot: React.FC<{ peers: OrganicScatterPoint[] }> = ({ peers }) => {
   return (
-    <div className="relative h-44 bg-[#F8FAFC] rounded-xl p-3 border border-[#E2E8F0] overflow-hidden select-none">
+    <div className="relative h-44 bg-surface-subtle rounded p-3 border border-line overflow-hidden select-none">
       {/* Shaded Organic Safe Zone Corridor */}
-      <div className="absolute top-4 left-6 right-6 bottom-6 bg-[#10B981]/12 border border-[#10B981]/30 rounded-lg pointer-events-none flex items-center justify-center">
-        <span className="text-[10px] text-[#059669] font-black tracking-wider uppercase opacity-75">
+      <div className="absolute top-4 left-6 right-6 bottom-6 bg-success-600/12 border border-success-600/30 rounded-card pointer-events-none flex items-center justify-center">
+        <span className="text-2xs text-success-600 font-semibold tracking-wider uppercase opacity-75">
           High Retention Organic Corridor (Bot-Free)
         </span>
       </div>
@@ -946,11 +950,11 @@ export const OrganicConversionScatterPlot: React.FC<{ peers: OrganicScatterPoint
           return (
             <div
               key={i}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#7155F5] border-2 border-white shadow-md animate-pulse cursor-pointer flex items-center justify-center"
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded bg-brand-500 border-2 border-surface shadow-card animate-pulse cursor-pointer flex items-center justify-center"
               style={{ left: `${leftPct}%`, top: `${topPct}%`, width: '32px', height: '32px', zIndex: 10 }}
               title={`${p.artistName}: ${p.streamsToFollowerRatio}x ratio, ${p.organicConfidencePercent}% organic`}
             >
-              <span className="text-[9px] font-black text-white font-mono">YOU</span>
+              <span className="text-2xs font-semibold text-navy-900 font-mono">YOU</span>
             </div>
           );
         }
@@ -958,14 +962,14 @@ export const OrganicConversionScatterPlot: React.FC<{ peers: OrganicScatterPoint
         return (
           <div
             key={i}
-            className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#94A3B8] opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+            className="absolute -translate-x-1/2 -translate-y-1/2 rounded bg-purple-300 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
             style={{ left: `${leftPct}%`, top: `${topPct}%`, width: '12px', height: '12px' }}
             title={`${p.artistName}: ${p.streamsToFollowerRatio}x ratio`}
           />
         );
       })}
 
-      <div className="absolute bottom-1 right-3 text-[9px] font-mono text-[#94A3B8]">
+      <div className="absolute bottom-1 right-3 text-2xs font-mono text-purple-300">
         X: Stream/Follower Ratio • Y: Organic Conf %
       </div>
     </div>
@@ -984,14 +988,14 @@ export const DiscographyTrajectoryChart: React.FC<{ releases: DiscographyTraject
           return (
             <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
               <div
-                className="w-full bg-[#7155F5] group-hover:bg-[#5E3EE4] rounded-t-lg transition-all relative"
+                className="w-full bg-brand-500 group-hover:bg-brand-600 rounded-t-lg transition-all relative"
                 style={{ height: `${(rel.tavScore / 100) * 100}%` }}
               >
-                <div className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-[#0F172A] text-white text-[9px] px-1.5 py-0.5 rounded font-mono pointer-events-none whitespace-nowrap shadow-md">
+                <div className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-2xs px-1.5 py-0.5 rounded font-mono pointer-events-none whitespace-nowrap shadow-raised">
                   {rel.trackTitle}: TAV {rel.tavScore}
                 </div>
               </div>
-              <span className="text-[10px] text-[#64748B] font-mono font-bold truncate max-w-[64px]">
+              <span className="text-2xs text-purple-500 font-mono font-bold truncate max-w-[64px]">
                 Rel #{rel.releaseOrder}
               </span>
             </div>
@@ -999,9 +1003,9 @@ export const DiscographyTrajectoryChart: React.FC<{ releases: DiscographyTraject
         })}
       </div>
 
-      <div className="flex items-center justify-between text-xs text-[#64748B] pt-2 border-t border-[#F1F5F9]">
-        <span>Artistic Momentum: <strong className="text-[#059669]">+12.4% TAV Progression</strong></span>
-        <span className="font-mono text-[#7155F5] font-bold">Steep Upward Trajectory</span>
+      <div className="flex items-center justify-between text-xs text-purple-500 pt-2 border-t border-line">
+        <span>Artistic Momentum: <strong className="text-success-600">+12.4% TAV Progression</strong></span>
+        <span className="font-mono text-brand-600 font-bold">Steep Upward Trajectory</span>
       </div>
     </div>
   );

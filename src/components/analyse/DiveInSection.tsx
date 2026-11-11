@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -23,6 +23,8 @@ import {
   Award,
   ArrowUpRight
 } from 'lucide-react';
+import { platform } from '../../shared/theme/chartPalette';
+import { Button } from '../../shared/ui/Button';
 import { RealArtistData, RealSong } from '../../types';
 import { 
   GrowthMetricKPI, 
@@ -36,6 +38,7 @@ import {
   OrganicScatterPoint, 
   DiscographyTrajectoryPoint 
 } from '../../types/analytics';
+import { fetchAnalyticsTimeseries } from '../../services/backendApi';
 import {
   MonthlyStreamProgressionChart,
   PlatformAudiencePieChart,
@@ -60,13 +63,17 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
   onPlaySong,
   playingSongId
 }) => {
+  if (!artist) {
+    return <div className="p-6 border border-line-strong rounded bg-surface text-navy-700">No artist selected for analysis.</div>;
+  }
   // Horizon slicer (default: 90D for deep 90-day trajectory)
   const [timeHorizon, setTimeHorizon] = useState<'7D' | '30D' | '90D' | '180D' | '1Y'>('90D');
   const [selectedCohort, setSelectedCohort] = useState<'East Africa Indie' | 'Afrobeats / Amapiano' | 'Global Underground'>('East Africa Indie');
 
   // Derive base figures
-  const baseMonthly = artist.monthlyListeners || 184000;
-  const primaryTrack = artist.tracks?.[0];
+  const baseMonthly = Number(artist?.monthlyListeners || 0) || 184000;
+  const tracks = Array.isArray(artist?.tracks) ? artist.tracks : [];
+  const primaryTrack = tracks[0];
   const avm = primaryTrack?.avm;
   const rollup = artist.avmRollup;
 
@@ -85,7 +92,7 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
   // EXECUTIVE DASHBOARD SUMMARY SECTION (AT LEAST 5 KEY GROWTH METRICS)
   // ============================================================================
   const growthKpis: GrowthMetricKPI[] = useMemo(() => {
-    const streamGrowthRate = artist.growthSignal30d || 24.8;
+    const streamGrowthRate = Number(artist?.growthSignal30d ?? 24.8);
     const estStreams = Math.round(baseMonthly * 3.42 * horizonMultiplier);
 
     return [
@@ -125,7 +132,7 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {
         id: 'viral_probability',
         label: 'Viral Hit Probability',
-        value: `${artist.discoveryScore || 88.5}%`,
+        value: `${Number(artist?.discoveryScore ?? 88.5)}%`,
         subValue: 'Breakout Tier High',
         changePercent: 31.2,
         isPositive: true,
@@ -136,7 +143,7 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {
         id: 'regional_reach',
         label: 'Regional Reach',
-        value: `${artist.country || 'East Africa'} Hub`,
+        value: `${artist?.country || 'East Africa'} Hub`,
         subValue: '5 Core Metropolitan Hubs',
         changePercent: 28.4,
         isPositive: true,
@@ -158,7 +165,7 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {
         id: 'organic_integrity',
         label: 'Organic Integrity',
-        value: `${((artist.organicConfidence || 0.94) * 100).toFixed(0)}%`,
+        value: `${((Number(artist?.organicConfidence ?? 0.94)) * 100).toFixed(0)}%`,
         subValue: 'Bot anomaly < 1.2%',
         changePercent: 8.5,
         isPositive: true,
@@ -169,7 +176,7 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {
         id: 'est_advance',
         label: 'Recommended Advance',
-        value: `$${(avm ? avm.headroomRecommendation.suggestedStudioAdvanceUsd * 2.5 : 12500).toLocaleString()}`,
+        value: `$${(avm?.headroomRecommendation?.suggestedStudioAdvanceUsd ? avm.headroomRecommendation.suggestedStudioAdvanceUsd * 2.5 : 12500).toLocaleString()}`,
         subValue: 'EP Master Deal Option',
         changePercent: 18.0,
         isPositive: true,
@@ -181,20 +188,19 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
   }, [baseMonthly, horizonMultiplier, artist, rollup, avm, timeHorizon]);
 
   // ============================================================================
-  // DATASET 1: 90-DAY TIME SERIES STREAM PROGRESSION
+  // DATASET 1: TIME SERIES STREAM PROGRESSION (backend-preferred, local fallback)
   // ============================================================================
-  const timeSeriesProgression: TimeSeriesPoint[] = useMemo(() => {
+  const localTimeSeries = useMemo<TimeSeriesPoint[]>(() => {
     const points: TimeSeriesPoint[] = [];
     const now = Date.now();
     const dayMs = 86400000;
-    const numPoints = timeHorizon === '7D' ? 7 : timeHorizon === '30D' ? 30 : 90;
+    const numPoints = timeHorizon === '7D' ? 7 : timeHorizon === '30D' ? 30 : timeHorizon === '90D' ? 90 : timeHorizon === '180D' ? 180 : 365;
 
     for (let i = numPoints - 1; i >= 0; i--) {
       const pointTime = now - i * dayMs;
-      const progress = 1 - i / numPoints; // 0 to 1
+      const progress = 1 - i / Math.max(1, numPoints); // 0 to 1
       const noise = Math.sin(i * 0.45) * 0.12;
 
-      // Realistic progression starting from modest underground numbers to breakout
       const spotify = Math.round(baseMonthly * (0.35 + progress * 0.65 + noise) * 0.45);
       const appleMusic = Math.round(spotify * 0.28 * (1 + noise * 0.5));
       const youtube = Math.round(spotify * 0.55 * (1 - noise * 0.3));
@@ -214,16 +220,32 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
     return points;
   }, [baseMonthly, timeHorizon]);
 
+  const [backendTimeSeries, setBackendTimeSeries] = useState<TimeSeriesPoint[] | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchAnalyticsTimeseries(baseMonthly, timeHorizon)
+      .then(points => {
+        if (!mounted) return;
+        if (Array.isArray(points) && points.length > 0) setBackendTimeSeries(points as TimeSeriesPoint[]);
+        else setBackendTimeSeries(null);
+      })
+      .catch(() => { if (mounted) setBackendTimeSeries(null); });
+    return () => { mounted = false; };
+  }, [baseMonthly, timeHorizon, artist.id]);
+
+  const timeSeriesProgression: TimeSeriesPoint[] = backendTimeSeries && backendTimeSeries.length > 0 ? backendTimeSeries : localTimeSeries;
+
   // ============================================================================
   // DATASET 2: PLATFORM AUDIENCE SHARE
   // ============================================================================
   const platformSlices: PlatformShareSlice[] = useMemo(() => {
     return [
-      { platform: 'Spotify', sharePercentage: 42, streamCount: Math.round(baseMonthly * 1.45), color: '#10B981' },
-      { platform: 'YouTube', sharePercentage: 26, streamCount: Math.round(baseMonthly * 0.90), color: '#EF4444' },
-      { platform: 'TikTok', sharePercentage: 18, streamCount: Math.round(baseMonthly * 0.62), color: '#0F172A' },
-      { platform: 'Apple Music', sharePercentage: 9, streamCount: Math.round(baseMonthly * 0.31), color: '#F43F5E' },
-      { platform: 'Boomplay', sharePercentage: 5, streamCount: Math.round(baseMonthly * 0.17), color: '#38BDF8' }
+      { platform: 'Spotify', sharePercentage: 42, streamCount: Math.round(baseMonthly * 1.45), color: platform.spotify },
+      { platform: 'YouTube', sharePercentage: 26, streamCount: Math.round(baseMonthly * 0.90), color: platform.youtube },
+      { platform: 'TikTok', sharePercentage: 18, streamCount: Math.round(baseMonthly * 0.62), color: platform.tiktok },
+      { platform: 'Apple Music', sharePercentage: 9, streamCount: Math.round(baseMonthly * 0.31), color: platform.apple },
+      { platform: 'Boomplay', sharePercentage: 5, streamCount: Math.round(baseMonthly * 0.17), color: platform.boomplay }
     ];
   }, [baseMonthly]);
 
@@ -376,7 +398,7 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
   // ============================================================================
   const organicPeers: OrganicScatterPoint[] = useMemo(() => {
     return [
-      { artistName: artist.name, streamsToFollowerRatio: 3.42, organicConfidencePercent: 94, catalogDepth: 4, isTargetArtist: true },
+      { artistName: artist?.name || 'Artist', streamsToFollowerRatio: 3.42, organicConfidencePercent: 94, catalogDepth: 4, isTargetArtist: true },
       { artistName: 'Cohort Peer Alpha', streamsToFollowerRatio: 1.85, organicConfidencePercent: 78, catalogDepth: 3, isTargetArtist: false },
       { artistName: 'Cohort Peer Beta', streamsToFollowerRatio: 2.10, organicConfidencePercent: 82, catalogDepth: 5, isTargetArtist: false },
       { artistName: 'Cohort Peer Gamma', streamsToFollowerRatio: 2.65, organicConfidencePercent: 86, catalogDepth: 2, isTargetArtist: false },
@@ -390,8 +412,8 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
   // DATASET 10: DISCOGRAPHY TRAJECTORY
   // ============================================================================
   const discographyProgression: DiscographyTrajectoryPoint[] = useMemo(() => {
-    if (artist.tracks && artist.tracks.length > 0) {
-      return artist.tracks.slice(0, 6).map((t, idx) => ({
+    if (Array.isArray(artist?.tracks) && artist.tracks.length > 0) {
+      return (artist.tracks || []).slice(0, 6).map((t, idx) => ({
         releaseOrder: idx + 1,
         trackTitle: t.title,
         releaseDate: t.releaseDate || '2025',
@@ -410,8 +432,8 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
   // Export dossier functionality
   const handleExportDossier = () => {
     const report = {
-      artist: artist.name,
-      territory: `${artist.city}, ${artist.country}`,
+      artist: artist?.name || "Unknown",
+      territory: `${artist?.city || ''}, ${artist?.country || ''}`.replace(/^, |, $/g,''),
       horizon: timeHorizon,
       metrics: growthKpis,
       timeSeriesProgression,
@@ -424,57 +446,56 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `DiveIn_Executive_Dossier_${artist.name.replace(/\s+/g, '_')}_${timeHorizon}.json`;
+    link.download = `DiveIn_Executive_Dossier_${(artist?.name||'artist').replace(/\s+/g, '_')}_${timeHorizon}.json`;
     link.click();
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in pb-16">
+    <div className="space-y-5 animate-in fade-in pb-12">
       {/* =======================================================================
           TOP CONTROL PANEL & HORIZON SLICERS
          ======================================================================= */}
-      <div 
-        className="rounded-3xl p-6 shadow-xl space-y-4 border border-[rgba(255,255,255,0.15)] text-white"
-        style={{
-          background: 'radial-gradient(600px 320px at 90% 0, #7C5CFF 0, transparent 65%), #0B1530',
-          boxShadow: '0 14px 34px -16px rgba(59, 92, 170, 0.4)'
-        }}
-      >
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-white/10 text-[#C8F51F] border border-[#C8F51F]/40 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
-                <BarChart3 className="w-3 h-3 text-[#C8F51F]" />
-                DIVE IN · EXECUTIVE A&R INTELLIGENCE ENGINE
+      <div className="rounded-card border border-line-strong bg-surface overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3.5 p-3.5 border-b border-line">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-sm border border-brand-100 bg-brand-50 text-brand-600 text-2xs font-mono font-semibold uppercase tracking-[0.1em]">
+                <BarChart3 className="w-3 h-3" />
+                Dive In · Executive A&amp;R Intelligence Engine
               </span>
-              <span className="text-[10px] text-[#C8F51F] font-mono flex items-center gap-1 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C8F51F] animate-ping"></span>
-                LIVE D3 TELEMETRY READY
+              <span className="inline-flex items-center gap-1.5 text-2xs font-mono font-semibold uppercase tracking-[0.1em] text-success-600">
+                <span className="w-1.5 h-1.5 bg-success-600 animate-pulse"></span>
+                Live D3 telemetry
               </span>
             </div>
 
-            <h2 className="text-2xl font-black tracking-tight mt-1 text-white flex items-center gap-2">
-              <span>{artist.name}</span>
-              <span className="text-sm font-semibold text-[#DFE9FF]">({artist.city}, {artist.country})</span>
+            <h2 className="text-lg font-semibold tracking-tight mt-1.5 text-navy-700 flex items-baseline flex-wrap gap-x-2">
+              <span className="font-mono">{artist?.name || 'Artist'}</span>
+              <span className="text-xs font-normal text-purple-500">
+                ({artist?.city || '—'}, {artist?.country || '—'})
+              </span>
             </h2>
-            <p className="text-xs text-[#DFE9FF]/80 max-w-2xl leading-relaxed mt-0.5">
-              Multi-channel streaming progression, platform concentration, daily engagement anomalies, vocal tessitura cent distributions, and forensic organic repeat retention.
+            <p className="text-xs text-purple-500 max-w-2xl mt-1">
+              Multi-channel streaming progression, platform concentration, engagement
+              anomalies, vocal tessitura and organic repeat retention.
             </p>
           </div>
 
-          {/* Slicers & Export */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* Timeframe Slicer */}
-            <div className="flex items-center bg-white/10 border border-white/20 p-1 rounded-full text-xs backdrop-blur-md">
-              <span className="text-[10px] font-bold text-[#DFE9FF] px-2.5 uppercase">Horizon:</span>
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            {/* Horizon slicer — segmented block group */}
+            <div className="inline-flex items-center rounded-sm border border-line overflow-hidden bg-surface">
+              <span className="px-2 py-1.5 text-2xs font-mono font-semibold uppercase tracking-[0.1em] text-purple-500 border-r border-line bg-surface-subtle">
+                HZ
+              </span>
               {(['7D', '30D', '90D', '180D', '1Y'] as const).map(t => (
                 <button
                   key={t}
                   onClick={() => setTimeHorizon(t)}
-                  className={`px-3 py-1 rounded-full font-extrabold text-xs transition-all cursor-pointer ${
+                  aria-pressed={timeHorizon === t}
+                  className={`px-2.5 py-1.5 text-2xs font-mono font-semibold uppercase tracking-wider cursor-pointer transition-colors border-l border-line first:border-l-0 ${
                     timeHorizon === t
-                      ? 'bg-[#3B6CFF] text-white shadow-xs'
-                      : 'text-[#DFE9FF] hover:text-white'
+                      ? 'bg-brand-500 text-navy-900'
+                      : 'text-purple-500 hover:bg-purple-100 hover:text-navy-700'
                   }`}
                 >
                   {t}
@@ -482,76 +503,88 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
               ))}
             </div>
 
-            {/* Export JSON Dossier */}
-            <button
-              onClick={handleExportDossier}
-              className="btn-lime text-xs flex items-center gap-1.5 cursor-pointer shadow-sm"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export Dossier (JSON)</span>
-            </button>
+            <Button variant="secondary" size="sm" onClick={handleExportDossier} leftIcon={<Download className="w-3.5 h-3.5" />}>
+              Export Dossier
+            </Button>
           </div>
         </div>
 
-        {/* Cohort Benchmark Slicer */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/15 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-[#DFE9FF]/80 uppercase">Benchmark Peer Cohort:</span>
-            {(['East Africa Indie', 'Afrobeats / Amapiano', 'Global Underground'] as const).map(c => (
-              <button
-                key={c}
-                onClick={() => setSelectedCohort(c)}
-                className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-colors ${
-                  selectedCohort === c ? 'bg-white text-[#0B1530]' : 'text-[#DFE9FF] hover:text-white'
-                }`}
-              >
-                {c}
-              </button>
-            ))}
+        {/* Cohort benchmark slicer */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-3.5 py-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-2xs font-mono font-semibold uppercase tracking-[0.1em] text-purple-500">
+              Benchmark peer cohort
+            </span>
+            <div className="inline-flex items-center rounded-sm border border-line overflow-hidden">
+              {(['East Africa Indie', 'Afrobeats / Amapiano', 'Global Underground'] as const).map(c => (
+                <button
+                  key={c}
+                  onClick={() => setSelectedCohort(c)}
+                  aria-pressed={selectedCohort === c}
+                  className={`px-2.5 py-1 text-2xs font-mono uppercase tracking-wide cursor-pointer transition-colors border-l border-line first:border-l-0 ${
+                    selectedCohort === c
+                      ? 'bg-surface-subtle text-navy-700'
+                      : 'text-purple-500 hover:bg-purple-100 hover:text-navy-700'
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="text-[11px] text-[#DFE9FF]/80">
-            Cohort Size: <strong className="text-white">142 Emerging Artists</strong> • Confidence Interval: <strong className="text-[#C8F51F]">95%</strong>
+          <div className="text-2xs font-mono uppercase tracking-wide text-purple-500">
+            Cohort <span className="text-navy-700 font-semibold">142</span> artists
+            <span className="mx-1.5 text-line-strong">|</span>
+            CI <span className="text-success-600 font-semibold">95%</span>
           </div>
         </div>
       </div>
 
       {/* =======================================================================
-          EXECUTIVE DASHBOARD SUMMARY SECTION: 8 KEY GROWTH METRICS WITH TRENDS
+          EXECUTIVE DASHBOARD — BORDER-DIVIDED KPI TABLE
          ======================================================================= */}
       <div>
-        <div className="flex items-center justify-between mb-2.5">
-          <h3 className="text-xs font-black text-[#0B1530] uppercase tracking-wider flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#3B6CFF]" />
-            <span>Executive Growth Dashboard · Key Performance Indicators</span>
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <h3 className="text-2xs font-mono font-semibold uppercase tracking-[0.14em] text-purple-500 flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-info-600" />
+            Executive growth dashboard · KPIs
           </h3>
-          <span className="text-[11px] text-[#5F6B8A]">
-            Telemetry benchmarked across DSPs and UGC audio engines
+          <span className="text-2xs font-mono uppercase tracking-[0.1em] text-purple-500 shrink-0">
+            DSP + UGC benchmarked
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-          {growthKpis.map(kpi => (
-            <div
-              key={kpi.id}
-              className="p-3.5 rounded-2xl bg-white border border-[rgba(120,140,190,0.2)] shadow-[0_14px_34px_-16px_rgba(59,92,170,0.22),inset_0_1px_0_#fff] space-y-1 hover:border-[#3B6CFF] transition-all"
-              title={kpi.tooltip}
-            >
-              <span className="text-[10px] font-bold text-[#5F6B8A] uppercase block truncate">
-                {kpi.label}
-              </span>
-              <div className="text-lg font-black text-[#0B1530] font-mono tracking-tight">
-                {kpi.value}
+        <div className="rounded-card border border-line bg-line overflow-hidden">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-px">
+            {growthKpis.map(kpi => (
+              <div
+                key={kpi.id}
+                className="bg-surface px-2.5 py-2 min-w-0 hover:bg-purple-100 transition-colors"
+                title={kpi.tooltip}
+              >
+                <div className="text-2xs font-mono font-semibold uppercase tracking-[0.08em] text-purple-500 truncate">
+                  {kpi.label}
+                </div>
+                <div className="text-lg font-mono font-semibold tabular-nums tracking-tight text-navy-700 mt-0.5 truncate">
+                  {kpi.value}
+                </div>
+                <div className="flex items-baseline justify-between gap-1.5 mt-0.5">
+                  <span
+                    className={`text-2xs font-mono font-semibold tabular-nums shrink-0 ${
+                      kpi.changePercent >= 0 ? 'text-success-600' : 'text-danger-600'
+                    }`}
+                  >
+                    {kpi.changePercent >= 0 ? '+' : ''}
+                    {kpi.changePercent.toFixed(1)}%
+                  </span>
+                  <span className="text-2xs font-mono text-purple-500 truncate">
+                    {kpi.periodLabel}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between pt-0.5">
-                <span className="flex items-center gap-0.5 text-[10px] font-extrabold text-[#12B76A]">
-                  <TrendingUp className="w-3 h-3 text-[#12B76A]" />
-                  <span>+{kpi.changePercent.toFixed(1)}%</span>
-                </span>
-                <span className="text-[9px] text-[#5F6B8A] truncate font-medium">{kpi.periodLabel}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
@@ -562,35 +595,37 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 1: Visualizations 1 & 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 1: Monthly Stream Progression (8 cols) */}
-        <div className="lg:col-span-8 glass p-5 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[rgba(120,140,190,0.2)] pb-3">
-            <div>
-              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
-                VISUALIZATION 01 · TIME-SERIES TRAJECTORY
-              </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+        <div className="lg:col-span-8 rounded-card border border-line bg-surface overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3.5 py-2.5 border-b border-line bg-surface-subtle">
+            <div className="min-w-0">
+              <div className="text-2xs font-mono font-semibold uppercase tracking-[0.1em] text-brand-600">
+                Visualization 01 · Time-series trajectory
+              </div>
+              <div className="text-xs font-semibold text-navy-700 mt-0.5">
                 Monthly Stream Progression ({timeHorizon} Telemetry)
-              </h3>
+              </div>
             </div>
-            <span className="text-xs font-mono font-bold text-[#12B76A] bg-[#EFFBC4] px-2.5 py-0.5 rounded-full border border-[#C8F51F]">
-              +68.4% Net MoM Growth
+            <span className="text-2xs font-mono font-semibold tabular-nums uppercase tracking-wide text-success-600 shrink-0">
+              +68.4% Net MoM
             </span>
           </div>
 
-          <MonthlyStreamProgressionChart
-            data={timeSeriesProgression}
-            height={260}
-            timeRangeLabel={timeHorizon}
-          />
+          <div className="p-3.5">
+            <MonthlyStreamProgressionChart
+              data={timeSeriesProgression}
+              height={260}
+              timeRangeLabel={timeHorizon}
+            />
+          </div>
         </div>
 
         {/* Visualization 2: Platform Audience Share Distribution (4 cols) */}
-        <div className="lg:col-span-4 glass p-5 space-y-4 flex flex-col justify-between">
-          <div className="border-b border-[rgba(120,140,190,0.2)] pb-3">
-            <span className="text-[10px] font-black text-[#7C5CFF] uppercase tracking-wider block">
+        <div className="lg:col-span-4 glass p-3.5 space-y-3 flex flex-col justify-between">
+          <div className="border-b border-line pb-3">
+            <span className="text-2xs font-semibold text-brand-600 uppercase tracking-wider block">
               VISUALIZATION 02 · DSP AUDIENCE SHARE
             </span>
-            <h3 className="text-sm font-extrabold text-[#0B1530]">
+            <h3 className="text-sm font-semibold text-navy-700">
               Platform Audience Distribution (Pie / Donut)
             </h3>
           </div>
@@ -600,8 +635,10 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
             size={220}
           />
 
-          <div className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
-            Dominant presence on <strong>Spotify (42%)</strong> with accelerated UGC discovery through <strong>TikTok audio usage (18%)</strong>.
+          <div className="text-2xs font-mono uppercase tracking-wide text-purple-500 pt-2 border-t border-line">
+            Spotify <span className="text-navy-700 font-semibold">42%</span>
+            <span className="mx-1.5 text-line-strong">|</span>
+            TikTok UGC <span className="text-navy-700 font-semibold">18%</span>
           </div>
         </div>
       </div>
@@ -609,17 +646,17 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 2: Visualizations 3 & 4 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 3: Daily Engagement Spikes (8 cols) */}
-        <div className="lg:col-span-8 glass p-5 space-y-3">
-          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
+        <div className="lg:col-span-8 glass p-3.5 space-y-3">
+          <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
+              <span className="text-2xs font-semibold text-info-600 uppercase tracking-wider block">
                 VISUALIZATION 03 · 90-DAY VOLATILITY & OUTLIER DETECTION
               </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+              <h3 className="text-sm font-semibold text-navy-700">
                 Daily Engagement Spikes Over the Last 90 Days
               </h3>
             </div>
-            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[#EFFBC4] text-[#0B1530] border border-[#C8F51F]">
+            <span className="text-2xs font-semibold px-2.5 py-0.5 rounded bg-warning-50 text-navy-700 border border-warning-100">
               3 Confirmed Viral Breakouts
             </span>
           </div>
@@ -631,13 +668,13 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
         </div>
 
         {/* Visualization 4: TikTok & Reels UGC Virality Timeline (4 cols) */}
-        <div className="lg:col-span-4 glass p-5 space-y-3 flex flex-col justify-between">
+        <div className="lg:col-span-4 glass p-3.5 space-y-3 flex flex-col justify-between">
           <div>
-            <div className="border-b border-[rgba(120,140,190,0.2)] pb-3">
-              <span className="text-[10px] font-black text-[#F0457A] uppercase tracking-wider block">
+            <div className="border-b border-line pb-3">
+              <span className="text-2xs font-semibold text-brand-600 uppercase tracking-wider block">
                 VISUALIZATION 04 · SHORT-FORM VIRALITY
               </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+              <h3 className="text-sm font-semibold text-navy-700">
                 TikTok & Reels UGC Creations Velocity
               </h3>
             </div>
@@ -646,10 +683,10 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white/70 border border-[rgba(120,140,190,0.2)] text-xs space-y-1">
-            <span className="text-[10px] font-bold text-[#F0457A] uppercase block">UGC Creation Lift</span>
-            <div className="text-sm font-black text-[#0B1530] font-mono">+210% Week-over-Week</div>
-            <p className="text-[10px] text-[#5F6B8A]">Over 2,640 new user videos created with this artist's sound snippet.</p>
+          <div className="p-3.5 rounded bg-surface border border-line text-xs space-y-1">
+            <span className="text-2xs font-bold text-brand-600 uppercase block">UGC Creation Lift</span>
+            <div className="text-sm font-semibold text-navy-700 font-mono">+210% Week-over-Week</div>
+            <p className="text-2xs font-mono uppercase tracking-wide text-purple-500">2,640 new UGC videos on this sound</p>
           </div>
         </div>
       </div>
@@ -657,48 +694,52 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 3: Visualizations 5 & 6 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 5: Regional Listener Concentration (6 cols) */}
-        <div className="lg:col-span-6 glass p-5 space-y-3">
-          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
+        <div className="lg:col-span-6 glass p-3.5 space-y-3">
+          <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
+              <span className="text-2xs font-semibold text-info-600 uppercase tracking-wider block">
                 VISUALIZATION 05 · GEOGRAPHIC TERRITORY FOOTPRINT
               </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+              <h3 className="text-sm font-semibold text-navy-700">
                 Regional Listener Concentration (East Africa Hubs)
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#ECFDF5] text-[#12B76A] border border-[#12B76A]/30">
+            <span className="text-2xs font-bold px-2.5 py-0.5 rounded bg-success-50 text-success-600 border border-success-600/30">
               Nairobi Metropolitan Core
             </span>
           </div>
 
           <RegionalListenerConcentrationChart cities={regionalCities} />
 
-          <p className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
-            Strong grassroot anchor in <strong>Nairobi (46%)</strong> with organic cross-border penetration into <strong>Mombasa, Dar es Salaam, and Kampala</strong>.
+          <p className="text-2xs font-mono uppercase tracking-wide text-purple-500 pt-2 border-t border-line">
+            Nairobi <span className="text-navy-700 font-semibold">46%</span>
+            <span className="mx-1.5 text-line-strong">|</span>
+            Mombasa · Dar es Salaam · Kampala
           </p>
         </div>
 
         {/* Visualization 6: AVM 4-Pillar Spider Radar Chart (6 cols) */}
-        <div className="lg:col-span-6 glass p-5 space-y-3">
-          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
+        <div className="lg:col-span-6 glass p-3.5 space-y-3">
+          <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7C5CFF] uppercase tracking-wider block">
+              <span className="text-2xs font-semibold text-brand-600 uppercase tracking-wider block">
                 VISUALIZATION 06 · AVM 4-PILLAR RADAR PROFILE
               </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+              <h3 className="text-sm font-semibold text-navy-700">
                 Acoustic & Artistic Competence Spider Radar
               </h3>
             </div>
-            <span className="text-xs font-mono font-black text-[#7C5CFF]">
+            <span className="text-xs font-mono font-semibold text-brand-600">
               AAV {rollup ? rollup.aav : 84.5}
             </span>
           </div>
 
           <AvmRadarChart metrics={radarMetrics} size={250} />
 
-          <p className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
-            Artist competence significantly outperforms the 142-peer cohort in <strong>Vocal Holding ($P_V$)</strong> and <strong>Multilingual Writing Arc ($P_W$)</strong>.
+          <p className="text-2xs font-mono uppercase tracking-wide text-purple-500 pt-2 border-t border-line">
+            vs 142-peer cohort · Vocal holding <span className="text-success-600 font-semibold">↑</span>
+            <span className="mx-1.5 text-line-strong">|</span>
+            Multilingual arc <span className="text-success-600 font-semibold">↑</span>
           </p>
         </div>
       </div>
@@ -706,58 +747,58 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 4: Visualizations 7 & 8 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 7: Vocal F0 Cent Error Distribution Histogram (6 cols) */}
-        <div className="lg:col-span-6 glass p-5 space-y-3">
-          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
+        <div className="lg:col-span-6 glass p-3.5 space-y-3">
+          <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
+              <span className="text-2xs font-semibold text-info-600 uppercase tracking-wider block">
                 VISUALIZATION 07 · VOCAL PITCH INTONATION ACCURACY
               </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+              <h3 className="text-sm font-semibold text-navy-700">
                 CREPE Cent Deviation Histogram (-50¢ to +50¢)
               </h3>
             </div>
-            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[#EFFBC4] text-[#0B1530] border border-[#C8F51F]">
+            <span className="text-2xs font-semibold px-2.5 py-0.5 rounded bg-warning-50 text-navy-700 border border-warning-100">
               89.4% in Strict Key
             </span>
           </div>
 
           <VocalPitchHistogramChart bins={pitchBins} />
 
-          <p className="text-[11px] text-[#5F6B8A] pt-1">
-            Psychoacoustic evaluation validates that <strong>89.4% of vocal audio frames</strong> stay within the narrow $\pm 20$ cents threshold without heavy pitch correction artifacts.
+          <p className="text-2xs font-mono uppercase tracking-wide text-purple-500 pt-1">
+            89.4% frames within ±20¢ · no pitch correction
           </p>
         </div>
 
         {/* Visualization 8: Dynamic 1-Pt/Sec Track Energy & Section Lift (6 cols) */}
-        <div className="lg:col-span-6 glass p-5 space-y-3">
-          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
+        <div className="lg:col-span-6 glass p-3.5 space-y-3">
+          <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
+              <span className="text-2xs font-semibold text-info-600 uppercase tracking-wider block">
                 VISUALIZATION 08 · DYNAMIC 1-PT/SEC TRACK ENERGY CURVE ($P_S$)
               </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+              <h3 className="text-sm font-semibold text-navy-700">
                 Loudness Jump, Section Lift & Waveform Dynamics
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#DFE9FF] text-[#3B6CFF]">
+            <span className="text-2xs font-bold px-2.5 py-0.5 rounded bg-purple-50 text-info-600">
               {primaryTrack?.title || 'Catalog Single'}
             </span>
           </div>
 
           <DynamicEnergyWaveformChart points={energyPoints} />
 
-          <div className="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-[rgba(120,140,190,0.18)]">
+          <div className="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-line">
             <div>
-              <span className="text-[10px] text-[#5F6B8A] block font-semibold">Time to First Hook</span>
-              <strong className="text-[#0B1530] font-mono">14.0s (Optimal)</strong>
+              <span className="text-2xs text-purple-700 block font-semibold">Time to First Hook</span>
+              <strong className="text-navy-700 font-mono">14.0s (Optimal)</strong>
             </div>
             <div>
-              <span className="text-[10px] text-[#5F6B8A] block font-semibold">Chorus Lift Delta</span>
-              <strong className="text-[#12B76A] font-mono">+6.2 dB RMS</strong>
+              <span className="text-2xs text-purple-700 block font-semibold">Chorus Lift Delta</span>
+              <strong className="text-success-600 font-mono">+6.2 dB RMS</strong>
             </div>
             <div>
-              <span className="text-[10px] text-[#5F6B8A] block font-semibold">Spectral Contrast</span>
-              <strong className="text-[#7C5CFF] font-mono">0.84 High</strong>
+              <span className="text-2xs text-purple-700 block font-semibold">Spectral Contrast</span>
+              <strong className="text-brand-600 font-mono">0.84 High</strong>
             </div>
           </div>
         </div>
@@ -766,47 +807,49 @@ export const DiveInSection: React.FC<DiveInSectionProps> = ({
       {/* ROW 5: Visualizations 9 & 10 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Visualization 9: Stream-to-Follower Organic Conversion Scatter Plot (6 cols) */}
-        <div className="lg:col-span-6 glass p-5 space-y-3">
-          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
+        <div className="lg:col-span-6 glass p-3.5 space-y-3">
+          <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">
+              <span className="text-2xs font-semibold text-info-600 uppercase tracking-wider block">
                 VISUALIZATION 09 · ORGANIC CONVERSION BENCHMARK
               </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+              <h3 className="text-sm font-semibold text-navy-700">
                 Stream-to-Follower Repeat Scatter (Bot vs Organic Corridor)
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#ECFDF5] text-[#12B76A] border border-[#12B76A]/30">
+            <span className="text-2xs font-bold px-2.5 py-0.5 rounded bg-success-50 text-success-600 border border-success-600/30">
               Verified Safe Zone
             </span>
           </div>
 
           <OrganicConversionScatterPlot peers={organicPeers} />
 
-          <p className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
-            {artist.name} demonstrates a <strong>3.42x stream replay ratio</strong> with <strong>94% organic confidence</strong>, confirming strong fan loyalty rather than artificial click-farming.
+          <p className="text-2xs font-mono uppercase tracking-wide text-purple-500 pt-2 border-t border-line">
+            Replay <span className="text-navy-700 font-semibold">3.42×</span>
+            <span className="mx-1.5 text-line-strong">|</span>
+            Organic confidence <span className="text-success-600 font-semibold">94%</span>
           </p>
         </div>
 
         {/* Visualization 10: Discography Trajectory (TAV vs Production per Release) (6 cols) */}
-        <div className="lg:col-span-6 glass p-5 space-y-3">
-          <div className="flex items-center justify-between border-b border-[rgba(120,140,190,0.2)] pb-3">
+        <div className="lg:col-span-6 glass p-3.5 space-y-3">
+          <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
-              <span className="text-[10px] font-black text-[#7C5CFF] uppercase tracking-wider block">
+              <span className="text-2xs font-semibold text-brand-600 uppercase tracking-wider block">
                 VISUALIZATION 10 · DISCOGRAPHY TRAJECTORY
               </span>
-              <h3 className="text-sm font-extrabold text-[#0B1530]">
+              <h3 className="text-sm font-semibold text-navy-700">
                 TAV Progression Across Verified Singles
               </h3>
             </div>
-            <span className="text-xs font-mono font-bold text-[#12B76A]">
+            <span className="text-xs font-mono font-bold text-success-600">
               +{rollup ? rollup.trajectory : 76.5} Slope
             </span>
           </div>
 
           <DiscographyTrajectoryChart releases={discographyProgression} />
 
-          <p className="text-[11px] text-[#5F6B8A] pt-2 border-t border-[rgba(120,140,190,0.18)]">
+          <p className="text-2xs text-purple-700 pt-2 border-t border-line">
             Successive releases show marked compound improvement in both songwriting cohesion ($P_S$) and vocal maturity ($P_V$).
           </p>
         </div>

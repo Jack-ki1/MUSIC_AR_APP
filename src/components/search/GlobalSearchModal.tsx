@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, Compass, Activity, Sparkles, Settings as SettingsIcon, ArrowRight } from 'lucide-react';
+import { Search, X, Command } from 'lucide-react';
 import { RealArtistData } from '../../services/realMusicApi';
 import { WorkspaceSection } from '../../types';
+import { Pill } from '../../shared/ui/Pill';
 
 interface GlobalSearchModalProps {
   isOpen: boolean;
@@ -10,6 +11,13 @@ interface GlobalSearchModalProps {
   onSelectArtist: (artist: RealArtistData) => void;
   onNavigateSection: (section: WorkspaceSection) => void;
 }
+
+const NAV_SECTIONS: [WorkspaceSection, string][] = [
+  ['discovery', 'Discovery'],
+  ['analyse', 'Analyze'],
+  ['recommendations', 'Recommendations'],
+  ['settings', 'Settings']
+];
 
 export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   isOpen,
@@ -26,9 +34,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         e.preventDefault();
         if (isOpen) onClose();
       }
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
+      if (e.key === 'Escape' && isOpen) onClose();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -36,111 +42,119 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   if (!isOpen) return null;
 
-  const filtered = artists.filter(a => 
-    a.name.toLowerCase().includes(query.toLowerCase()) ||
-    a.city.toLowerCase().includes(query.toLowerCase()) ||
-    a.country.toLowerCase().includes(query.toLowerCase()) ||
-    a.primaryGenre.toLowerCase().includes(query.toLowerCase())
-  );
+  const q = query.toLowerCase().trim();
+  const filtered = q
+    ? artists.filter(a =>
+        a.name.toLowerCase().includes(q) ||
+        a.city?.toLowerCase().includes(q) ||
+        a.country?.toLowerCase().includes(q) ||
+        a.primaryGenre?.toLowerCase().includes(q)
+      ).slice(0, 20)
+    : [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-[#0B1530]/40 backdrop-blur-md animate-in fade-in duration-150">
-      <div 
-        className="w-full max-w-xl glass p-0 overflow-hidden flex flex-col shadow-2xl border border-white/90"
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4 bg-black/70"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-xl bg-surface border border-line rounded-card shadow-overlay overflow-hidden section-enter"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Search Input Bar */}
-        <div className="flex items-center px-5 py-4 border-b border-[rgba(120,140,190,0.2)] gap-3 bg-white/60">
-          <Search className="w-5 h-5 text-[#3B6CFF] shrink-0" />
+        <div className="flex items-center px-3 py-2.5 border-b border-line gap-2">
+          <Search className="w-4 h-4 text-purple-500 shrink-0" />
           <input
             type="text"
-            placeholder="Search artist, city, genre..."
+            placeholder="Search artists, city, genre..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
-            className="w-full bg-transparent text-[#0B1530] placeholder-[#5F6B8A] text-sm font-semibold focus:outline-none"
+            className="w-full bg-transparent border-none p-0 text-sm text-navy-700 placeholder:text-navy-300 focus:outline-none focus:ring-0 focus:shadow-none"
+            style={{ boxShadow: 'none', border: 'none', padding: 0 }}
           />
-          <button 
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 text-2xs font-mono text-purple-500 border border-line rounded px-1.5 py-0.5">
+            <Command className="w-3 h-3" /> K
+          </kbd>
+          <button
             onClick={onClose}
-            className="p-1 rounded-full text-[#5F6B8A] hover:text-[#0B1530] hover:bg-white/80 cursor-pointer"
+            aria-label="Close search"
+            className="p-1 rounded-tile text-purple-500 hover:text-navy-700 hover:bg-purple-50 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Results */}
-        <div className="max-h-[50vh] overflow-y-auto p-5 space-y-4">
-          {!query && (
-            <div className="space-y-2">
-              <span className="text-[10px] font-black text-[#5F6B8A] uppercase tracking-wider block">
-                Quick Navigation
-              </span>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <button
-                  onClick={() => { onNavigateSection('discovery'); onClose(); }}
-                  className="p-2.5 rounded-2xl bg-white/70 hover:bg-white border border-[rgba(120,140,190,0.2)] text-xs font-bold text-[#0B1530] flex items-center gap-2 cursor-pointer transition-all shadow-2xs hover:shadow-xs"
-                >
-                  <Compass className="w-4 h-4 text-[#3B6CFF]" />
-                  <span>Discovery</span>
-                </button>
-                <button
-                  onClick={() => { onNavigateSection('analyse'); onClose(); }}
-                  className="p-2.5 rounded-2xl bg-white/70 hover:bg-white border border-[rgba(120,140,190,0.2)] text-xs font-bold text-[#0B1530] flex items-center gap-2 cursor-pointer transition-all shadow-2xs hover:shadow-xs"
-                >
-                  <Activity className="w-4 h-4 text-[#3B6CFF]" />
-                  <span>Analyze</span>
-                </button>
-                <button
-                  onClick={() => { onNavigateSection('recommendations'); onClose(); }}
-                  className="p-2.5 rounded-2xl bg-white/70 hover:bg-white border border-[rgba(120,140,190,0.2)] text-xs font-bold text-[#0B1530] flex items-center gap-2 cursor-pointer transition-all shadow-2xs hover:shadow-xs"
-                >
-                  <Sparkles className="w-4 h-4 text-[#7C5CFF]" />
-                  <span>Recommend</span>
-                </button>
-                <button
-                  onClick={() => { onNavigateSection('settings'); onClose(); }}
-                  className="p-2.5 rounded-2xl bg-white/70 hover:bg-white border border-[rgba(120,140,190,0.2)] text-xs font-bold text-[#0B1530] flex items-center gap-2 cursor-pointer transition-all shadow-2xs hover:shadow-xs"
-                >
-                  <SettingsIcon className="w-4 h-4 text-[#FF8A3D]" />
-                  <span>Settings</span>
-                </button>
+        <div className="max-h-[50vh] overflow-y-auto p-2">
+          {!q && (
+            <div className="p-1">
+              <div className="text-2xs font-semibold text-purple-500 uppercase tracking-wider px-2 py-1">
+                Navigate
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
+                {NAV_SECTIONS.map(([sec, label]) => (
+                  <button
+                    key={sec}
+                    onClick={() => { onNavigateSection(sec); onClose(); }}
+                    className="px-2 py-1.5 text-xs text-left text-navy-700 hover:bg-purple-50 rounded-tile border border-transparent hover:border-line cursor-pointer"
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
           )}
 
-          <div>
-            <span className="text-[10px] font-black text-[#5F6B8A] uppercase tracking-wider block mb-2">
-              Discovered Artists ({filtered.length})
-            </span>
-            <div className="space-y-1.5">
-              {filtered.map((artist, idx) => (
-                <div
-                  key={`search-art-${artist.id}-${idx}`}
-                  onClick={() => {
-                    onSelectArtist(artist);
-                    onNavigateSection('analyse');
-                    onClose();
-                  }}
-                  className="p-3 rounded-2xl bg-white/70 hover:bg-white border border-[rgba(120,140,190,0.2)] flex items-center justify-between cursor-pointer group transition-all shadow-2xs hover:shadow-xs"
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={artist.avatarUrl}
-                      alt={artist.name}
-                      className="w-9 h-9 rounded-xl object-cover border border-[rgba(120,140,190,0.25)] shadow-xs"
-                    />
-                    <div>
-                      <p className="text-xs font-extrabold text-[#0B1530] group-hover:text-[#3B6CFF]">{artist.name}</p>
-                      <p className="text-[10px] text-[#5F6B8A]">{artist.city}, {artist.country} • {artist.primaryGenre}</p>
-                    </div>
-                  </div>
-                  <span className="text-xs font-mono font-black text-[#7C5CFF]">
-                    {artist.discoveryScore.toFixed(1)}
-                  </span>
+          {q && (
+            <div>
+              <div className="text-2xs font-semibold text-purple-500 uppercase tracking-wider px-2 py-1">
+                Results ({filtered.length})
+              </div>
+              {filtered.length === 0 ? (
+                <div className="px-2 py-3 text-xs text-purple-500">No matches.</div>
+              ) : (
+                <div className="space-y-0.5">
+                  {filtered.map((artist, idx) => (
+                    <button
+                      key={`search-${artist.id}-${idx}`}
+                      onClick={() => { onSelectArtist(artist); onNavigateSection('analyse'); onClose(); }}
+                      className="w-full px-2 py-1.5 rounded-tile hover:bg-purple-50 border border-transparent hover:border-line flex items-center justify-between gap-2 cursor-pointer text-left"
+                    >
+                      <span className="flex items-center gap-2 min-w-0">
+                        <img
+                          src={artist.avatarUrl}
+                          alt=""
+                          className="w-6 h-6 rounded-tile object-cover border border-line shrink-0"
+                        />
+                        <span className="min-w-0">
+                          <span className="block text-xs font-medium text-navy-700 truncate">
+                            {artist.name}
+                          </span>
+                          <span className="block text-2xs text-purple-500 truncate">
+                            {artist.city}, {artist.country} · {artist.primaryGenre}
+                          </span>
+                        </span>
+                      </span>
+                      <span className="shrink-0 flex items-center gap-1.5">
+                        <Pill
+                          tone={
+                            artist.recommendationTier === 'PURSUE' ? 'sign'
+                            : artist.recommendationTier === 'MEET' ? 'meet'
+                            : artist.recommendationTier === 'MORE_EVIDENCE' ? 'evidence'
+                            : 'watch'
+                          }
+                        >
+                          {artist.recommendationTier}
+                        </Pill>
+                        <span className="text-2xs font-mono text-purple-700">
+                          {Number(artist.discoveryScore || 0).toFixed(1)}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,34 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Sparkles, 
-  CheckCircle2, 
-  ArrowRight, 
-  UserCheck, 
-  Calendar, 
-  Check, 
-  X,
-  ExternalLink,
-  Music,
+  Sparkles,
+  CheckCircle2,
+  UserCheck,
   Scale,
-  DollarSign,
   FileText,
   Copy,
-  Sliders,
   Play,
   Pause,
-  AlertCircle,
   Download,
   Kanban,
   Table as TableIcon,
-  TrendingUp,
-  Clock,
-  ShieldCheck,
-  CheckSquare,
-  HelpCircle,
-  FolderDown,
-  Layers
+  CheckSquare
 } from 'lucide-react';
 import { RealArtistData, ARDecision, RealSong } from '../../types';
+import { fetchDecisionsFromBackend } from '../../services/backendApi';
+import { Button } from '../../shared/ui/Button';
+import { Card } from '../../shared/ui/Card';
+import { Modal } from '../../shared/ui/Modal';
+import { Pill, PillTone } from '../../shared/ui/Pill';
+import { SectionHeader } from '../../shared/ui/SectionHeader';
+import { Tabs } from '../../shared/ui/Tabs';
+import { Field, Input, Select, Textarea } from '../../shared/ui/Field';
 
 interface RecommendationsSectionProps {
   artists: RealArtistData[];
@@ -36,13 +29,27 @@ interface RecommendationsSectionProps {
   onRecordDecision: (artistId: string, decision: string, notes: string) => void;
 }
 
+type SubTab = 'matrix' | 'pipeline-board' | 'decisions' | 'comparison' | 'next-actions';
+
+/** Recommendation tier → shared pill tone. */
+const tierTone = (tier?: string): PillTone => {
+  switch (tier) {
+    case 'PURSUE': return 'sign';
+    case 'MEET': return 'meet';
+    case 'WATCH': return 'watch';
+    case 'MORE_EVIDENCE': return 'evidence';
+    case 'HOLD': return 'hold';
+    default: return 'neutral';
+  }
+};
+
 export const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({
   artists,
   onSelectArtist,
   onRecordDecision,
 }) => {
   // Sub-Navigation: 'matrix' | 'pipeline-board' | 'decisions' | 'comparison' | 'next-actions'
-  const [activeSubTab, setActiveSubTab] = useState<'matrix' | 'pipeline-board' | 'decisions' | 'comparison' | 'next-actions'>('matrix');
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>('matrix');
 
   const [selectedTier, setSelectedTier] = useState<string>('ALL');
   const [showDecisionModal, setShowDecisionModal] = useState(false);
@@ -72,7 +79,6 @@ export const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({
     try {
       const saved = localStorage.getItem('breakout_radar_decisions');
       if (saved) return JSON.parse(saved);
-      // Seed initial high-quality decision ledger
       return [
         {
           id: 'dec-170921001',
@@ -101,6 +107,21 @@ export const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({
       return [];
     }
   });
+
+  useEffect(() => {
+    let mounted = true;
+    fetchDecisionsFromBackend().then((remote) => {
+      if (!mounted || !Array.isArray(remote) || remote.length === 0) return;
+      setDecisionHistory(prev => {
+        const map = new Map<string, ARDecision>();
+        [...remote, ...prev].forEach(d => { if (d?.id) map.set(d.id, d); });
+        const merged = Array.from(map.values()).sort((a,b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+        localStorage.setItem('breakout_radar_decisions', JSON.stringify(merged));
+        return merged;
+      });
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, []);
 
   const handlePlaySong = (song: RealSong) => {
     if (!song.previewUrl) return;
@@ -231,8 +252,8 @@ ARTISTIC VALUE MODEL (AVM) ACOUSTIC FINDINGS:
 - Intrinsic Pitch Confidence: ${avm ? (avm.vocalProfile.intrinsicPitchConfidence * 100).toFixed(0) : '88'}%
 - Pitch intonation: ${avm?.notesWithin20CentsPercent}% within ±20 cents threshold
 - Production Polish Index: ${avm?.productionIndex}/100 (Bonus: +${avm?.productionBonus} pts)
-- Polish Headroom: ${avm?.headroomRecommendation.polishBudgetRecommendation}
-- Recommended Studio Advance: $${avm?.headroomRecommendation.suggestedStudioAdvanceUsd}
+- Polish Headroom: ${avm?.headroomRecommendation?.polishBudgetRecommendation ?? 'N/A'}
+- Recommended Studio Advance: $${avm?.headroomRecommendation?.suggestedStudioAdvanceUsd ?? 'N/A'}
 
 STREAMING VELOCITY & FOOTPRINT:
 - Estimated Monthly Listeners: ${artist.monthlyListeners.toLocaleString()}
@@ -253,195 +274,112 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
   };
 
   return (
-    <div className="space-y-6 pb-28">
+    <div className="space-y-5 pb-12 section-enter">
       {/* 1. Header Banner */}
-      <div className="glass p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-[11px] font-black tracking-wider text-[#3B6CFF] uppercase bg-[#DFE9FF] px-3 py-1 rounded-full">
-            A&R DECISION SUPPORT & PIPELINE
-          </span>
-          <h1 className="text-2xl font-black text-[#0B1530] tracking-tight mt-1.5">
-            Turn Evidence into A&R Signing Decisions
-          </h1>
-          <p className="text-xs text-[#5F6B8A] mt-0.5 max-w-2xl leading-relaxed">
-            Prioritise emerging artists using explainable acoustic signals, four-pillar AVM profiles, and documented contractual decision history.
-          </p>
-        </div>
+      <Card>
+        <SectionHeader
+          eyebrow={
+            <span className="bg-purple-50 px-3 py-1 rounded-tile">
+              A&R Decision Support &amp; Pipeline
+            </span>
+          }
+          title="Turn Evidence into A&R Signing Decisions"
+          description="Prioritise emerging artists using explainable acoustic signals, four-pillar AVM profiles, and documented contractual decision history."
+          actions={
+            <>
+              {comparisonIds.length > 0 && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<Scale className="w-3.5 h-3.5 text-info-600" />}
+                  onClick={() => setActiveSubTab('comparison')}
+                >
+                  Compare ({comparisonIds.length})
+                </Button>
+              )}
 
-        {/* Top Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {comparisonIds.length > 0 && (
-            <button
-              onClick={() => setActiveSubTab('comparison')}
-              className="btn-soft text-xs font-extrabold flex items-center gap-1.5 cursor-pointer shadow-2xs"
-            >
-              <Scale className="w-3.5 h-3.5 text-[#3B6CFF]" />
-              <span>Compare ({comparisonIds.length})</span>
-            </button>
-          )}
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<FileText className="w-3.5 h-3.5 text-info-600" />}
+                onClick={() => {
+                  if (sortedArtists.length > 0) {
+                    setTargetArtist(sortedArtists[0]);
+                    setShowExportModal(true);
+                  }
+                }}
+              >
+                Executive Dossier
+              </Button>
 
-          <button
-            onClick={() => {
-              if (sortedArtists.length > 0) {
-                setTargetArtist(sortedArtists[0]);
-                setShowExportModal(true);
-              }
-            }}
-            className="btn-soft text-xs font-extrabold flex items-center gap-1.5 cursor-pointer shadow-2xs"
-          >
-            <FileText className="w-3.5 h-3.5 text-[#3B6CFF]" />
-            <span>Executive Dossier</span>
-          </button>
+              <Button
+                size="sm"
+                leftIcon={<Download className="w-3.5 h-3.5" />}
+                onClick={handleExportDecisionsCsv}
+              >
+                Export CSV
+              </Button>
+            </>
+          }
+        />
+      </Card>
 
-          <button
-            onClick={handleExportDecisionsCsv}
-            className="btn-lime text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export CSV</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 2. Top Metric KPI Pipeline Cards matching .pipe from index.html */}
+      {/* 2. Top Metric KPI Pipeline Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-        <button
-          onClick={() => { setSelectedTier('PURSUE'); setActiveSubTab('matrix'); }}
-          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-            selectedTier === 'PURSUE'
-              ? 'bg-white border-[#7C5CFF] shadow-[0_14px_34px_-16px_rgba(124,92,255,0.4),inset_0_1px_0_#fff] ring-2 ring-[#7C5CFF]/30'
-              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#7C5CFF]/50'
-          }`}
-        >
-          <span className="w-1 h-6 bg-[#7C5CFF] rounded-r absolute left-0 top-4"></span>
-          <span className="text-[10px] font-black text-[#7C5CFF] uppercase tracking-wider block">PURSUE</span>
-          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{pursueCount}</div>
-          <p className="text-[9px] text-[#5F6B8A]">High-conviction signings</p>
-        </button>
-
-        <button
-          onClick={() => { setSelectedTier('MEET'); setActiveSubTab('matrix'); }}
-          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-            selectedTier === 'MEET'
-              ? 'bg-white border-[#C8F51F] shadow-[0_14px_34px_-16px_rgba(200,245,31,0.5),inset_0_1px_0_#fff] ring-2 ring-[#C8F51F]/40'
-              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#C8F51F]/50'
-          }`}
-        >
-          <span className="w-1 h-6 bg-[#C8F51F] rounded-r absolute left-0 top-4"></span>
-          <span className="text-[10px] font-black text-[#0B1530] uppercase tracking-wider block">MEET</span>
-          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{meetCount}</div>
-          <p className="text-[9px] text-[#5F6B8A]">Showcase / Introduction</p>
-        </button>
-
-        <button
-          onClick={() => { setSelectedTier('WATCH'); setActiveSubTab('matrix'); }}
-          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-            selectedTier === 'WATCH'
-              ? 'bg-white border-[#3B6CFF] shadow-[0_14px_34px_-16px_rgba(59,92,170,0.35),inset_0_1px_0_#fff] ring-2 ring-[#3B6CFF]/30'
-              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#3B6CFF]/50'
-          }`}
-        >
-          <span className="w-1 h-6 bg-[#3B6CFF] rounded-r absolute left-0 top-4"></span>
-          <span className="text-[10px] font-black text-[#3B6CFF] uppercase tracking-wider block">WATCH</span>
-          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{watchCount}</div>
-          <p className="text-[9px] text-[#5F6B8A]">Monitor trajectory</p>
-        </button>
-
-        <button
-          onClick={() => { setSelectedTier('MORE_EVIDENCE'); setActiveSubTab('matrix'); }}
-          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-            selectedTier === 'MORE_EVIDENCE'
-              ? 'bg-white border-[#5F6B8A] shadow-xs ring-2 ring-[#5F6B8A]/30'
-              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#5F6B8A]/50'
-          }`}
-        >
-          <span className="w-1 h-6 bg-[#5F6B8A] rounded-r absolute left-0 top-4"></span>
-          <span className="text-[10px] font-black text-[#5F6B8A] uppercase tracking-wider block">EVIDENCE</span>
-          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{moreEvidenceCount}</div>
-          <p className="text-[9px] text-[#5F6B8A]">Need stems / audio</p>
-        </button>
-
-        <button
-          onClick={() => { setSelectedTier('HIGH_POTENTIAL'); setActiveSubTab('matrix'); }}
-          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-            selectedTier === 'HIGH_POTENTIAL'
-              ? 'bg-[#EFFBC4] border-[#C8F51F] shadow-[0_14px_34px_-16px_rgba(200,245,31,0.5),inset_0_1px_0_#fff] ring-2 ring-[#C8F51F]'
-              : 'bg-white/80 border-[rgba(120,140,190,0.2)] hover:border-[#FF8A3D]/50'
-          }`}
-        >
-          <span className="w-1 h-6 bg-[#FF8A3D] rounded-r absolute left-0 top-4"></span>
-          <span className="text-[10px] font-black text-[#0B1530] uppercase tracking-wider block flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-[#FF8A3D]" />
-            HIGH POTENTIAL
-          </span>
-          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{highPotentialCount}</div>
-          <p className="text-[9px] text-[#0B1530] font-semibold">Low Production Gems</p>
-        </button>
-
-        <button
-          onClick={() => { setSelectedTier('ALL'); setActiveSubTab('matrix'); }}
-          className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-            selectedTier === 'ALL'
-              ? 'bg-white border-[#0B1530] shadow-[0_14px_34px_-16px_rgba(11,21,48,0.35),inset_0_1px_0_#fff] ring-2 ring-[#0B1530]/20'
-              : 'bg-white/80 border-[rgba(120,140,190,0.2)]'
-          }`}
-        >
-          <span className="w-1 h-6 bg-[#0B1530] rounded-r absolute left-0 top-4"></span>
-          <span className="text-[10px] font-black text-[#0B1530] uppercase tracking-wider block">ALL ROSTER</span>
-          <div className="text-2xl font-black text-[#0B1530] mt-0.5 font-mono">{artists.length}</div>
-          <p className="text-[9px] text-[#5F6B8A]">View complete pipeline</p>
-        </button>
+        {([
+          { tier: 'PURSUE', label: 'PURSUE', count: pursueCount, desc: 'High-conviction signings', bar: 'bg-brand-500', text: 'text-brand-600' },
+          { tier: 'MEET', label: 'MEET', count: meetCount, desc: 'Showcase / Introduction', bar: 'bg-purple-500', text: 'text-purple-700' },
+          { tier: 'WATCH', label: 'WATCH', count: watchCount, desc: 'Monitor trajectory', bar: 'bg-info-600', text: 'text-info-600' },
+          { tier: 'MORE_EVIDENCE', label: 'EVIDENCE', count: moreEvidenceCount, desc: 'Need stems / audio', bar: 'bg-navy-500', text: 'text-purple-700' },
+          { tier: 'HIGH_POTENTIAL', label: 'HIGH POTENTIAL', count: highPotentialCount, desc: 'Low Production Gems', bar: 'bg-brand-400', text: 'text-warning-700', sparkles: true },
+          { tier: 'ALL', label: 'ALL ROSTER', count: artists.length, desc: 'View complete pipeline', bar: 'bg-purple-500', text: 'text-navy-700' }
+        ]).map((t) => {
+          const isActive = selectedTier === t.tier;
+          return (
+            <button
+              key={t.tier}
+              onClick={() => { setSelectedTier(t.tier); setActiveSubTab('matrix'); }}
+              className={[
+                'p-4 rounded-card border text-left transition-all cursor-pointer relative overflow-hidden',
+                'hover:border-line-strong',
+                isActive
+                  ? 'bg-surface border-brand-500 shadow-raised ring-2 ring-brand-500/30'
+                  : 'bg-surface border-line'
+              ].join(' ')}
+            >
+              <span className={`w-1 h-6 ${t.bar} rounded-r absolute left-0 top-4`} />
+              <span className={`text-2xs font-semibold ${t.text} uppercase tracking-wider block flex items-center gap-1`}>
+                {t.sparkles && <Sparkles className="w-3 h-3 text-warning-600" />}
+                {t.label}
+              </span>
+              <div className="text-xl font-semibold tabular-nums text-navy-700 mt-0.5 font-mono">{t.count}</div>
+              <p className="text-2xs text-purple-700">{t.desc}</p>
+            </button>
+          );
+        })}
       </div>
 
-      {/* 3. Sub-Navigation Tabs matching .chip in index.html */}
-      <div className="flex items-center gap-2 overflow-x-auto border-b border-[rgba(120,140,190,0.2)] pb-3 text-xs">
-        <button
-          onClick={() => setActiveSubTab('matrix')}
-          className={`chip ${activeSubTab === 'matrix' ? 'on' : ''} flex items-center gap-2`}
-        >
-          <TableIcon className="w-3.5 h-3.5" />
-          <span>Ranked Priority Matrix ({filteredArtists.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveSubTab('pipeline-board')}
-          className={`chip ${activeSubTab === 'pipeline-board' ? 'on' : ''} flex items-center gap-2`}
-        >
-          <Kanban className="w-3.5 h-3.5" />
-          <span>A&R Kanban Board</span>
-        </button>
-
-        <button
-          onClick={() => setActiveSubTab('decisions')}
-          className={`chip ${activeSubTab === 'decisions' ? 'on' : ''} flex items-center gap-2`}
-        >
-          <UserCheck className="w-3.5 h-3.5" />
-          <span>Committee Decision Ledger ({decisionHistory.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveSubTab('comparison')}
-          className={`chip ${activeSubTab === 'comparison' ? 'on' : ''} flex items-center gap-2`}
-        >
-          <Scale className="w-3.5 h-3.5" />
-          <span>Comparative Benchmark ({comparisonIds.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveSubTab('next-actions')}
-          className={`chip ${activeSubTab === 'next-actions' ? 'on' : ''} flex items-center gap-2`}
-        >
-          <CheckSquare className="w-3.5 h-3.5" />
-          <span>Next-Best-Action Queue</span>
-        </button>
-      </div>
+      {/* 3. Sub-Navigation */}
+      <Tabs<SubTab>
+        ariaLabel="Recommendation views"
+        active={activeSubTab}
+        onChange={setActiveSubTab}
+        className="border-b border-line pb-3"
+        items={[
+          { id: 'matrix', label: `Ranked Priority Matrix (${filteredArtists.length})`, icon: <TableIcon className="w-3.5 h-3.5" /> },
+          { id: 'pipeline-board', label: 'A&R Kanban Board', icon: <Kanban className="w-3.5 h-3.5" /> },
+          { id: 'decisions', label: `Committee Decision Ledger (${decisionHistory.length})`, icon: <UserCheck className="w-3.5 h-3.5" /> },
+          { id: 'comparison', label: `Comparative Benchmark (${comparisonIds.length})`, icon: <Scale className="w-3.5 h-3.5" /> },
+          { id: 'next-actions', label: 'Next-Best-Action Queue', icon: <CheckSquare className="w-3.5 h-3.5" /> }
+        ]}
+      />
 
       {/* 4. TAB 1: RANKED PRIORITY MATRIX */}
       {activeSubTab === 'matrix' && (
-        <div className="glass overflow-hidden">
+        <Card padding="none" className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-white/60 border-b border-[rgba(120,140,190,0.2)] text-[#5F6B8A] font-bold uppercase tracking-wider text-[10px]">
+              <thead className="bg-surface border-b border-line text-purple-700 font-bold uppercase tracking-wider text-2xs">
                 <tr>
                   <th className="py-3 px-3 w-8">#</th>
                   <th className="py-3 px-3">Artist Candidate</th>
@@ -453,21 +391,21 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                   <th className="py-3 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(120,140,190,0.15)]">
+              <tbody className="divide-y divide-line">
                 {filteredArtists.map((artist, idx) => {
                   const primarySong = artist.tracks[0];
                   const isPlaying = playingSongId === primarySong?.id;
                   const isCompared = comparisonIds.includes(artist.id);
 
                   return (
-                    <tr key={`rec-art-${artist.id}-${idx}`} className="hover:bg-white/50 transition-colors">
+                    <tr key={`rec-art-${artist.id}-${idx}`} className="hover:bg-surface-subtle transition-colors">
                       {/* Compare checkbox & Rank */}
                       <td className="py-3.5 px-3">
                         <input
                           type="checkbox"
                           checked={isCompared}
                           onChange={() => toggleCompareArtist(artist.id)}
-                          className="rounded accent-[#3B6CFF] cursor-pointer"
+                          className="rounded accent-info-600 cursor-pointer"
                           title="Select to compare up to 3 candidates"
                         />
                       </td>
@@ -475,15 +413,15 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                       {/* Artist Details */}
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
-                          <span className="font-extrabold text-sm text-[#5F6B8A] w-5">
+                          <span className="font-semibold text-sm text-purple-700 w-5">
                             #{idx + 1}
                           </span>
 
                           {primarySong && (
                             <button
                               onClick={() => handlePlaySong(primarySong)}
-                              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
-                                isPlaying ? 'bg-[#3B6CFF] text-white' : 'bg-white text-[#5F6B8A] hover:text-[#0B1530] border border-[rgba(120,140,190,0.25)]'
+                              className={`w-7 h-7 rounded flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+                                isPlaying ? 'bg-info-600 text-navy-900' : 'bg-surface text-purple-700 hover:text-navy-700 border border-line-strong'
                               }`}
                               title={isPlaying ? 'Pause' : 'Play 30s preview'}
                             >
@@ -494,14 +432,14 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                           <img
                             src={artist.avatarUrl}
                             alt={artist.name}
-                            className="w-10 h-10 rounded-xl object-cover border border-[rgba(120,140,190,0.25)] shadow-xs"
+                            className="w-10 h-10 rounded object-cover border border-line-strong "
                           />
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-extrabold text-[#0B1530] text-sm">{artist.name}</span>
-                              {artist.verified && <CheckCircle2 className="w-3.5 h-3.5 text-[#3B6CFF] fill-current" />}
+                              <span className="font-semibold text-navy-700 text-sm">{artist.name}</span>
+                              {artist.verified && <CheckCircle2 className="w-3.5 h-3.5 text-info-600 fill-current" />}
                             </div>
-                            <span className="text-[10px] text-[#5F6B8A] block font-medium">
+                            <span className="text-2xs text-purple-700 block font-medium">
                               {artist.stage} • {artist.primaryGenre}
                             </span>
                           </div>
@@ -510,29 +448,29 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
                       {/* Location */}
                       <td className="py-3.5 px-3">
-                        <span className="font-semibold text-[#0B1530]">{artist.city}, {artist.country}</span>
-                        <span className="text-[10px] text-[#5F6B8A] block">
+                        <span className="font-semibold text-navy-700">{artist.city}, {artist.country}</span>
+                        <span className="text-2xs text-purple-700 block">
                           {(artist.monthlyListeners / 1000).toFixed(0)}k listeners
                         </span>
                       </td>
 
                       {/* AAV */}
-                      <td className="py-3.5 px-3 font-mono font-black text-[#7C5CFF]">
+                      <td className="py-3.5 px-3 font-mono font-semibold text-brand-600">
                         {artist.avmRollup ? artist.avmRollup.aav : (artist.artisticScore * 20).toFixed(1)}
                       </td>
 
                       {/* Discovery */}
-                      <td className="py-3.5 px-3 font-mono font-bold text-[#0B1530]">
+                      <td className="py-3.5 px-3 font-mono font-bold text-navy-700">
                         {artist.discoveryScore.toFixed(1)}
                       </td>
 
                       {/* Combined Score */}
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-black text-base text-[#0B1530]">
+                          <span className="font-mono font-semibold text-base text-navy-700">
                             {artist.combinedScore.toFixed(1)}
                           </span>
-                          <span className="text-[10px] font-black text-[#12B76A]">
+                          <span className="text-2xs font-semibold text-success-600">
                             +{artist.growthSignal30d}%
                           </span>
                         </div>
@@ -541,20 +479,14 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                       {/* Tier & High Potential */}
                       <td className="py-3.5 px-3">
                         <div className="space-y-1">
-                          <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-block ${
-                            artist.recommendationTier === 'PURSUE'
-                              ? 'pill-sign'
-                              : artist.recommendationTier === 'MEET'
-                              ? 'pill-investigate'
-                              : 'pill-monitor'
-                          }`}>
+                          <Pill tone={tierTone(artist.recommendationTier)} className="uppercase tracking-wider">
                             {artist.recommendationTier}
-                          </span>
+                          </Pill>
 
                           {artist.avmRollup?.highPotentialCount > 0 && (
-                            <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-[#EFFBC4] text-[#0B1530] block w-fit">
+                            <Pill tone="warning" className="block w-fit">
                               High Potential (Low Prod)
-                            </span>
+                            </Pill>
                           )}
                         </div>
                       </td>
@@ -562,20 +494,18 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                       {/* Actions */}
                       <td className="py-3.5 px-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={() => onSelectArtist(artist)}
-                            className="px-3 py-1.5 rounded-full bg-white/80 hover:bg-white text-[#5F6B8A] hover:text-[#0B1530] border border-[rgba(120,140,190,0.25)] font-extrabold transition-all cursor-pointer shadow-2xs"
                             title="Inspect in Analyse section"
                           >
                             Analyse
-                          </button>
+                          </Button>
 
-                          <button
-                            onClick={() => handleOpenDecision(artist)}
-                            className="btn-lime text-xs font-black cursor-pointer shadow-2xs"
-                          >
+                          <Button size="sm" onClick={() => handleOpenDecision(artist)}>
                             Sign Decision
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -584,7 +514,7 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* 5. TAB 2: A&R KANBAN BOARD */}
@@ -593,56 +523,50 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
           {(['PURSUE', 'MEET', 'WATCH', 'MORE_EVIDENCE'] as const).map((tier) => {
             const tierArtists = sortedArtists.filter(a => a.recommendationTier === tier);
             return (
-              <div key={tier} className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4 space-y-3">
-                <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
-                  <span className={`text-xs font-black uppercase tracking-wider ${
-                    tier === 'PURSUE' ? 'text-[#059669]' : tier === 'MEET' ? 'text-[#4338CA]' : tier === 'WATCH' ? 'text-[#B45309]' : 'text-[#64748B]'
+              <Card key={tier} variant="subtle" padding="sm" className="space-y-3">
+                <div className="flex items-center justify-between border-b border-line pb-2">
+                  <span className={`text-xs font-semibold uppercase tracking-wider ${
+                    tier === 'PURSUE' ? 'text-success-600' : tier === 'MEET' ? 'text-brand-700' : tier === 'WATCH' ? 'text-warning-700' : 'text-purple-500'
                   }`}>
                     {tier} ({tierArtists.length})
                   </span>
-                  <span className="text-[10px] text-[#94A3B8] font-bold">A&R Stage</span>
+                  <span className="text-2xs text-purple-300 font-bold">A&R Stage</span>
                 </div>
 
                 <div className="space-y-2.5">
                   {tierArtists.map((art) => (
-                    <div key={`kanban-${art.id}`} className="p-3 bg-white border border-[#E2E8F0] rounded-xl shadow-2xs space-y-2">
+                    <Card key={`kanban-${art.id}`} padding="sm" className="space-y-2">
                       <div className="flex items-center gap-2.5">
-                        <img src={art.avatarUrl} alt={art.name} className="w-9 h-9 rounded-lg object-cover border" />
+                        <img src={art.avatarUrl} alt={art.name} className="w-9 h-9 rounded-sm object-cover border border-line" />
                         <div className="truncate">
-                          <strong className="text-xs text-[#0F172A] truncate block">{art.name}</strong>
-                          <span className="text-[10px] text-[#64748B]">{art.city}, {art.country}</span>
+                          <strong className="text-xs text-navy-700 truncate block">{art.name}</strong>
+                          <span className="text-2xs text-purple-500">{art.city}, {art.country}</span>
                         </div>
                       </div>
 
-                      <div className="flex justify-between text-[11px] pt-1 border-t border-[#F1F5F9]">
-                        <span className="text-[#64748B]">Combined Score:</span>
-                        <strong className="text-[#7155F5] font-mono">{art.combinedScore.toFixed(1)}</strong>
+                      <div className="flex justify-between text-2xs pt-1 border-t border-line">
+                        <span className="text-purple-500">Combined Score:</span>
+                        <strong className="text-brand-600 font-mono">{art.combinedScore.toFixed(1)}</strong>
                       </div>
 
                       <div className="flex gap-1.5 pt-1">
-                        <button
-                          onClick={() => onSelectArtist(art)}
-                          className="flex-1 py-1 rounded-lg bg-[#F1F5F9] hover:bg-[#EEF2FF] text-[10px] font-bold text-[#475569] text-center cursor-pointer"
-                        >
+                        <Button variant="secondary" size="xs" className="flex-1" onClick={() => onSelectArtist(art)}>
                           Analyse
-                        </button>
-                        <button
-                          onClick={() => handleOpenDecision(art)}
-                          className="flex-1 py-1 rounded-lg bg-[#7155F5] hover:bg-[#5E3EE4] text-[10px] font-bold text-white text-center cursor-pointer"
-                        >
+                        </Button>
+                        <Button size="xs" className="flex-1" onClick={() => handleOpenDecision(art)}>
                           Sign Deal
-                        </button>
+                        </Button>
                       </div>
-                    </div>
+                    </Card>
                   ))}
 
                   {tierArtists.length === 0 && (
-                    <div className="p-6 text-center text-xs text-[#94A3B8] italic">
+                    <div className="p-6 text-center text-xs text-purple-300 italic">
                       No artists currently in {tier} stage.
                     </div>
                   )}
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
@@ -650,28 +574,29 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
 
       {/* 6. TAB 3: OFFICIAL COMMITTEE DECISION LEDGER */}
       {activeSubTab === 'decisions' && (
-        <div className="bg-white border border-[#E5E9F3] rounded-2xl overflow-hidden shadow-2xs">
-          <div className="p-4 border-b border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <Card padding="none" className="overflow-hidden">
+          <div className="p-4 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
-                <UserCheck className="w-5 h-5 text-[#059669]" />
+              <h3 className="text-base font-semibold text-navy-700 flex items-center gap-2">
+                <UserCheck className="w-5 h-5 text-success-600" />
                 <span>A&R Committee Official Decision Ledger ({decisionHistory.length})</span>
               </h3>
-              <p className="text-xs text-[#64748B]">Permanent auditable records of all contractual commitments, deals, and advance offers.</p>
+              <p className="text-xs text-purple-500">Permanent auditable records of all contractual commitments, deals, and advance offers.</p>
             </div>
 
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={handleExportDecisionsCsv}
-              className="px-3.5 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] text-[#0F172A] hover:bg-[#EEF2FF] text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              leftIcon={<Download className="w-3.5 h-3.5 text-brand-600" />}
             >
-              <Download className="w-3.5 h-3.5 text-[#7155F5]" />
-              <span>Download Ledger CSV</span>
-            </button>
+              Download Ledger CSV
+            </Button>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#64748B] font-bold uppercase text-[10px]">
+              <thead className="bg-surface-subtle border-b border-line text-purple-500 font-bold uppercase text-2xs">
                 <tr>
                   <th className="py-3 px-4">Record ID</th>
                   <th className="py-3 px-3">Artist Candidate</th>
@@ -683,38 +608,38 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
                   <th className="py-3 px-4">Rationale</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9]">
+              <tbody className="divide-y divide-line">
                 {decisionHistory.map((dec, decIdx) => {
                   const art = artists.find(a => a.id === dec.artistId);
                   return (
-                    <tr key={`ledger-${dec.id}-${decIdx}`} className="hover:bg-[#F8FAFC]">
-                      <td className="py-3 px-4 font-mono text-[#64748B]">{dec.id}</td>
-                      <td className="py-3 px-3 font-bold text-[#0F172A]">{art?.name || 'Artist Candidate'}</td>
-                      <td className="py-3 px-3 font-semibold text-[#059669]">{dec.decision}</td>
-                      <td className="py-3 px-3 text-[#4338CA] font-medium">{dec.dealType || 'EP Dev'}</td>
-                      <td className="py-3 px-3 font-mono font-bold text-[#0F172A]">${dec.recommendedAdvanceUsd || 3000}</td>
-                      <td className="py-3 px-3 text-[#64748B]">{dec.decisionMaker}</td>
-                      <td className="py-3 px-3 text-[#64748B] font-mono">{dec.followUpDate}</td>
-                      <td className="py-3 px-4 text-[#475569] max-w-xs truncate" title={dec.rationale}>"{dec.rationale}"</td>
+                    <tr key={`ledger-${dec.id}-${decIdx}`} className="hover:bg-surface-subtle">
+                      <td className="py-3 px-4 font-mono text-purple-500">{dec.id}</td>
+                      <td className="py-3 px-3 font-bold text-navy-700">{art?.name || 'Artist Candidate'}</td>
+                      <td className="py-3 px-3 font-semibold text-success-600">{dec.decision}</td>
+                      <td className="py-3 px-3 text-brand-700 font-medium">{dec.dealType || 'EP Dev'}</td>
+                      <td className="py-3 px-3 font-mono font-bold text-navy-700">${dec.recommendedAdvanceUsd || 3000}</td>
+                      <td className="py-3 px-3 text-purple-500">{dec.decisionMaker}</td>
+                      <td className="py-3 px-3 text-purple-500 font-mono">{dec.followUpDate}</td>
+                      <td className="py-3 px-4 text-purple-700 max-w-xs truncate" title={dec.rationale}>"{dec.rationale}"</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* 7. TAB 4: SIDE-BY-SIDE MATRIX COMPARISON */}
       {activeSubTab === 'comparison' && (
-        <div className="bg-white border border-[#E5E9F3] rounded-2xl p-6 shadow-2xs space-y-6">
-          <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
+        <Card padding="md" className="space-y-4">
+          <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
-              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
-                <Scale className="w-5 h-5 text-[#7155F5]" />
+              <h3 className="text-base font-semibold text-navy-700 flex items-center gap-2">
+                <Scale className="w-5 h-5 text-brand-600" />
                 <span>Side-by-Side Multi-Candidate Benchmark ({compareArtistsList.length} of 3 selected)</span>
               </h3>
-              <p className="text-xs text-[#64748B]">
+              <p className="text-xs text-purple-500">
                 Direct comparative benchmarking of AVM vocal features, songwriting metrics, and streaming momentum.
               </p>
             </div>
@@ -725,219 +650,191 @@ Prepared by: ${reviewerName} | Date: ${new Date().toLocaleDateString()}`;
               const trk = art.tracks[0];
               const av = trk?.avm;
               return (
-                <div key={`comp-tab-${art.id}-${cIdx}`} className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-3 flex flex-col justify-between">
+                <div key={`comp-tab-${art.id}-${cIdx}`} className="p-4 rounded bg-surface-subtle border border-line space-y-3 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <img src={art.avatarUrl} alt={art.name} className="w-12 h-12 rounded-xl object-cover border" />
+                      <img src={art.avatarUrl} alt={art.name} className="w-12 h-12 rounded object-cover border" />
                       <div>
-                        <h4 className="text-sm font-extrabold text-[#0F172A]">{art.name}</h4>
-                        <span className="text-[10px] text-[#64748B]">{art.city}, {art.country} • {art.primaryGenre}</span>
+                        <h4 className="text-sm font-semibold text-navy-700">{art.name}</h4>
+                        <span className="text-2xs text-purple-500">{art.city}, {art.country} • {art.primaryGenre}</span>
                       </div>
                     </div>
 
                     <div className="space-y-2 text-xs">
-                      <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
-                        <span className="text-[#64748B]">Combined A&R Score:</span>
-                        <strong className="text-[#7155F5] font-mono text-sm">{art.combinedScore.toFixed(1)}</strong>
+                      <div className="flex justify-between py-1 border-b border-line">
+                        <span className="text-purple-500">Combined A&R Score:</span>
+                        <strong className="text-brand-600 font-mono text-sm">{art.combinedScore.toFixed(1)}</strong>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
-                        <span className="text-[#64748B]">Artist AAV (Catalog):</span>
-                        <strong className="text-[#0F172A] font-mono">{art.avmRollup ? art.avmRollup.aav : 82.0}</strong>
+                      <div className="flex justify-between py-1 border-b border-line">
+                        <span className="text-purple-500">Artist AAV (Catalog):</span>
+                        <strong className="text-navy-700 font-mono">{art.avmRollup ? art.avmRollup.aav : 82.0}</strong>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
-                        <span className="text-[#64748B]">Vocal Ability ($P_V$):</span>
-                        <strong className="text-[#2563EB] font-mono">{av?.pillarVocal || 0.75}</strong>
+                      <div className="flex justify-between py-1 border-b border-line">
+                        <span className="text-purple-500">Vocal Ability ($P_V$):</span>
+                        <strong className="text-series-4 font-mono">{av?.pillarVocal || 0.75}</strong>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
-                        <span className="text-[#64748B]">Writing Craft ($P_W$):</span>
-                        <strong className="text-[#7155F5] font-mono">{av?.pillarWriting || 0.70}</strong>
+                      <div className="flex justify-between py-1 border-b border-line">
+                        <span className="text-purple-500">Writing Craft ($P_W$):</span>
+                        <strong className="text-brand-600 font-mono">{av?.pillarWriting || 0.70}</strong>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
-                        <span className="text-[#64748B]">Tessitura / Range:</span>
-                        <strong className="text-[#0F172A] font-mono">{av?.vocalProfile.lowestNote}–{av?.vocalProfile.highestNote} ({av?.vocalProfile.usableRangeSemitones}st)</strong>
+                      <div className="flex justify-between py-1 border-b border-line">
+                        <span className="text-purple-500">Tessitura / Range:</span>
+                        <strong className="text-navy-700 font-mono">{av?.vocalProfile.lowestNote}–{av?.vocalProfile.highestNote} ({av?.vocalProfile.usableRangeSemitones}st)</strong>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
-                        <span className="text-[#64748B]">Production Index:</span>
-                        <strong className="text-[#059669] font-mono">{av?.productionIndex}/100</strong>
+                      <div className="flex justify-between py-1 border-b border-line">
+                        <span className="text-purple-500">Production Index:</span>
+                        <strong className="text-success-600 font-mono">{av?.productionIndex}/100</strong>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
-                        <span className="text-[#64748B]">30-Day Velocity:</span>
-                        <strong className="text-[#059669] font-mono">+{art.growthSignal30d}%</strong>
+                      <div className="flex justify-between py-1 border-b border-line">
+                        <span className="text-purple-500">30-Day Velocity:</span>
+                        <strong className="text-success-600 font-mono">+{art.growthSignal30d}%</strong>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
-                        <span className="text-[#64748B]">Recommendation Tier:</span>
-                        <span className="font-bold text-[#059669] uppercase">{art.recommendationTier}</span>
+                      <div className="flex justify-between py-1 border-b border-line">
+                        <span className="text-purple-500">Recommendation Tier:</span>
+                        <span className="font-bold text-success-600 uppercase">{art.recommendationTier}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="pt-2">
-                    <button
+                    <Button
+                      className="w-full"
                       onClick={() => handleOpenDecision(art)}
-                      className="w-full py-2 rounded-xl bg-[#7155F5] text-white font-bold text-xs cursor-pointer hover:bg-[#5E3EE4]"
                     >
                       Sign Deal for {art.name}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* 8. TAB 5: NEXT-BEST-ACTION INTELLIGENCE QUEUE */}
       {activeSubTab === 'next-actions' && (
         <div className="space-y-4">
-          <div className="bg-white border border-[#E5E9F3] rounded-2xl p-6 shadow-2xs space-y-4">
+          <Card padding="md" className="space-y-3">
             <div>
-              <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
-                <CheckSquare className="w-5 h-5 text-[#7155F5]" />
+              <h3 className="text-base font-semibold text-navy-700 flex items-center gap-2">
+                <CheckSquare className="w-5 h-5 text-brand-600" />
                 <span>Next-Best-Action A&R Intelligence Engine</span>
               </h3>
-              <p className="text-xs text-[#64748B]">
+              <p className="text-xs text-purple-500">
                 Automated context-driven recommendations based on missing evidence, detected spikes, or release trajectories.
               </p>
             </div>
 
             <div className="space-y-3">
               {sortedArtists.map((art, idx) => (
-                <div key={`nba-${art.id}`} className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div key={`nba-${art.id}`} className="p-4 rounded bg-surface-subtle border border-line flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                   <div className="flex items-center gap-3">
-                    <img src={art.avatarUrl} alt={art.name} className="w-10 h-10 rounded-xl object-cover border" />
+                    <img src={art.avatarUrl} alt={art.name} className="w-10 h-10 rounded object-cover border" />
                     <div>
-                      <strong className="text-[#0F172A] text-sm block">{art.name} ({art.city}, {art.country})</strong>
-                      <span className="text-xs text-[#7155F5] font-semibold">{art.nextBestAction}</span>
+                      <strong className="text-navy-700 text-sm block">{art.name} ({art.city}, {art.country})</strong>
+                      <span className="text-xs text-brand-600 font-semibold">{art.nextBestAction}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => onSelectArtist(art)}
-                      className="px-3 py-1.5 rounded-lg bg-white border border-[#CBD5E1] text-[#0F172A] font-bold hover:bg-[#F1F5F9] cursor-pointer"
-                    >
+                    <Button variant="secondary" size="sm" onClick={() => onSelectArtist(art)}>
                       View Stems
-                    </button>
-                    <button
-                      onClick={() => handleOpenDecision(art)}
-                      className="px-3 py-1.5 rounded-lg bg-[#7155F5] text-white font-bold hover:bg-[#5E3EE4] cursor-pointer"
-                    >
+                    </Button>
+                    <Button size="sm" onClick={() => handleOpenDecision(art)}>
                       Execute Action
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* Decision Signing Modal */}
-      {showDecisionModal && targetArtist && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
-              <div>
-                <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-[#059669]" />
-                  <span>A&R Committee Deal Commitment</span>
-                </h3>
-                <p className="text-xs text-[#64748B]">Execute auditable contract recommendation for <strong>{targetArtist.name}</strong></p>
-              </div>
-              <button onClick={() => setShowDecisionModal(false)} className="text-[#64748B] hover:text-[#0F172A]">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      <Modal
+        open={showDecisionModal && !!targetArtist}
+        onClose={() => setShowDecisionModal(false)}
+        size="md"
+        title={
+          <span className="flex items-center gap-2">
+            <UserCheck className="w-5 h-5 text-success-600" />
+            A&R Committee Deal Commitment
+          </span>
+        }
+        subtitle={
+          <>
+            Execute auditable contract recommendation for <strong>{targetArtist?.name}</strong>
+          </>
+        }
+      >
+        <form onSubmit={handleCommitDecision} className="space-y-4 text-xs">
+          <Field label="Official Decision Action">
+            <Select value={decisionAction} onChange={(e) => setDecisionAction(e.target.value)}>
+              <option value="PURSUE: Sign Master Distribution & EP Development">PURSUE: Sign Master Distribution &amp; EP Development</option>
+              <option value="MEET: Schedule Studio Showcase in Nairobi">MEET: Schedule Studio Showcase in Nairobi</option>
+              <option value="WATCH: Add to 60-Day Priority Watchlist">WATCH: Add to 60-Day Priority Watchlist</option>
+              <option value="EVIDENCE: Request Multi-Track Stems & Live Footage">EVIDENCE: Request Multi-Track Stems &amp; Live Footage</option>
+              <option value="HOLD: Defer Committee Evaluation">HOLD: Defer Committee Evaluation</option>
+            </Select>
+          </Field>
 
-            <form onSubmit={handleCommitDecision} className="space-y-4 text-xs">
-              <div>
-                <label className="text-[10px] font-bold text-[#64748B] uppercase block mb-1">Official Decision Action</label>
-                <select
-                  value={decisionAction}
-                  onChange={(e) => setDecisionAction(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl p-2.5 text-xs text-[#0F172A] focus:outline-none"
-                >
-                  <option value="PURSUE: Sign Master Distribution & EP Development">PURSUE: Sign Master Distribution & EP Development</option>
-                  <option value="MEET: Schedule Studio Showcase in Nairobi">MEET: Schedule Studio Showcase in Nairobi</option>
-                  <option value="WATCH: Add to 60-Day Priority Watchlist">WATCH: Add to 60-Day Priority Watchlist</option>
-                  <option value="EVIDENCE: Request Multi-Track Stems & Live Footage">EVIDENCE: Request Multi-Track Stems & Live Footage</option>
-                  <option value="HOLD: Defer Committee Evaluation">HOLD: Defer Committee Evaluation</option>
-                </select>
-              </div>
+          <Field label="Proposed Deal Framework">
+            <Select value={dealType} onChange={(e) => setDealType(e.target.value)}>
+              <option value="EP Development & Master Distribution">EP Development &amp; Master Distribution</option>
+              <option value="Singles Option Deal (3 Singles)">Singles Option Deal (3 Singles)</option>
+              <option value="Global 360 Partnership Deal">Global 360 Partnership Deal</option>
+              <option value="Direct Publishing & Sync Admin">Direct Publishing &amp; Sync Admin</option>
+            </Select>
+          </Field>
 
-              <div>
-                <label className="text-[10px] font-bold text-[#64748B] uppercase block mb-1">Proposed Deal Framework</label>
-                <select
-                  value={dealType}
-                  onChange={(e) => setDealType(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl p-2.5 text-xs text-[#0F172A] focus:outline-none"
-                >
-                  <option value="EP Development & Master Distribution">EP Development & Master Distribution</option>
-                  <option value="Singles Option Deal (3 Singles)">Singles Option Deal (3 Singles)</option>
-                  <option value="Global 360 Partnership Deal">Global 360 Partnership Deal</option>
-                  <option value="Direct Publishing & Sync Admin">Direct Publishing & Sync Admin</option>
-                </select>
-              </div>
+          <Field label="Committee Rationale & Observations">
+            <Textarea
+              rows={3}
+              value={decisionNotes}
+              onChange={(e) => setDecisionNotes(e.target.value)}
+              placeholder="Enter specific contractual reasons, acoustic metrics, or marketing strategy..."
+            />
+          </Field>
 
-              <div>
-                <label className="text-[10px] font-bold text-[#64748B] uppercase block mb-1">Committee Rationale & Observations</label>
-                <textarea
-                  rows={3}
-                  value={decisionNotes}
-                  onChange={(e) => setDecisionNotes(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl p-2.5 text-xs text-[#0F172A] focus:outline-none"
-                  placeholder="Enter specific contractual reasons, acoustic metrics, or marketing strategy..."
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-[11px] text-[#64748B]">Audited by {reviewerName}</span>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs shadow-xs cursor-pointer"
-                >
-                  {decisionCommitted ? '✓ Recorded to Ledger' : 'Commit Committee Decision'}
-                </button>
-              </div>
-            </form>
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-2xs text-purple-500">Audited by {reviewerName}</span>
+            <Button type="submit" variant="danger" size="sm">
+              {decisionCommitted ? '✓ Recorded to Ledger' : 'Commit Committee Decision'}
+            </Button>
           </div>
-        </div>
-      )}
+        </form>
+      </Modal>
 
       {/* Dossier Export Modal */}
-      {showExportModal && targetArtist && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#F1F5F9] pb-3">
-              <div>
-                <h3 className="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-[#2563EB]" />
-                  <span>A&R Executive Candidate Dossier</span>
-                </h3>
-                <p className="text-xs text-[#64748B]">Printable briefing for Senior Label Directors & Executive Committee</p>
-              </div>
-              <button onClick={() => setShowExportModal(false)} className="text-[#64748B] hover:text-[#0F172A]">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <pre className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-mono text-[#0F172A] overflow-x-auto whitespace-pre-wrap max-h-96">
-              {generateBriefText(targetArtist)}
-            </pre>
-
-            <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-[#64748B]">Ready for committee circulation</span>
-              <button
-                onClick={() => handleCopyBrief(targetArtist)}
-                className="px-4 py-2 rounded-xl bg-[#7155F5] hover:bg-[#5E3EE4] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
-              >
-                <Copy className="w-3.5 h-3.5" />
-                <span>{copiedBrief ? '✓ Copied to Clipboard' : 'Copy Executive Brief'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={showExportModal && !!targetArtist}
+        onClose={() => setShowExportModal(false)}
+        size="lg"
+        title={
+          <span className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-series-4" />
+            A&R Executive Candidate Dossier
+          </span>
+        }
+        subtitle="Printable briefing for Senior Label Directors & Executive Committee"
+        footer={
+          <>
+            <span className="text-xs text-purple-500 mr-auto">Ready for committee circulation</span>
+            <Button
+              size="sm"
+              onClick={() => targetArtist && handleCopyBrief(targetArtist)}
+              leftIcon={<Copy className="w-3.5 h-3.5" />}
+            >
+              {copiedBrief ? '✓ Copied to Clipboard' : 'Copy Executive Brief'}
+            </Button>
+          </>
+        }
+      >
+        <pre className="p-4 rounded-card bg-surface-subtle border border-line text-xs font-mono text-navy-700 overflow-x-auto whitespace-pre-wrap max-h-96">
+          {targetArtist ? generateBriefText(targetArtist) : ''}
+        </pre>
+      </Modal>
     </div>
   );
 };

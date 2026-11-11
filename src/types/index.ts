@@ -1,4 +1,4 @@
-export type WorkspaceSection = 'discovery' | 'analyse' | 'recommendations' | 'settings';
+export type WorkspaceSection = 'home' | 'discovery' | 'analyse' | 'recommendations' | 'settings';
 
 export type RecommendationTier = 'PURSUE' | 'MEET' | 'WATCH' | 'MORE_EVIDENCE' | 'HOLD';
 

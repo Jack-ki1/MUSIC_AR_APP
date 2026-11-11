@@ -5,11 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
+    "dev:frontend": "vite --port=3000 --host=0.0.0.0",
+    "dev:backend": "python3 -m backend.server",
     "build": "vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist server.js backend/__pycache__ backend/*.db",
     "lint": "tsc --noEmit",
-    "test": "tsx src/tests/runVerificationTests.ts"
+    "test": "tsx src/tests/runVerificationTests.ts",
+    "test:backend": "python3 -m unittest discover -s backend/tests -p 'test_*.py' -v",
+    "test:all": "npm run test && npm run test:backend"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

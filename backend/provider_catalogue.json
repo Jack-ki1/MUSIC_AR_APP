@@ -1,0 +1,1694 @@
+[
+  {
+    "id": "musicbrainz",
+    "name": "MusicBrainz",
+    "category": "Music metadata",
+    "access": "public",
+    "docs_url": "https://musicbrainz.org/doc/MusicBrainz_API",
+    "description": "Open artist identities, releases and identifiers.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": true,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": true,
+    "status": "ready",
+    "access_note": "Public API; one request/second; meaningful User-Agent required."
+  },
+  {
+    "id": "wikidata",
+    "name": "Wikidata",
+    "category": "Music metadata",
+    "access": "public",
+    "docs_url": "https://www.wikidata.org/wiki/Wikidata:Data_access",
+    "description": "Structured artist identities and identifiers.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": true,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": true,
+    "status": "ready",
+    "access_note": "Coverage varies for emerging artists."
+  },
+  {
+    "id": "wikipedia",
+    "name": "Wikipedia",
+    "category": "Music metadata",
+    "access": "public",
+    "docs_url": "https://www.mediawiki.org/wiki/Wikimedia_REST_API",
+    "description": "Public biographical and notability context.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": true,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": true,
+    "status": "ready",
+    "access_note": "Identity context only, not a definitive popularity measure."
+  },
+  {
+    "id": "deezer",
+    "name": "Deezer",
+    "category": "Streaming & catalogue",
+    "access": "public",
+    "docs_url": "https://developers.deezer.com/api",
+    "description": "Artist, track, playlist and catalogue discovery.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": true,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": true,
+    "status": "ready",
+    "access_note": "Verify developer and commercial-use terms."
+  },
+  {
+    "id": "youtube",
+    "name": "YouTube Data API",
+    "category": "Video & creator",
+    "access": "api_key",
+    "docs_url": "https://developers.google.com/youtube/v3",
+    "description": "Public channels, videos and comments.",
+    "fields": [
+      {
+        "key": "api_key",
+        "label": "Google API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "api_key"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "search.list has a separate default quota bucket of 100 calls/day; channels.list can return public channel statistics. Private analytics require channel-owner OAuth."
+  },
+  {
+    "id": "spotify",
+    "name": "Spotify Web API",
+    "category": "Streaming & catalogue",
+    "access": "api_key",
+    "docs_url": "https://developer.spotify.com/documentation/web-api",
+    "description": "Spotify catalogue metadata and identity search.",
+    "fields": [
+      {
+        "key": "client_id",
+        "label": "Client ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "client_secret",
+        "label": "Client secret",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "client_id",
+      "client_secret"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Use for catalogue identity only. Spotify development mode is explicitly limited for experimentation and should not be treated as a scalable audience-analytics feed."
+  },
+  {
+    "id": "apple_music",
+    "name": "Apple Music API",
+    "category": "Streaming & catalogue",
+    "access": "api_key",
+    "docs_url": "https://developer.apple.com/documentation/AppleMusicAPI",
+    "description": "Apple Music catalogue, charts and metadata.",
+    "fields": [
+      {
+        "key": "developer_token",
+        "label": "Developer JWT",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "storefront",
+        "label": "Storefront",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "developer_token",
+      "storefront"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Requires signed developer token and storefront."
+  },
+  {
+    "id": "itunes",
+    "name": "iTunes Search API",
+    "category": "Streaming & catalogue",
+    "access": "public",
+    "docs_url": "https://performance-partners.apple.com/search-api",
+    "description": "Public iTunes catalogue search.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": true,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": true,
+    "status": "ready",
+    "access_note": "Public lookup; respect attribution and request limits."
+  },
+  {
+    "id": "lastfm",
+    "name": "Last.fm",
+    "category": "Streaming & catalogue",
+    "access": "api_key",
+    "docs_url": "https://www.last.fm/api",
+    "description": "Artist search, tags and similarity.",
+    "fields": [
+      {
+        "key": "api_key",
+        "label": "API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "api_key"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Commercial/research use requires partner contact."
+  },
+  {
+    "id": "discogs",
+    "name": "Discogs",
+    "category": "Music metadata",
+    "access": "api_key",
+    "docs_url": "https://www.discogs.com/developers",
+    "description": "Artists, releases, labels and catalogue data.",
+    "fields": [
+      {
+        "key": "token",
+        "label": "Personal access token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "token"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Respect rate limits, User-Agent and reuse restrictions."
+  },
+  {
+    "id": "knowledge_graph",
+    "name": "Google Knowledge Graph",
+    "category": "Music metadata",
+    "access": "api_key",
+    "docs_url": "https://developers.google.com/knowledge-graph",
+    "description": "Notable artist entity resolution.",
+    "fields": [
+      {
+        "key": "api_key",
+        "label": "Google API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "api_key"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Notability bias omits many early-stage artists."
+  },
+  {
+    "id": "theaudiodb",
+    "name": "TheAudioDB",
+    "category": "Music metadata",
+    "access": "api_key",
+    "docs_url": "https://www.theaudiodb.com/api_guide.php",
+    "description": "Artist identity and metadata enrichment.",
+    "fields": [
+      {
+        "key": "api_key",
+        "label": "API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "api_key"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Check key tier and commercial reuse terms."
+  },
+  {
+    "id": "jamendo",
+    "name": "Jamendo",
+    "category": "Independent music",
+    "access": "api_key",
+    "docs_url": "https://developer.jamendo.com/v3.0/docs",
+    "description": "Independent artist catalogue.",
+    "fields": [
+      {
+        "key": "client_id",
+        "label": "Client ID",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "client_id"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "API access does not grant recording-use rights."
+  },
+  {
+    "id": "audius",
+    "name": "Audius",
+    "category": "Independent music",
+    "access": "public",
+    "docs_url": "https://docs.audius.co/api",
+    "description": "Open catalog, creator profiles and playlists.",
+    "fields": [
+      {
+        "key": "app_name",
+        "label": "Application name",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "app_name"
+    ],
+    "enabled": true,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "needs_credentials",
+    "access_note": "Public read endpoints; app name/key where required."
+  },
+  {
+    "id": "soundcloud",
+    "name": "SoundCloud",
+    "category": "Streaming & catalogue",
+    "access": "api_key",
+    "docs_url": "https://developers.soundcloud.com/docs/api/guide",
+    "description": "Creator profiles and independent music discovery.",
+    "fields": [
+      {
+        "key": "client_id",
+        "label": "Client ID",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "client_secret",
+        "label": "Client secret",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "client_id",
+      "client_secret"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Requires approved app and supported API access."
+  },
+  {
+    "id": "ticketmaster",
+    "name": "Ticketmaster Discovery",
+    "category": "Live & events",
+    "access": "api_key",
+    "docs_url": "https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/",
+    "description": "Artist attractions and listed event activity.",
+    "fields": [
+      {
+        "key": "api_key",
+        "label": "API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "api_key"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Market-dependent event coverage."
+  },
+  {
+    "id": "musixmatch",
+    "name": "Musixmatch",
+    "category": "Music metadata",
+    "access": "api_key",
+    "docs_url": "https://docs.musixmatch.com/",
+    "description": "Artist and track catalogue lookup.",
+    "fields": [
+      {
+        "key": "api_key",
+        "label": "API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "api_key"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Lyrics are excluded; separate rights required for lyric display."
+  },
+  {
+    "id": "genius",
+    "name": "Genius",
+    "category": "Music metadata",
+    "access": "api_key",
+    "docs_url": "https://docs.genius.com/",
+    "description": "Artist/song knowledge search.",
+    "fields": [
+      {
+        "key": "access_token",
+        "label": "Access token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Commercial API use may require a separate licence."
+  },
+  {
+    "id": "bluesky",
+    "name": "Bluesky / AT Protocol",
+    "category": "Social & community",
+    "access": "public",
+    "docs_url": "https://docs.bsky.app/",
+    "description": "Public creator profiles and post search.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": true,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": true,
+    "status": "ready",
+    "access_note": "Use public AppView; observe rate limits and deletion rules."
+  },
+  {
+    "id": "mastodon",
+    "name": "Mastodon",
+    "category": "Social & community",
+    "access": "instance",
+    "docs_url": "https://docs.joinmastodon.org/methods/search/",
+    "description": "Federated account and hashtag search.",
+    "fields": [
+      {
+        "key": "instance_url",
+        "label": "Instance URL",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "access_token",
+        "label": "Access token (optional)",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "instance_url",
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Search results depend on the instance and authentication."
+  },
+  {
+    "id": "gdelt",
+    "name": "GDELT Project",
+    "category": "Press & media",
+    "access": "public",
+    "docs_url": "https://www.gdeltproject.org/",
+    "description": "Global news and press coverage signals.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": true,
+    "implemented": true,
+    "capability": "evidence_enrichment",
+    "connected": true,
+    "status": "ready",
+    "access_note": "Coverage is not an audience measurement."
+  },
+  {
+    "id": "wikipedia_commons",
+    "name": "Wikimedia Commons",
+    "category": "Media & identity",
+    "access": "public",
+    "docs_url": "https://commons.wikimedia.org/wiki/Commons:API",
+    "description": "Public images/media with licence metadata.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Respect each work's licence and attribution."
+  },
+  {
+    "id": "reddit",
+    "name": "Reddit Data API",
+    "category": "Social & community",
+    "access": "api_key",
+    "docs_url": "https://www.reddit.com/dev/api/",
+    "description": "Community discussion and artist/genre mentions.",
+    "fields": [
+      {
+        "key": "client_id",
+        "label": "OAuth client ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "client_secret",
+        "label": "OAuth secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "username",
+        "label": "Reddit username",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "password",
+        "label": "Reddit password",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "client_id",
+      "client_secret",
+      "username",
+      "password"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "evidence_enrichment",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "OAuth and app approval required. Reddit requires prior written permission and a contract before commercial product use; keep disabled until the intended use is approved."
+  },
+  {
+    "id": "twitch",
+    "name": "Twitch Helix",
+    "category": "Video & creator",
+    "access": "api_key",
+    "docs_url": "https://dev.twitch.tv/docs/api/",
+    "description": "Music streams and creator/channel discovery.",
+    "fields": [
+      {
+        "key": "client_id",
+        "label": "Client ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "client_secret",
+        "label": "Client secret",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "client_id",
+      "client_secret"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "App token for eligible public resources; user auth when needed."
+  },
+  {
+    "id": "setlistfm",
+    "name": "setlist.fm",
+    "category": "Live & events",
+    "access": "api_key",
+    "docs_url": "https://api.setlist.fm/docs/1.0/index.html",
+    "description": "Artist gigography and setlist evidence.",
+    "fields": [
+      {
+        "key": "api_key",
+        "label": "API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "api_key"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "identity_search",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "API key and descriptive User-Agent required."
+  },
+  {
+    "id": "vimeo",
+    "name": "Vimeo",
+    "category": "Video & creator",
+    "access": "api_key",
+    "docs_url": "https://developer.vimeo.com/api/reference",
+    "description": "Public video and creator context.",
+    "fields": [
+      {
+        "key": "access_token",
+        "label": "Access token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Rate limits vary; stop on 429."
+  },
+  {
+    "id": "flickr",
+    "name": "Flickr",
+    "category": "Media & identity",
+    "access": "api_key",
+    "docs_url": "https://www.flickr.com/services/api/",
+    "description": "Public event/artist imagery with licence metadata.",
+    "fields": [
+      {
+        "key": "api_key",
+        "label": "API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "api_key"
+    ],
+    "enabled": false,
+    "implemented": true,
+    "capability": "evidence_enrichment",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Commercial API use requires prior permission."
+  },
+  {
+    "id": "openverse",
+    "name": "Openverse",
+    "category": "Media & identity",
+    "access": "public",
+    "docs_url": "https://api.openverse.org/v1/",
+    "description": "Openly licensed media search.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": true,
+    "capability": "evidence_enrichment",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Validate individual licence, creator and attribution."
+  },
+  {
+    "id": "listenbrainz",
+    "name": "ListenBrainz",
+    "category": "Listening communities",
+    "access": "public",
+    "docs_url": "https://listenbrainz.readthedocs.io/en/latest/users/api/",
+    "description": "Open listening community and artist popularity signals.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Opt-in listening community, not representative global streams."
+  },
+  {
+    "id": "wikidata_sparql",
+    "name": "Wikidata SPARQL",
+    "category": "Music metadata",
+    "access": "public",
+    "docs_url": "https://query.wikidata.org/",
+    "description": "Structured artist identity queries.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Use bounded queries and descriptive User-Agent."
+  },
+  {
+    "id": "apple_music_feed",
+    "name": "Apple Music Feed",
+    "category": "Streaming & catalogue",
+    "access": "partner",
+    "docs_url": "https://developer.apple.com/documentation/AppleMusicAPI",
+    "description": "Bulk Apple catalogue feed.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Partner/feed entitlement required."
+  },
+  {
+    "id": "tiktok_display",
+    "name": "TikTok Display API",
+    "category": "Social & community",
+    "access": "oauth",
+    "docs_url": "https://developers.tiktok.com/docs/en/display-api-overview",
+    "description": "Creator-authorised profile and recent video display.",
+    "fields": [
+      {
+        "key": "client_key",
+        "label": "Client key",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "client_secret",
+        "label": "Client secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "access_token",
+        "label": "Creator token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "client_key",
+      "client_secret",
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Approved app/scopes and creator authorisation required."
+  },
+  {
+    "id": "tiktok_research",
+    "name": "TikTok Research API",
+    "category": "Research & public datasets",
+    "access": "research",
+    "docs_url": "https://developers.tiktok.com/products/research-api/",
+    "description": "Public accounts/video research data.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Qualified researchers and eligible organisations only; not commercial analytics."
+  },
+  {
+    "id": "instagram_graph",
+    "name": "Instagram Graph API",
+    "category": "Social & community",
+    "access": "oauth",
+    "docs_url": "https://developers.facebook.com/docs/instagram-platform/",
+    "description": "Professional-account media and authorised insights.",
+    "fields": [
+      {
+        "key": "app_id",
+        "label": "Meta app ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "app_secret",
+        "label": "Meta app secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "access_token",
+        "label": "Access token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "app_id",
+      "app_secret",
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "App review, scopes and professional-account permission required."
+  },
+  {
+    "id": "threads",
+    "name": "Threads API",
+    "category": "Social & community",
+    "access": "oauth",
+    "docs_url": "https://developers.facebook.com/docs/threads/",
+    "description": "Authorised creator profile, posts and insights.",
+    "fields": [
+      {
+        "key": "app_id",
+        "label": "Meta app ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "app_secret",
+        "label": "Meta app secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "access_token",
+        "label": "Access token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "app_id",
+      "app_secret",
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Developer approval and creator authorisation required."
+  },
+  {
+    "id": "facebook_pages",
+    "name": "Facebook Pages Graph API",
+    "category": "Social & community",
+    "access": "oauth",
+    "docs_url": "https://developers.facebook.com/docs/graph-api/",
+    "description": "Authorised Page content and insights.",
+    "fields": [
+      {
+        "key": "app_id",
+        "label": "Meta app ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "app_secret",
+        "label": "Meta app secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "access_token",
+        "label": "Page token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "app_id",
+      "app_secret",
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Page access and approved permissions required."
+  },
+  {
+    "id": "meta_content_library",
+    "name": "Meta Content Library",
+    "category": "Research & public datasets",
+    "access": "research",
+    "docs_url": "https://transparency.meta.com/researchtools/meta-content-library/",
+    "description": "Public content research for approved organisations.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Research eligibility and controlled environment apply."
+  },
+  {
+    "id": "x_api",
+    "name": "X API",
+    "category": "Social & community",
+    "access": "api_key",
+    "docs_url": "https://developer.x.com/en/docs",
+    "description": "Public posts, profiles and selected engagement fields.",
+    "fields": [
+      {
+        "key": "bearer_token",
+        "label": "Bearer token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "bearer_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Paid/approved developer access; endpoint and tier limits."
+  },
+  {
+    "id": "pinterest",
+    "name": "Pinterest API v5",
+    "category": "Social & community",
+    "access": "oauth",
+    "docs_url": "https://dev.pinterest.com/docs/api/v5/",
+    "description": "Creator boards, pins and account analytics.",
+    "fields": [
+      {
+        "key": "app_id",
+        "label": "App ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "app_secret",
+        "label": "App secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "access_token",
+        "label": "Access token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "app_id",
+      "app_secret",
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Trial/standard access tiers and app approval determine analytics."
+  },
+  {
+    "id": "tumblr",
+    "name": "Tumblr API v2",
+    "category": "Social & community",
+    "access": "oauth",
+    "docs_url": "https://www.tumblr.com/docs/en/api/v2",
+    "description": "Blog and public post metadata.",
+    "fields": [
+      {
+        "key": "consumer_key",
+        "label": "Consumer key",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "consumer_secret",
+        "label": "Consumer secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "oauth_token",
+        "label": "OAuth token",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "oauth_secret",
+        "label": "OAuth secret",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "consumer_key",
+      "consumer_secret",
+      "oauth_token",
+      "oauth_secret"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "OAuth and application registration required."
+  },
+  {
+    "id": "linkedin",
+    "name": "LinkedIn Community Management",
+    "category": "Social & community",
+    "access": "oauth",
+    "docs_url": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview",
+    "description": "Authorised organisation content and engagement.",
+    "fields": [
+      {
+        "key": "client_id",
+        "label": "Client ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "client_secret",
+        "label": "Client secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "access_token",
+        "label": "Access token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "client_id",
+      "client_secret",
+      "access_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Restricted product; not a public people-search API."
+  },
+  {
+    "id": "google_trends",
+    "name": "Google Trends API",
+    "category": "Demand signals",
+    "access": "partner",
+    "docs_url": "https://developers.google.com/search/apis/trends",
+    "description": "Regional search interest for artists and genres.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Limited alpha access; no unofficial scraping fallback."
+  },
+  {
+    "id": "songkick",
+    "name": "Songkick API",
+    "category": "Live & events",
+    "access": "partner",
+    "docs_url": "https://www.songkick.com/developer",
+    "description": "Concert discovery and artist gigography.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "New API keys currently unavailable; partnership/licence required."
+  },
+  {
+    "id": "bandsintown",
+    "name": "Bandsintown for Artists",
+    "category": "Live & events",
+    "access": "artist",
+    "docs_url": "https://help.artists.bandsintown.com/en/articles/9186477-api-documentation",
+    "description": "Artist-authorised follower and event information.",
+    "fields": [
+      {
+        "key": "app_id",
+        "label": "Artist API key",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "app_id"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Keys are artist-specific; use only for an artist/team you represent."
+  },
+  {
+    "id": "chartmetric",
+    "name": "Chartmetric",
+    "category": "Commercial intelligence",
+    "access": "licensed",
+    "docs_url": "https://chartmetric.com/",
+    "description": "Cross-platform playlist and artist intelligence.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Commercial subscription/API licence required."
+  },
+  {
+    "id": "soundcharts",
+    "name": "Soundcharts",
+    "category": "Commercial intelligence",
+    "access": "licensed",
+    "docs_url": "https://soundcharts.com/",
+    "description": "Music charts, airplay and audience intelligence.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Commercial subscription/API licence required."
+  },
+  {
+    "id": "songstats",
+    "name": "Songstats",
+    "category": "Commercial intelligence",
+    "access": "licensed",
+    "docs_url": "https://songstats.com/",
+    "description": "Multi-platform artist analytics.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Commercial/API access subject to vendor agreement."
+  },
+  {
+    "id": "viberate",
+    "name": "Viberate",
+    "category": "Commercial intelligence",
+    "access": "licensed",
+    "docs_url": "https://www.viberate.com/",
+    "description": "Artist analytics, charts and market intelligence.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Commercial licensing or partner access required."
+  },
+  {
+    "id": "luminate",
+    "name": "Luminate",
+    "category": "Commercial intelligence",
+    "access": "licensed",
+    "docs_url": "https://luminatedata.com/",
+    "description": "Licensed music consumption measurements.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Enterprise licensing required."
+  },
+  {
+    "id": "mediabase",
+    "name": "Mediabase",
+    "category": "Commercial intelligence",
+    "access": "licensed",
+    "docs_url": "https://www.mediabase.com/",
+    "description": "Radio airplay and chart measurement.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Enterprise licensing required."
+  },
+  {
+    "id": "shazamkit",
+    "name": "ShazamKit",
+    "category": "Audio intelligence",
+    "access": "client",
+    "docs_url": "https://developer.apple.com/shazamkit/",
+    "description": "On-device audio recognition.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Client-side SDK; needs device implementation."
+  },
+  {
+    "id": "youtube_analytics",
+    "name": "YouTube Analytics API",
+    "category": "Video & creator",
+    "access": "oauth",
+    "docs_url": "https://developers.google.com/youtube/analytics",
+    "description": "Channel-owner authorised views, watch time and audience reports.",
+    "fields": [
+      {
+        "key": "client_id",
+        "label": "OAuth client ID",
+        "secret": false,
+        "configured": false
+      },
+      {
+        "key": "client_secret",
+        "label": "OAuth client secret",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "refresh_token",
+        "label": "Channel owner refresh token",
+        "secret": true,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "client_id",
+      "client_secret",
+      "refresh_token"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Only channels that explicitly authorise the app."
+  },
+  {
+    "id": "google_alerts",
+    "name": "Google Alerts RSS",
+    "category": "Press & media",
+    "access": "manual",
+    "docs_url": "https://www.google.com/alerts",
+    "description": "Operator-managed feeds for artists and scenes.",
+    "fields": [
+      {
+        "key": "feed_url",
+        "label": "RSS feed URL",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "feed_url"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Manual feed configuration; no general public Alerts API."
+  },
+  {
+    "id": "news_rss",
+    "name": "Music press RSS feeds",
+    "category": "Press & media",
+    "access": "manual",
+    "docs_url": "https://www.rssboard.org/rss-specification",
+    "description": "Configured music press, blogs and local publishers.",
+    "fields": [
+      {
+        "key": "feed_urls",
+        "label": "Feed URLs (one per line)",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "feed_urls"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Store source, title, date and short excerpt only; respect publisher terms."
+  },
+  {
+    "id": "spotify_charts",
+    "name": "Spotify Charts",
+    "category": "Streaming & catalogue",
+    "access": "manual",
+    "docs_url": "https://charts.spotify.com/",
+    "description": "Chart snapshots and official chart references.",
+    "fields": [
+      {
+        "key": "feed_url",
+        "label": "Licensed chart feed URL",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "feed_url"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Use licensed feeds/exports or official links; no scraping."
+  },
+  {
+    "id": "apple_charts",
+    "name": "Apple Music Charts",
+    "category": "Streaming & catalogue",
+    "access": "api_key",
+    "docs_url": "https://developer.apple.com/documentation/AppleMusicAPI",
+    "description": "Apple catalogue charts by storefront.",
+    "fields": [
+      {
+        "key": "developer_token",
+        "label": "Developer token (JWT)",
+        "secret": true,
+        "configured": false
+      },
+      {
+        "key": "storefront",
+        "label": "Storefront",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "developer_token",
+      "storefront"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Requires Apple developer token and storefront."
+  },
+  {
+    "id": "amazon_music",
+    "name": "Amazon Music",
+    "category": "Streaming & catalogue",
+    "access": "partner",
+    "docs_url": "https://developer.amazon.com/",
+    "description": "Music catalogue/creator data where partner services allow.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "No unrestricted public artist analytics API."
+  },
+  {
+    "id": "tidal",
+    "name": "TIDAL",
+    "category": "Streaming & catalogue",
+    "access": "partner",
+    "docs_url": "https://developer.tidal.com/",
+    "description": "Music catalogue and artist links.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Partner/developer approval required."
+  },
+  {
+    "id": "qobuz",
+    "name": "Qobuz",
+    "category": "Streaming & catalogue",
+    "access": "partner",
+    "docs_url": "https://www.qobuz.com/",
+    "description": "Music catalogue and editorial metadata.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "No general public analytics API."
+  },
+  {
+    "id": "pandora",
+    "name": "Pandora AMP",
+    "category": "Streaming & catalogue",
+    "access": "partner",
+    "docs_url": "https://amp.pandora.com/",
+    "description": "Artist marketing and audience insights.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Eligible artist/team programme access required."
+  },
+  {
+    "id": "anghami",
+    "name": "Anghami",
+    "category": "Streaming & catalogue",
+    "access": "partner",
+    "docs_url": "https://www.anghami.com/",
+    "description": "MENA streaming catalogue and market signals.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Partner access required."
+  },
+  {
+    "id": "boomplay",
+    "name": "Boomplay",
+    "category": "Streaming & catalogue",
+    "access": "partner",
+    "docs_url": "https://www.boomplay.com/",
+    "description": "African streaming catalogue and creator insights.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Partner/artist dashboard access required."
+  },
+  {
+    "id": "mdundo",
+    "name": "Mdundo",
+    "category": "Streaming & catalogue",
+    "access": "partner",
+    "docs_url": "https://mdundo.com/",
+    "description": "African music catalogue and creator performance.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Partner/artist dashboard access required."
+  },
+  {
+    "id": "bandcamp",
+    "name": "Bandcamp",
+    "category": "Independent music",
+    "access": "manual",
+    "docs_url": "https://bandcamp.com/",
+    "description": "Direct-to-fan releases, tags and artist links.",
+    "fields": [
+      {
+        "key": "artist_urls",
+        "label": "Artist/profile URLs (one per line)",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "artist_urls"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "No general public discovery API; reviewed links only."
+  },
+  {
+    "id": "shazam",
+    "name": "Shazam Charts",
+    "category": "Streaming & catalogue",
+    "access": "manual",
+    "docs_url": "https://www.shazam.com/charts",
+    "description": "Public chart references.",
+    "fields": [
+      {
+        "key": "chart_urls",
+        "label": "Chart URLs (one per line)",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "chart_urls"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Use official chart access or manual imports; no scraping."
+  },
+  {
+    "id": "radio_monitor",
+    "name": "Radio monitoring partners",
+    "category": "Commercial intelligence",
+    "access": "licensed",
+    "docs_url": "https://luminatedata.com/",
+    "description": "Licensed radio airplay monitoring.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Data-provider agreement required."
+  },
+  {
+    "id": "soundexchange",
+    "name": "SoundExchange",
+    "category": "Industry data",
+    "access": "partner",
+    "docs_url": "https://www.soundexchange.com/",
+    "description": "Eligible rights-holder statements and reporting.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Rights-holder account export/authorisation required."
+  },
+  {
+    "id": "ddex",
+    "name": "DDEX / distributor feeds",
+    "category": "Industry data",
+    "access": "licensed",
+    "docs_url": "https://ddex.net/",
+    "description": "Label/distributor release and delivery metadata.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Authorised label/distributor feed credentials required."
+  },
+  {
+    "id": "musicbrainz_tags",
+    "name": "MusicBrainz Tags & Genres",
+    "category": "Music metadata",
+    "access": "public",
+    "docs_url": "https://musicbrainz.org/doc/MusicBrainz_API",
+    "description": "Community genre and style tags.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Same MusicBrainz rate limit and User-Agent requirements."
+  },
+  {
+    "id": "wikimedia_pageviews",
+    "name": "Wikimedia Pageviews",
+    "category": "Demand signals",
+    "access": "public",
+    "docs_url": "https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/",
+    "description": "Public article pageview history when an artist page exists.",
+    "fields": [],
+    "missing_fields": [],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Attention proxy, not unique listeners or actual fans."
+  },
+  {
+    "id": "naijaplay",
+    "name": "Naija music press feeds",
+    "category": "Press & media",
+    "access": "manual",
+    "docs_url": "https://www.gdeltproject.org/",
+    "description": "Operator-curated Nigerian music publisher feeds.",
+    "fields": [
+      {
+        "key": "feed_urls",
+        "label": "Feed URLs (one per line)",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "feed_urls"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Operator-managed feed source."
+  },
+  {
+    "id": "okayafrica",
+    "name": "OkayAfrica",
+    "category": "Press & media",
+    "access": "manual",
+    "docs_url": "https://www.okayafrica.com/",
+    "description": "African music editorial references.",
+    "fields": [
+      {
+        "key": "feed_url",
+        "label": "RSS feed URL",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "feed_url"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Use publisher-provided feeds or manual references."
+  },
+  {
+    "id": "afropunk",
+    "name": "Afropunk",
+    "category": "Press & media",
+    "access": "manual",
+    "docs_url": "https://afropunk.com/",
+    "description": "African diaspora music and culture coverage.",
+    "fields": [
+      {
+        "key": "feed_url",
+        "label": "RSS feed URL",
+        "secret": false,
+        "configured": false
+      }
+    ],
+    "missing_fields": [
+      "feed_url"
+    ],
+    "enabled": false,
+    "implemented": false,
+    "capability": "catalogue_only",
+    "connected": false,
+    "status": "disabled",
+    "access_note": "Use publisher-provided feeds or manual references."
+  }
+]

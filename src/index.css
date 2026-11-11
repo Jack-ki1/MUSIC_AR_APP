@@ -1,228 +1,288 @@
 @import "tailwindcss";
 
-:root {
-  color-scheme: light;
-  --ink: #0B1530;
-  --mut: #5F6B8A;
-  --ln: rgba(120, 140, 190, 0.2);
-  --lime: #C8F51F;
-  --blue: #3B6CFF;
-  --vio: #7C5CFF;
-  --cy: #1FB6E8;
-  --org: #FF8A3D;
-  --rose: #F0457A;
-  --grn: #12B76A;
-  --gl: rgba(255, 255, 255, 0.76);
-  --sh: 0 14px 34px -16px rgba(59, 92, 170, 0.35), inset 0 1px 0 #fff;
-  --sh-sm: 0 6px 18px -8px rgba(59, 92, 170, 0.25), inset 0 1px 0 #fff;
+/* ============================================================================
+   Breakout Radar — A&R Intelligence Terminal
+   Dark technical aesthetic benchmarked against Bloomberg Terminal / Linear /
+   Datadog: solid zinc-950 base, crisp 1px zinc-800 rules, micro-rounded
+   corners, flat surfaces (no glow, no multi-layer shadows), tabular mono
+   numerals.
+   ========================================================================== */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Neutral ramp — primary + secondary text on the dark base.
+     navy-* is a TEXT ramp (light-on-dark), never a fill. */
+  --color-navy-900: #131316;
+  --color-navy-800: #18181b;
+  --color-navy-700: #fafafa;
+  --color-navy-500: #71717a;
+  --color-navy-300: #d4d4d8;
+  --color-navy-100: #f4f4f5;
+  --color-navy-50: #18181b;
+
+  /* Secondary text ramp + tinted surfaces.
+     purple-500 is the muted label colour; purple-100/50 are panel tints. */
+  --color-purple-900: #fafafa;
+  --color-purple-700: #e4e4e7;
+  --color-purple-500: #a1a1aa;
+  --color-purple-300: #d4d4d8;
+  --color-purple-200: #e4e4e7;
+  --color-purple-100: #1c1c1f;
+  --color-purple-50: #18181b;
+
+  /* Brand accent — signal orange, the only saturated hue in the chrome. */
+  --color-brand-700: #ff9a63;
+  --color-brand-600: #ff7a3d;
+  --color-brand-500: #ff6b1f;
+  --color-brand-400: #ff8c4d;
+  --color-brand-300: #ffb48a;
+  --color-brand-100: #2b1408;
+  --color-brand-50: #1f1209;
+
+  /* Semantic states — bright text, dark tinted fills. */
+  --color-success-700: #6ee7b7;
+  --color-success-600: #34d399;
+  --color-success-100: #0b2a20;
+  --color-success-50: #0a1f16;
+  --color-warning-700: #fcd34d;
+  --color-warning-600: #fbbf24;
+  --color-warning-100: #2a1e05;
+  --color-warning-50: #1c1503;
+  --color-danger-600: #f87171;
+  --color-danger-100: #2a0f0f;
+  --color-danger-50: #1c0a0a;
+  --color-info-600: #60a5fa;
+  --color-info-100: #0f1c33;
+  --color-info-50: #0b1424;
+
+  /* Data-visualization ramp (charts, pillars, series) */
+  --color-series-1: #8b7cff;
+  --color-series-2: #ff7a3d;
+  --color-series-3: #34d399;
+  --color-series-4: #60a5fa;
+  --color-series-5: #fbbf24;
+  --color-series-6: #c084fc;
+  --color-series-7: #2dd4bf;
+  --color-series-8: #f87171;
+
+  /* Third-party platform identities — the only non-brand colours allowed.
+     TikTok ships cyan because its near-black brand ink is invisible here. */
+  --color-platform-spotify: #1DB954;
+  --color-platform-youtube: #FF3B30;
+  --color-platform-tiktok: #25F4EE;
+  --color-platform-apple: #FA243C;
+  --color-platform-soundcloud: #FF5500;
+  --color-platform-boomplay: #38BDF8;
+  --color-platform-bandcamp: #BA478F;
+
+  /* Surfaces + lines — solid charcoal base, crisp 1px rules. */
+  --color-surface: #09090b;
+  --color-surface-subtle: #131316;
+  --color-surface-sunken: #0c0c0e;
+  --color-line: #27272a;
+  --color-line-strong: #3f3f46;
+
+  /* Type scale (adds 2xs below Tailwind's xs) */
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 1.35;
+  --text-2xs--letter-spacing: 0.02em;
+
+  /* Radius: sharp / micro-rounded only. */
+  --radius-card: 2px;
+  --radius-tile: 2px;
+
+  /* Elevation: flat. Any shadow here is a hairline, never a glow. */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-raised: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.8);
 }
+
+/* Legacy vars kept for any non-Tailwind consumers */
+:root {
+  color-scheme: dark;
+  --white: #FAFAFA;
+  --orange: #FF6B1F;
+  --navy: #FAFAFA;
+  --purple: #A1A1AA;
+  --bg: #09090B;
+  --bg-subtle: #131316;
+  --bg-muted: rgba(255, 255, 255, 0.04);
+  --border: #27272A;
+  --border-strong: #3F3F46;
+  --text: #FAFAFA;
+  --text-muted: #A1A1AA;
+  --text-faint: rgba(250, 250, 250, 0.6);
+  --accent: #FF6B1F;
+  --accent-hover: #ff7a3d;
+  --success: #34D399;
+  --warning: #FBBF24;
+  --danger: #F87171;
+}
+
+html, body, #root { height: 100%; }
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: var(--ink);
-  background: #fff;
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-}
-
-/* Ambient Radial Mesh Background matching attached index.html */
-body:before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: 
-    radial-gradient(600px 420px at 8% 0, #DCE8FF 0, transparent 70%),
-    radial-gradient(520px 420px at 100% 12%, #E9E2FF 0, transparent 70%),
-    radial-gradient(500px 400px at 60% 100%, #EFFBC4 0, transparent 70%),
-    #fff;
-  pointer-events: none;
-}
-
-/* Glassmorphism Container with crisp white inset highlight */
-.glass {
-  background: var(--gl);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: 24px;
-  box-shadow: var(--sh);
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  box-shadow: var(--sh-sm);
-}
-
-/* Design Tokens for Buttons matching index.html */
-.btn-lime {
-  background: var(--lime);
-  color: var(--ink);
-  border-radius: 9999px;
-  font-weight: 800;
-  box-shadow: 0 8px 20px -8px rgba(160, 200, 0, 0.7);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-}
-.btn-lime:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 24px -8px rgba(160, 200, 0, 0.85);
-}
-
-.btn-blue {
-  background: linear-gradient(135deg, var(--blue), var(--vio));
-  color: #fff;
-  border-radius: 9999px;
-  font-weight: 800;
-  box-shadow: 0 10px 22px -8px rgba(59, 108, 255, 0.6);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-}
-.btn-blue:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 26px -8px rgba(59, 108, 255, 0.75);
-}
-
-.btn-soft {
-  background: #fff;
-  color: var(--ink);
-  border-radius: 9999px;
-  font-weight: 700;
-  box-shadow: var(--sh);
-  border: 1px solid rgba(120, 140, 190, 0.2);
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-}
-.btn-soft:hover {
-  background: #F8FAFC;
-  transform: translateY(-1px);
-}
-
-/* Status & Recommendation Pills */
-.pill-sign {
-  background: var(--vio);
-  color: #fff;
-  border-radius: 9999px;
-  font-weight: 800;
-  font-size: 12px;
-  padding: 4px 12px;
-  display: inline-flex;
-  align-items: center;
-}
-.pill-investigate {
-  background: var(--lime);
-  color: var(--ink);
-  border-radius: 9999px;
-  font-weight: 800;
-  font-size: 12px;
-  padding: 4px 12px;
-  display: inline-flex;
-  align-items: center;
-}
-.pill-monitor {
-  background: #DDF1FF;
-  color: #0A6F96;
-  border-radius: 9999px;
-  font-weight: 800;
-  font-size: 12px;
-  padding: 4px 12px;
-  display: inline-flex;
-  align-items: center;
-}
-.pill-watch {
-  background: #ECEFF6;
-  color: var(--mut);
-  border-radius: 9999px;
-  font-weight: 800;
-  font-size: 12px;
-  padding: 4px 12px;
-  display: inline-flex;
-  align-items: center;
-}
-
-/* Filter Chips */
-.chip {
-  padding: 8px 16px;
-  border-radius: 9999px;
-  background: #fff;
-  font-weight: 700;
+  font-family: var(--font-sans);
   font-size: 13px;
-  color: var(--mut);
-  box-shadow: var(--sh-sm);
-  border: 1px solid rgba(120, 140, 190, 0.15);
-  transition: all 0.15s ease;
-  cursor: pointer;
-}
-.chip:hover {
-  color: var(--ink);
-}
-.chip.on {
-  background: var(--blue);
-  color: #fff;
-  border-color: var(--blue);
-  box-shadow: 0 8px 18px -6px rgba(59, 108, 255, 0.5);
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom switch */
-.sw {
-  width: 48px;
-  height: 28px;
-  border-radius: 9999px;
-  background: #CBD3E4;
-  position: relative;
-  transition: background-color 0.2s;
-  cursor: pointer;
-  border: none;
-  flex-shrink: 0;
-}
-.sw.on {
-  background: var(--blue);
-}
-.sw:after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #fff;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-.sw.on:after {
-  transform: translateX(20px);
+button, input, select, textarea { font: inherit; color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* Every metric, percentage, count and date is set in tabular mono. */
+code, pre, .font-mono, [data-mono] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Surfaces — flat 1px panels (.glass kept for existing call sites;
+   new code should prefer the <Card> primitive) */
+.glass {
+  background: var(--color-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: none;
 }
-::-webkit-scrollbar-track {
+
+/* Buttons — legacy class names kept so existing markup renders on-brand.
+   New code should prefer the <Button> primitive. */
+.btn-soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-tile);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+  background: #131316;
+  color: var(--navy);
+  border: 1px solid var(--border-strong);
+}
+.btn-soft:hover { background: #1c1c1f; border-color: #52525b; }
+.btn-soft:disabled { opacity: .45; cursor: not-allowed; }
+
+/* Primary CTA (legacy aliases → one orange truth) */
+.btn-lime, .btn-blue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-tile);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+  background: var(--orange);
+  color: #09090B;
+  border: 1px solid var(--orange);
+}
+.btn-lime:hover, .btn-blue:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.btn-lime:disabled, .btn-blue:disabled { opacity: .45; cursor: not-allowed; }
+
+/* Chips / tabs — square, bordered; active is a solid contrast block. */
+.chip {
+  padding: 4px 9px;
+  border-radius: var(--radius-tile);
   background: transparent;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--purple);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
 }
-::-webkit-scrollbar-thumb {
-  background: rgba(120, 140, 190, 0.3);
-  border-radius: 9999px;
+.chip:hover { border-color: var(--border-strong); background: rgba(255, 255, 255, 0.04); color: var(--navy); }
+.chip.on {
+  background: var(--orange);
+  color: #09090B;
+  border-color: var(--orange);
+  font-weight: 600;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(120, 140, 190, 0.5);
+
+/* Status pills — squared tags, tinted on the dark base */
+.pill-sign, .pill-investigate, .pill-monitor {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 11px;
+  padding: 2px 7px;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+.pill-sign { background: rgba(255, 107, 31, 0.14); color: var(--orange); border-color: rgba(255, 107, 31, 0.4); }
+.pill-investigate { background: rgba(161, 161, 170, 0.12); color: #d4d4d8; border-color: rgba(161, 161, 170, 0.35); }
+.pill-monitor { background: rgba(255, 255, 255, 0.05); color: #a1a1aa; border-color: #3f3f46; }
+
+table { border-collapse: collapse; width: 100%; }
+th {
+  font-weight: 600;
+  color: var(--purple);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-family: var(--font-mono);
+}
+td { color: var(--navy); }
+
+input[type="text"], input[type="number"], input[type="password"], input[type="search"], select, textarea {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-tile);
+  background: #0c0c0e;
+  padding: 5px 8px;
+  font-size: 12px;
+  outline: none;
+  color: var(--navy);
+}
+input::placeholder, textarea::placeholder { color: #71717a; }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 1px var(--orange);
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+@keyframes section-fade {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+.section-enter { animation: section-fade .16s ease-out; }
+
+@media (max-width: 63.999rem) {
+  .app-shell { flex-direction: column; }
+  /* The sidebar becomes a full-width horizontal bar; its own <aside> switches
+     to `w-full` / no `min-h-screen` in JS at the same breakpoint, so the
+     content pane below always keeps real height and scrolls. */
+  .app-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 45vh;
+    flex: 0 0 auto;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
 }

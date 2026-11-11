@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import { Topbar } from './components/layout/Topbar';
+import { ErrorBoundary } from './shared/lib/ErrorBoundary';
+import { HomePage } from './pages/HomePage';
 import { DiscoverySection, DiscoveryRegion, DiscoveryGenre } from './components/discovery/DiscoverySection';
 import { AnalyseSection } from './components/analyse/AnalyseSection';
 import { RecommendationsSection } from './components/recommendations/RecommendationsSection';
@@ -18,6 +20,15 @@ import {
   loadArtistsFromFirestore, 
   saveDecisionToFirestore 
 } from './services/firestoreSync';
+import {
+  checkBackendHealth,
+  fetchArtistsFromBackend,
+  fetchSeedArtistsFromBackend,
+  upsertArtistsToBackend,
+  saveDecisionToBackend,
+  fetchSettingsFromBackend,
+  saveSettingsToBackend
+} from './services/backendApi';
 import { WorkspaceSection, ARDecision } from './types';
 import { Check } from 'lucide-react';
 
@@ -92,7 +103,7 @@ const DEFAULT_GENRES: DiscoveryGenre[] = [
 ];
 
 export default function App() {
-  const [currentSection, setCurrentSection] = useState<WorkspaceSection>('discovery');
+  const [currentSection, setCurrentSection] = useState<WorkspaceSection>('home');
   
   // Real artists state initialized and cleansed of legacy artists and duplicate keys
   const [realArtists, setRealArtists] = useState<RealArtistData[]>(() => {
@@ -153,13 +164,33 @@ export default function App() {
   // Global search & toast
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [backendConnected, setBackendConnected] = useState<boolean>(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return window.localStorage.getItem('br.sidebar.collapsed') === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((v) => {
+      const next = !v;
+      try {
+        window.localStorage.setItem('br.sidebar.collapsed', next ? '1' : '0');
+      } catch {
+        /* storage unavailable — keep in-memory state only */
+      }
+      return next;
+    });
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Persist regions and genres
+  // Persist regions and genres + sync settings to backend when available
   useEffect(() => {
     localStorage.setItem('breakout_radar_regions', JSON.stringify(regions));
   }, [regions]);
@@ -172,27 +203,77 @@ export default function App() {
     localStorage.setItem('breakout_radar_real_artists', JSON.stringify(realArtists));
   }, [realArtists]);
 
-  // Initial live discovery fetch and Firestore sync on mount
   useEffect(() => {
-    // 1. Fetch any cloud-persisted artists from Firestore
-    loadArtistsFromFirestore().then(cloudArtists => {
-      if (cloudArtists && cloudArtists.length > 0) {
-        setRealArtists(prev => cleanAndDeduplicateArtists([...cloudArtists, ...prev]));
-      }
-    }).catch(err => console.warn('[App] Cloud load error:', err));
+    if (!backendConnected) return;
+    const payload = {
+      regions,
+      genres,
+      loopIntervalMinutes,
+      isAutonomousActive,
+      updatedAt: new Date().toISOString()
+    };
+    saveSettingsToBackend(payload).catch(() => {});
+  }, [regions, genres, loopIntervalMinutes, isAutonomousActive, backendConnected]);
 
-    // 2. Initial discovery if empty
-    if (realArtists.length === 0) {
-      runRealAutonomousDiscovery(regions, genres).then(results => {
-        if (results.length > 0) {
-          setRealArtists(results);
-          setSelectedArtist(results[0]);
-          batchSyncArtistsToFirestore(results);
+  // Initial bootstrap: backend (if available) + Firestore + local fallback
+  useEffect(() => {
+    let mounted = true;
+
+    async function bootstrap() {
+      const hasBackend = await checkBackendHealth();
+      if (!mounted) return;
+      setBackendConnected(hasBackend);
+
+      // 1) Backend artists or seed data + settings
+      if (hasBackend) {
+        try {
+          let backendArtists = await fetchArtistsFromBackend();
+          if (!backendArtists || backendArtists.length === 0) {
+            backendArtists = await fetchSeedArtistsFromBackend();
+          }
+          if (mounted && backendArtists && backendArtists.length > 0) {
+            const cleaned = cleanAndDeduplicateArtists(backendArtists);
+            setRealArtists(cleaned);
+            setSelectedArtist(prev => prev || cleaned[0] || null);
+          }
+        } catch (err) {
+          console.warn('[App] Backend bootstrap error:', err);
         }
+
+        try {
+          const backendSettings = await fetchSettingsFromBackend();
+          if (mounted && backendSettings) {
+            if (Array.isArray(backendSettings.regions) && backendSettings.regions.length) setRegions(backendSettings.regions);
+            if (Array.isArray(backendSettings.genres) && backendSettings.genres.length) setGenres(backendSettings.genres);
+            if (typeof backendSettings.loopIntervalMinutes === 'number') setLoopIntervalMinutes(backendSettings.loopIntervalMinutes);
+            if (typeof backendSettings.isAutonomousActive === 'boolean') setIsAutonomousActive(backendSettings.isAutonomousActive);
+          }
+        } catch (err) {
+          console.warn('[App] Backend settings load error:', err);
+        }
+      }
+
+      // 2) Firestore cloud merge (optional, best-effort)
+      try {
+        const cloudArtists = await loadArtistsFromFirestore();
+        if (mounted && cloudArtists && cloudArtists.length > 0) {
+          setRealArtists(prev => cleanAndDeduplicateArtists([...cloudArtists, ...prev]));
+        }
+      } catch (err) {
+        console.warn('[App] Cloud load error:', err);
+      }
+
+      // 3) Final fallback to local seed if still empty
+      setRealArtists(prev => {
+        if (prev && prev.length > 0) return prev;
+        const seed = getInitialVerifiedUpcomingArtists();
+        setSelectedArtist(seed[0] || null);
+        return seed;
       });
-    } else if (!selectedArtist && realArtists.length > 0) {
-      setSelectedArtist(realArtists[0]);
     }
+
+    bootstrap();
+    return () => { mounted = false; };
   }, []);
 
   const handleAddDiscoveredArtists = (newArtists: RealArtistData[]) => {
@@ -200,9 +281,10 @@ export default function App() {
       const combined = cleanAndDeduplicateArtists([...newArtists, ...prev]);
       return combined;
     });
-    // Cloud persist to Firestore in background
+    // Persist to backend + Firestore in background (best-effort)
+    upsertArtistsToBackend(newArtists).catch(() => {});
     batchSyncArtistsToFirestore(newArtists);
-    showToast(`Autonomous scan complete: ${newArtists.length} real artists parsed!`);
+    showToast(`Discovery update: ${newArtists.length} artist${newArtists.length === 1 ? '' : 's'} ingested.`);
   };
 
   const handleUpdateArtistScore = (artistId: string, artisticScore: number, notes: string) => {
@@ -240,30 +322,38 @@ export default function App() {
       followUpDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
       createdAt: new Date().toISOString()
     };
+    saveDecisionToBackend(newDecision).catch(() => {});
     saveDecisionToFirestore(newDecision);
     showToast(`Decision recorded: ${decision}`);
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-transparent text-[#0B1530] font-sans selection:bg-[#7C5CFF] selection:text-white">
-      {/* 1. Left Sidebar matching design system */}
-      <Sidebar
-        currentSection={currentSection}
-        onSelectSection={(sec) => setCurrentSection(sec)}
-        candidateCount={realArtists.length}
-      />
+    <ErrorBoundary>
+    <div className="app-shell flex h-dvh w-full overflow-hidden bg-surface text-navy-700 font-sans selection:bg-brand-500 selection:text-navy-900">
+      <div className="app-sidebar shrink-0 h-full">
+        <Sidebar
+          currentSection={currentSection}
+          onSelectSection={(sec) => { if (sec === 'analyse' && !selectedArtist && realArtists[0]) setSelectedArtist(realArtists[0]); setCurrentSection(sec); }}
+          candidateCount={realArtists.length}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={toggleSidebar}
+        />
+      </div>
 
-      {/* 2. Main Canvas */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-transparent">
-        {/* Topbar with ⌘K search and API connected indicator */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-surface">
         <Topbar
           onOpenGlobalSearch={() => setIsGlobalSearchOpen(true)}
-          apiConnected={true}
+          apiConnected={backendConnected}
+          sidebarCollapsed={sidebarCollapsed}
+          onToggleSidebar={toggleSidebar}
         />
 
-        {/* Workspace Content */}
-        <main className="flex-1 overflow-y-auto px-8 py-6">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 min-h-0 overflow-y-auto px-3 sm:px-4 md:px-6 py-4">
+          <div className="max-w-7xl mx-auto w-full">
+            {currentSection === 'home' && (
+              <HomePage candidateCount={realArtists.length} onNavigate={(section) => setCurrentSection(section)} />
+            )}
+
             {currentSection === 'discovery' && (
               <DiscoverySection
                 realArtists={realArtists}
@@ -314,13 +404,14 @@ export default function App() {
                 isAutonomousActive={isAutonomousActive}
                 onToggleAutonomous={() => setIsAutonomousActive(!isAutonomousActive)}
                 onShowToast={showToast}
+                realArtists={realArtists}
+                onAddDiscoveredArtists={handleAddDiscoveredArtists}
               />
             )}
           </div>
         </main>
       </div>
 
-      {/* Global Search Modal (⌘K) */}
       <GlobalSearchModal
         isOpen={isGlobalSearchOpen}
         onClose={() => setIsGlobalSearchOpen(false)}
@@ -329,15 +420,13 @@ export default function App() {
         onNavigateSection={(sec) => setCurrentSection(sec)}
       />
 
-      {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#0F172A] text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl animate-in slide-in-from-bottom-2">
-          <div className="w-4 h-4 rounded-full bg-[#10B981] text-white flex items-center justify-center font-bold">
-            <Check className="w-2.5 h-2.5 stroke-[3]" />
-          </div>
-          <span>{toastMessage}</span>
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-surface-subtle text-navy-700 text-xs px-3 py-2 rounded-sm border border-line-strong shadow-raised">
+          <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+          <span className="font-medium">{toastMessage}</span>
         </div>
       )}
     </div>
+    </ErrorBoundary>
   );
 }

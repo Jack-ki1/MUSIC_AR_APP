@@ -1,0 +1,5 @@
+# Breakout Radar backend
+# Standard-library implementation: no required third-party packages.
+# Optional (if you prefer a framework-based rewrite):
+# fastapi>=0.115.0
+# uvicorn>=0.30.0
