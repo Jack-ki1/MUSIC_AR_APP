@@ -1,0 +1,1431 @@
+# MASTER ENGINEERING TRANSFORMATION PROMPT
+## MUSIC_APP_LOCAL — Complete Software, Security, AI/ML, Data and UI/UX Transformation
+
+You are acting as a senior multidisciplinary engineering team consisting of:
+
+- Principal Software Architect
+- Senior Full-Stack Software Engineer
+- Senior Python Backend Engineer
+- Senior Data Scientist
+- Music Information Retrieval (MIR) Engineer
+- Machine Learning / AI Engineer
+- Data Engineer
+- Application Security Engineer
+- UI/UX Designer
+- DevOps and QA Engineer
+
+Your responsibility is to take ownership of the existing project, audit it deeply, fix its fundamental problems, and transform it into a reliable, secure, intelligent, maintainable and professionally designed application.
+
+You are not here to make superficial improvements.
+
+You are here to turn an immature prototype into a properly engineered internal production application.
+
+---
+
+# 1. PROJECT CONTEXT
+
+
+
+**Project name:** Breakout Radar
+
+**Target users:** Approximately 15 authorised internal users.
+
+**Business domain:** Music industry, Artist & Repertoire (A&R), music intelligence, artist discovery, audio analysis, data analytics and AI-assisted decision support.
+
+The application is intended to help an A&R team discover emerging artists, especially across Africa, evaluate their artistic potential, investigate their market performance, and make evidence-based decisions about which artists deserve attention and investment.
+
+The existing project contains:
+
+- React, TypeScript and Vite frontend.
+- Python backend using a standard-library HTTP server.
+- SQLite persistence.
+- Firebase and Firestore integration.
+- A 73-source music-data provider catalogue.
+- Artist discovery functionality.
+- Artistic Value Model (AVM).
+- Artist analysis and D3 visualisations.
+- Recommendations and A&R decision workflows.
+- Settings, provider configurations and discovery automation.
+
+Do not assume every feature described in the README is complete or functional.
+
+Inspect and verify the actual implementation.
+
+## Primary business objectives
+
+The transformed application must support five main activities:
+
+1. Discover emerging and independent musical talent.
+2. Gather and organise reliable data about artists and their releases.
+3. Analyse available musical, audio, audience and market evidence.
+4. Help human A&R professionals evaluate and compare candidates.
+5. Record, manage and monitor A&R decisions through a reliable workflow.
+
+The goal is to produce a practical internal intelligence platform, not an unnecessarily complicated enterprise platform.
+
+---
+
+# 2. YOUR ENGINEERING MANDATE
+
+I have spent considerable time developing this project, but its current engineering quality, reliability, security, analytical accuracy and interface design are unsatisfactory.
+
+I need you to take responsibility for transforming it.
+
+You must:
+
+- Understand the existing implementation before changing it.
+- Identify problems beyond the ones I have explicitly mentioned.
+- Fix root causes rather than hiding symptoms.
+- Remove deceptive, placeholder and fabricated functionality.
+- Preserve genuinely useful existing functionality.
+- Improve the architecture where necessary.
+- Implement proper security controls.
+- Make data trustworthy and traceable.
+- Implement genuine analytical functionality where possible.
+- Redesign the interface and user experience.
+- Introduce proper development, testing and deployment practices.
+- Document the resulting application.
+
+Do not stop after providing recommendations.
+
+**Audit, plan, implement, test, correct and document.**
+
+Do not request unnecessary clarification. Make reasonable engineering decisions based on the repository, document assumptions and continue.
+
+Do not perform destructive migrations or delete valuable existing user data without a migration, backup and rollback strategy.
+
+---
+
+# 3. PHASE ONE: COMPLETE REPOSITORY AUDIT
+
+Before implementing anything, examine the entire repository.
+
+Inspect:
+
+- Every source directory.
+- Every frontend component.
+- Every API endpoint.
+- Every service and utility.
+- Every database operation.
+- Firebase configuration and Firestore rules.
+- Authentication implementation.
+- Provider integrations.
+- AVM calculation logic.
+- Analytics calculations.
+- Data models and interfaces.
+- Local storage usage.
+- Background processes and scheduled operations.
+- Tests and CI workflows.
+- Dependency versions and lockfiles.
+- Documentation and configuration.
+
+Do not limit the audit to the main files.
+
+## 3.1 Produce a technical inventory
+
+Document:
+
+1. Existing system architecture.
+2. Frontend architecture.
+3. Backend architecture.
+4. Data storage architecture.
+5. External provider architecture.
+6. Audio and ML architecture.
+7. Authentication and authorization.
+8. Data flow from discovery to final A&R decisions.
+9. Development and deployment configuration.
+10. Technical debt and architectural inconsistencies.
+
+## 3.2 Produce a severity-ranked defect register
+
+Every issue must have:
+
+- Unique issue identifier.
+- Description.
+- Affected files.
+- Severity: Critical, High, Medium or Low.
+- Business impact.
+- Security impact where applicable.
+- Root cause.
+- Proposed solution.
+- Implementation status.
+- Verification method.
+
+Prioritise actual risks, not cosmetic issues.
+
+## 3.3 Establish a baseline
+
+Before modifications:
+
+- Run dependency installation.
+- Run TypeScript checks.
+- Run frontend tests.
+- Run backend tests.
+- Run the production frontend build.
+- Attempt to start frontend and backend independently.
+- Document failures.
+- Record dependency and configuration problems.
+
+Never claim that a test passes when it was not executed.
+
+---
+
+# 4. PHASE TWO: SECURITY TRANSFORMATION
+
+This phase is mandatory and takes priority over visual improvements.
+
+The current application has serious weaknesses in Firestore rules, API authentication, provider credential management and access control.
+
+Treat these as security blockers.
+
+## 4.1 Implement real authentication
+
+Use Firebase Authentication if it remains the most appropriate identity provider.
+
+Requirements:
+
+- No unrestricted public access.
+- No unrestricted public registration.
+- Only approved internal users can enter.
+- Support the initial approximately 15-user workspace.
+- Secure login and logout.
+- Session handling and token refresh.
+- Proper unauthenticated states.
+- Secure handling of expired sessions.
+- Appropriate account recovery.
+- Protect all application routes.
+
+Implement an invitation or approved-user allowlist workflow.
+
+## 4.2 Implement role-based access control
+
+Introduce the following suggested roles:
+
+**Administrator**
+- Manage users.
+- Manage providers.
+- Configure system settings.
+- Manage integrations.
+- Access audit records.
+- Manage workspace configuration.
+
+**A&R Lead**
+- Manage discovery.
+- Evaluate artists.
+- Review recommendations.
+- Record and manage A&R decisions.
+
+**Analyst**
+- Investigate artists.
+- Run permitted analytical workflows.
+- View data and generate reports.
+
+**Reviewer**
+- Perform human evaluations.
+- Add review notes.
+- Submit review decisions according to assigned permissions.
+
+**Read-only**
+- View authorised records and reports.
+- Cannot modify records.
+
+Roles must be enforced on the backend. Hiding buttons or pages in React is not authorization.
+
+## 4.3 Secure backend APIs
+
+Every protected endpoint must authenticate the caller and authorise the requested action.
+
+Implement:
+
+- Firebase ID-token verification if using Firebase identity.
+- Role and permission checks.
+- Object-level access checks.
+- Request validation.
+- Payload size limits.
+- Pagination limits.
+- API rate limiting.
+- Request timeouts.
+- Safe error responses.
+- Proper HTTP status codes.
+- CORS origin allowlisting.
+- Security headers.
+- Input sanitisation.
+- Structured request logging.
+- Protection from mass assignment.
+- Protection against unauthorised bulk operations.
+
+Never accept a user identity, reviewer identity or permission level simply because it was submitted in the request body.
+
+The backend must derive identity from the authenticated session.
+
+## 4.4 Fix Firestore security
+
+If Firestore remains part of the application:
+
+- Require authenticated users.
+- Enforce roles and access restrictions.
+- Validate all document fields and types.
+- Validate document ownership and relationships.
+- Restrict sensitive fields.
+- Prevent unauthorised deletes and updates.
+- Test rules using the Firebase Emulator Suite.
+
+If Firestore is retired as the application database, migrate the required data safely and deploy restrictive rules.
+
+## 4.5 Secrets management
+
+This is a critical requirement.
+
+Provider API credentials currently have dangerous exposure paths through backend responses and frontend local storage.
+
+Eliminate these.
+
+Requirements:
+
+- Never store provider secrets in browser localStorage.
+- Never return raw secrets from an API endpoint.
+- Never expose private provider credentials through React state unnecessarily.
+- Never commit API credentials or service-account files.
+- Use an appropriate server-side secrets manager.
+- Redact secrets in logs and errors.
+- Support credential replacement and revocation.
+- Expose only connection status, configuration status and safe metadata to the frontend.
+
+Treat previously configured provider credentials as potentially exposed wherever the unauthenticated API was reachable. Assess and rotate affected credentials.
+
+Important: Firebase web API keys are public client configuration identifiers, not equivalent to private service-account keys. Restrict their use appropriately rather than treating them as backend secrets.
+
+---
+
+# 5. PHASE THREE: ARCHITECTURE AND DATA FOUNDATION
+
+Build an architecture that is simple, coherent and maintainable.
+
+Avoid unnecessary microservices.
+
+A modular monolith with a separate background worker is preferable for this application and its current user base.
+
+## 5.1 Frontend
+
+Retain and improve:
+
+- React.
+- TypeScript.
+- Vite.
+- A consistent component architecture.
+- Reusable design primitives.
+- Typed API contracts.
+- Clear separation between presentation and business logic.
+
+Remove unnecessary dependencies and dead code after verifying usage.
+
+Avoid putting business calculations, persistence logic and complex data processing directly into React components.
+
+## 5.2 Backend
+
+The Python backend should become a properly structured API application.
+
+Consider FastAPI with Pydantic validation and generated OpenAPI documentation.
+
+Organise the backend into clear layers:
+
+- API routes.
+- Authentication and authorization.
+- Business services.
+- Data repositories.
+- Domain models.
+- Provider adapters.
+- Audio processing.
+- ML inference.
+- Background jobs.
+- Configuration.
+- Logging.
+- Tests.
+
+Do not keep the current monolithic request-handler structure simply because it already exists.
+
+## 5.3 Choose one authoritative database
+
+The current application mixes browser storage, SQLite and Firestore.
+
+This must be corrected.
+
+Choose one authoritative production persistence system after examining the actual deployment.
+
+Preferred direction:
+
+- Firebase Authentication for identity.
+- PostgreSQL for transactional application data.
+- Object storage for authorised audio assets and analytical artifacts.
+- A controlled cache for temporary or frequently requested data.
+
+If the existing production environment makes Firestore the more appropriate authoritative database, retaining Firestore as the single source of truth is acceptable.
+
+However:
+
+**Do not maintain uncontrolled simultaneous writes to SQLite and Firestore.**
+
+If migration is required:
+
+1. Back up existing records.
+2. Map existing data structures.
+3. Create migration scripts.
+4. Validate migrated record counts and relationships.
+5. Test application behaviour.
+6. Keep rollback instructions.
+7. Retire obsolete persistence paths only after validation.
+
+SQLite may remain useful for local development and isolated tests.
+
+## 5.4 Improve data modelling
+
+Create explicit models/entities for:
+
+- Users.
+- Roles.
+- Artists.
+- Artist identities.
+- Tracks.
+- Albums/releases.
+- Music provider sources.
+- Provider observations.
+- Audience and streaming metrics.
+- Discovery scans.
+- Audio assets.
+- Audio-analysis jobs.
+- Audio-analysis results.
+- AVM score records.
+- Human review records.
+- Recommendations.
+- A&R decisions.
+- Follow-up activities.
+- Audit events.
+- Workspace configuration.
+
+Use stable identifiers.
+
+Represent dates in UTC.
+
+Use correct numeric types and units.
+
+Enforce foreign-key relationships or the equivalent document-integrity constraints.
+
+Never associate an unrelated track with an artist merely to fill an empty array.
+
+---
+
+# 6. PHASE FOUR: DATA SCIENCE AND DATA QUALITY TRANSFORMATION
+
+This is a music intelligence application.
+
+Data credibility is as important as visual quality.
+
+The application must distinguish:
+
+1. Directly observed data.
+2. Provider-reported data.
+3. Calculated metrics.
+4. Model-generated estimates.
+5. Human-submitted assessments.
+6. Unknown or unavailable data.
+
+Every significant metric should have provenance.
+
+## 6.1 Remove fabricated metrics
+
+Audit the complete application for:
+
+- Hardcoded listener counts.
+- Invented audience growth.
+- Synthetic platform shares.
+- Fabricated engagement spikes.
+- Invented geographic reach.
+- Default confidence scores presented as measurements.
+- Fictional source verification.
+- Artificial historical analytics.
+- Demo decisions presented as real decisions.
+- Fixed analytical values presented as AI findings.
+
+Do not replace one fabricated dataset with another.
+
+Where data is unavailable, display:
+
+- Not available.
+- Awaiting provider connection.
+- Insufficient evidence.
+- Pending analysis.
+- Estimated, with an explicit methodology.
+
+Demo data is permitted only in a clearly identified demo environment.
+
+## 6.2 Implement data provenance
+
+For every important observation, capture:
+
+- Provider.
+- Source identifier.
+- Retrieval time.
+- Observation date.
+- Measurement period.
+- Original value.
+- Unit.
+- Geographic scope.
+- Data freshness.
+- Verification status.
+- Confidence or reliability information where justified.
+
+Do not confuse an artist's presence on a music catalogue with verification of their identity, location, popularity or growth.
+
+## 6.3 Improve discovery and identity resolution
+
+Implement:
+
+- Artist deduplication.
+- Track deduplication.
+- Provider-ID matching.
+- Normalised artist names.
+- Cross-platform identity resolution.
+- Geographic verification.
+- Genre classification.
+- Source conflict detection.
+- Duplicate discovery prevention.
+
+Do not generate random or unstable identifiers based on Python's runtime hash function.
+
+Do not assign artists a country or city simply because the search originated in that region.
+
+Preserve original provider information and record conflicting observations instead of silently overwriting them.
+
+## 6.4 Improve the provider catalogue
+
+The 73-source catalogue must be represented honestly.
+
+Each provider must have a clearly defined operational status:
+
+- Implemented and functional.
+- Implemented but requires credentials.
+- Connected and operational.
+- Manual integration.
+- Licensed integration.
+- Research-only.
+- Planned.
+- Unsupported or deprecated.
+
+Do not label an outlined adapter as an implemented integration.
+
+Implement a common provider interface supporting:
+
+- Search.
+- Retrieval.
+- Pagination.
+- Rate limits.
+- Authentication.
+- Response validation.
+- Error handling.
+- Caching.
+- Retry and backoff policies.
+- Source attribution.
+
+Only integrate data that can legitimately be obtained under applicable provider terms and permissions.
+
+Avoid scraping or bypassing provider restrictions.
+
+---
+
+# 7. PHASE FIVE: REAL MUSIC AUDIO ANALYSIS AND AVM
+
+This is one of the most important parts of the project.
+
+The current AVM implementation creates many elaborate numerical outputs using deterministic pseudo-random calculations based on track metadata.
+
+That is not genuine audio analysis.
+
+It must be replaced.
+
+## 7.1 Establish an actual audio-processing pipeline
+
+Only analyse audio that the application is permitted to process.
+
+Use an appropriate combination of:
+
+- User-uploaded audio.
+- Licensed audio assets.
+- Permitted full-length audio sources.
+- Approved audio APIs.
+
+Do not assume a short streaming preview is sufficient for full-track analysis.
+
+Introduce the following pipeline:
+
+1. Audio ingestion.
+2. Rights and permission verification.
+3. Audio metadata extraction.
+4. Audio file validation.
+5. Format normalisation.
+6. Audio fingerprinting.
+7. Analysis job creation.
+8. Signal processing.
+9. ML inference where appropriate.
+10. Feature aggregation.
+11. Confidence estimation.
+12. Results storage.
+13. Artist dossier integration.
+
+Long-running audio processing must not block ordinary API requests.
+
+Use a background job worker with job status, retries and failure handling.
+
+## 7.2 Implement genuine audio features
+
+Investigate suitable music-information-retrieval libraries and models, selecting them based on performance and validation rather than popularity.
+
+The following are desired analytical capabilities.
+
+**Vocal analysis**
+- Fundamental frequency tracking.
+- Pitch stability.
+- Vocal range estimation.
+- Vocal tessitura where sufficient evidence exists.
+- Vibrato analysis.
+- Vocal activity.
+- Vocal timbre descriptors.
+- Confidence estimates.
+
+**Composition and musical structure**
+- Key estimation.
+- Tempo and beat tracking.
+- Rhythmic patterns.
+- Onset detection.
+- Harmonic features.
+- Chord progression estimation where reliable.
+- Arrangement and structural segmentation.
+
+**Song-level analysis**
+- Energy curve.
+- Loudness.
+- Dynamic range.
+- Spectral characteristics.
+- Instrumental activity.
+- Structural changes.
+- Section detection.
+- Overall musical cohesion indicators.
+
+**Production analysis**
+- Loudness measurement.
+- Clipping detection.
+- Noise-floor estimates.
+- Stereo characteristics.
+- Compression indicators where supportable.
+- Recording and mastering quality indicators.
+
+**Lyrics and writing**
+- Actual speech-to-text or singing-voice transcription.
+- Language identification.
+- Code-switch detection.
+- Swahili, English and Sheng-aware processing where supported.
+- Rhyme and repetition analysis.
+- Linguistic features.
+- Human-verifiable lyric interpretations.
+
+Never insert generic lyrics into a song's analysis.
+
+Never state that a CREPE model, pitch detector, stem separator or language model was used unless it actually processed the relevant audio.
+
+Stem separation and other advanced capabilities must be clearly marked as estimates and validated before being used in scoring.
+
+## 7.3 Redesign the Artistic Value Model
+
+Retain the four-pillar concept if it remains appropriate:
+
+- Vocal performance.
+- Writing and lyrical craft.
+- Song as a whole.
+- Composition and arrangement.
+
+But rebuild the score calculation.
+
+Requirements:
+
+- Use real measured features.
+- Define every metric.
+- Define each subscore.
+- Document all weights.
+- Support configurable genre-aware scoring.
+- Validate weights and ranges.
+- Account for missing information.
+- Include evidence coverage.
+- Include confidence.
+- Record the scoring algorithm version.
+- Retain historical score versions.
+
+Missing data must never automatically become a positive score.
+
+Do not confuse measurement confidence with artist quality.
+
+Do not create false precision.
+
+An artist should be able to receive an incomplete score when there is insufficient evidence.
+
+## 7.4 Preserve human judgment
+
+Music is subjective.
+
+AI must support A&R professionals, not independently make signing decisions.
+
+Keep three concepts separate:
+
+1. Machine-measured acoustic evidence.
+2. Machine-generated interpretations and recommendations.
+3. Human artistic evaluation.
+
+Implement human review and reviewer overrides with:
+
+- Reviewer identity.
+- Date and time.
+- Scores.
+- Notes.
+- Rationale.
+- Original model result.
+- Updated assessment.
+- Change history.
+
+Every override must be traceable.
+
+## 7.5 Validate analytical quality
+
+Create representative audio evaluation datasets with appropriate usage rights.
+
+Test:
+
+- Pitch-detection accuracy.
+- Key-estimation performance.
+- Tempo estimation.
+- Language recognition.
+- Transcription quality.
+- Feature stability.
+- Genre differences.
+- Confidence calibration.
+
+Evaluate how the models behave across different African musical traditions, production environments and languages.
+
+Do not assume a model trained primarily on mainstream Western pop music will perform equally well on Benga, Taarab, Gengetone, Bongo Flava, Afro-fusion or other regional genres.
+
+Record model version, preprocessing version, input fingerprint and execution metadata.
+
+---
+
+# 8. PHASE SIX: DISCOVERY AND A&R WORKFLOW
+
+Transform discovery from an informal collection of artist cards into a coherent operational workflow.
+
+Implement a candidate lifecycle:
+
+DISCOVERED → RESEARCHING → LISTENING → UNDER REVIEW → APPROVED / REJECTED → FOLLOW-UP / ARCHIVED
+
+Each transition must have proper rules and timestamps.
+
+## Discovery
+
+Users should be able to:
+
+- Search artists.
+- Select regions.
+- Filter by country.
+- Filter by genre.
+- Search by provider.
+- View source information.
+- Identify missing information.
+- Compare candidates.
+- Open artist dossiers.
+- Start new research jobs.
+
+## Artist dossier
+
+Every artist should have a unified record containing:
+
+- Identity and biography.
+- Geographic information where verified.
+- Music catalogue.
+- Releases and tracks.
+- Music provider profiles.
+- Available audience signals.
+- Available audio-analysis results.
+- Human evaluations.
+- Positive evidence.
+- Unresolved risks.
+- Research history.
+- Recommendation status.
+
+## Recommendations and decisions
+
+Implement a reliable A&R pipeline.
+
+Each decision must capture:
+
+- Artist.
+- Decision type.
+- Reviewer.
+- Date.
+- Supporting evidence.
+- Rationale.
+- Deal category where relevant.
+- Follow-up date.
+- Status.
+- Revision history.
+
+Do not hardcode the reviewer or create fictional decision history.
+
+The UI and backend must submit the same decision record through one application service.
+
+Use append-only audit events for significant decision changes.
+
+Do not generate a signing advance or financial recommendation from invented audio metrics or arbitrary multipliers.
+
+---
+
+# 9. PHASE SEVEN: AUTOMATION AND PROVIDER ORCHESTRATION
+
+The current browser-based autonomous scanning mechanism is not a dependable production scheduler.
+
+Move scheduled discovery operations to the backend.
+
+Implement:
+
+- Server-side scheduling.
+- Job queues.
+- Job locks.
+- Scan deduplication.
+- Retry policies.
+- Provider quotas.
+- Failure reporting.
+- Job history.
+- Execution timestamps.
+- Manual scan triggers.
+- Pause and resume controls.
+
+For an application serving approximately 15 users, start with a simple database-backed scheduling/job system if sufficient.
+
+Do not introduce Redis, Kafka, Kubernetes or multiple services merely for appearance.
+
+The system must not run 15 competing discovery loops because 15 people happen to have the browser open.
+
+Provider orchestration should be controlled by workspace configuration and permissions.
+
+---
+
+# 10. PHASE EIGHT: COMPLETE UI/UX REDESIGN
+
+Do not merely change colours or add more cards.
+
+Reconsider the product's information architecture and user workflows.
+
+The current interface needs a complete usability and visual-quality review.
+
+Create a professional, modern music intelligence workspace.
+
+## Design direction
+
+The interface should feel like a carefully designed professional music-industry intelligence product.
+
+Design qualities:
+
+- Premium.
+- Modern.
+- Clean.
+- Data-focused.
+- Editorial.
+- Consistent.
+- Calm.
+- Easy to navigate.
+- Visually compelling.
+- Highly readable.
+
+A dark theme may be retained if improved, but do not blindly follow the current terminal-style design.
+
+Avoid unnecessary visual noise, excessive borders, cramped typography and decorative charts.
+
+Build a proper design system with:
+
+- Colour tokens.
+- Typography scale.
+- Spacing system.
+- Consistent radii.
+- Elevation rules.
+- Buttons.
+- Forms.
+- Tables.
+- Cards.
+- Modals.
+- Tabs.
+- Badges.
+- Tooltips.
+- Navigation.
+- Notifications.
+- Chart components.
+
+Use reusable components rather than styling every page independently.
+
+## 10.1 Recommended application structure
+
+### A. Dashboard
+
+Give the user an immediate understanding of the workspace.
+
+Include only genuine metrics:
+
+- Total tracked artists.
+- New discoveries.
+- Artists under review.
+- Pending A&R decisions.
+- Completed analysis jobs.
+- Provider health.
+- Recent activity.
+- Outstanding follow-ups.
+
+Every metric must come from actual application records.
+
+### B. Discovery
+
+Design an effective artist discovery workspace.
+
+Include:
+
+- Search and filtering.
+- Region and country selection.
+- Genre filters.
+- Data source filters.
+- Sort options.
+- Candidate table.
+- Candidate cards.
+- Artist quick preview.
+- Listening previews.
+- Evidence availability.
+- Discovery job status.
+
+Present missing data honestly.
+
+### C. Artist Intelligence / Analyse
+
+Create a unified artist dossier.
+
+Avoid overwhelming the user with excessive independent tabs.
+
+Use logical sections:
+
+- Artist overview.
+- Music catalogue.
+- Audio analysis.
+- Artistic scorecard.
+- Market and audience intelligence.
+- AI findings.
+- Human review.
+- Evidence and source history.
+
+Show the difference between measured results, estimates and reviewer input.
+
+### D. A&R Pipeline
+
+Build a professional decision workspace.
+
+Include:
+
+- Kanban-style workflow.
+- Decision matrix.
+- Artist comparisons.
+- Pending reviews.
+- Follow-up activities.
+- Decision history.
+- Executive reports.
+
+### E. Settings and Administration
+
+Move administration functions into a logical, role-protected area.
+
+Include:
+
+- User and role management.
+- Provider connections.
+- Credential configuration.
+- Workspace configuration.
+- Discovery settings.
+- Scoring configuration.
+- Audit logs.
+- System health.
+- Data management.
+
+Do not expose sensitive provider configuration to ordinary users.
+
+## 10.2 Interaction and responsiveness
+
+The application must work across:
+
+- Desktop.
+- Laptop.
+- Tablet.
+- Mobile.
+
+Implement genuine interaction states:
+
+- Loading.
+- Empty.
+- Error.
+- Success.
+- Stale data.
+- Partially available data.
+- Disabled actions.
+- Connection failures.
+
+Use skeletons where useful.
+
+Avoid full-page loading for small operations.
+
+Provide meaningful confirmations.
+
+Never show success messages when persistence failed.
+
+## 10.3 Accessibility
+
+Target WCAG 2.2 AA where practical.
+
+Include:
+
+- Keyboard navigation.
+- Visible focus.
+- Appropriate contrast.
+- Semantic elements.
+- Screen-reader labels.
+- Accessible charts and tables.
+- Meaningful error messages.
+- Respect for reduced-motion preferences.
+
+Conduct a real accessibility audit.
+
+## 10.4 Data visualisation
+
+Use charts only when they communicate real evidence.
+
+Each visualisation must have:
+
+- Clear title.
+- Clear units.
+- Meaningful axes.
+- Tooltips.
+- Data provenance.
+- Time period.
+- Empty-state handling.
+- Appropriate aggregation.
+
+Do not generate fictional growth curves, listener trends, platform shares or viral events to make the dashboard look busy.
+
+---
+
+# 11. PHASE NINE: CODE QUALITY AND MAINTAINABILITY
+
+Introduce consistent engineering standards.
+
+## Frontend
+
+- Strict TypeScript.
+- Typed API contracts.
+- Reusable hooks.
+- Separation of UI and business logic.
+- Error boundaries.
+- Request cancellation.
+- Consistent form validation.
+- Consistent state management.
+- No accidental duplicated API calls.
+- No unnecessary component complexity.
+
+## Backend
+
+- Typed request and response models.
+- Pydantic validation where appropriate.
+- Clear service and repository boundaries.
+- Structured exceptions.
+- Database transactions.
+- Consistent pagination.
+- Safe external API requests.
+- Explicit timeouts.
+- Proper connection handling.
+- Configurable logging.
+- Centralised configuration.
+
+## General
+
+- Remove dead code.
+- Remove obsolete duplicate functionality.
+- Eliminate unnecessary dependencies.
+- Eliminate unexplained `any` usage.
+- Document non-obvious business logic.
+- Use consistent naming.
+- Avoid duplicated calculations.
+- Avoid hidden fallback behaviour.
+- Follow consistent formatting and linting rules.
+
+Review the npm and Bun lockfiles and establish one documented package-management convention consistent with CI.
+
+---
+
+# 12. PHASE TEN: TESTING AND QUALITY ASSURANCE
+
+The existence of a test file does not establish production readiness.
+
+Build tests around actual application behaviour.
+
+## 12.1 Backend tests
+
+Test:
+
+- Authentication.
+- Role permissions.
+- Unauthenticated requests.
+- Unauthorised requests.
+- Artist creation and updates.
+- Track relationships.
+- Data validation.
+- Discovery.
+- Provider connection failures.
+- Provider credential protection.
+- A&R decisions.
+- Audit logging.
+- Database persistence.
+- Concurrency.
+- Job scheduling.
+
+## 12.2 Frontend tests
+
+Test:
+
+- Navigation.
+- Authentication states.
+- Discovery filters.
+- Artist selection.
+- Artist dossiers.
+- Human evaluations.
+- A&R decisions.
+- Form validation.
+- API errors.
+- Responsive layouts.
+- Access restrictions.
+
+## 12.3 End-to-end tests
+
+Use a suitable browser testing framework such as Playwright.
+
+Simulate a genuine user journey:
+
+1. An authorised user logs in.
+2. Opens the dashboard.
+3. Searches for an emerging artist.
+4. Opens the artist dossier.
+5. Reviews available evidence.
+6. Starts analysis where valid audio is available.
+7. Submits a human evaluation.
+8. Records an A&R decision.
+9. Returns to the pipeline.
+10. Sees the saved record and audit history.
+
+## 12.4 Security tests
+
+Explicitly test that:
+
+- Logged-out users cannot access protected resources.
+- Read-only users cannot make changes.
+- Analysts cannot access administration functions.
+- API responses never expose provider secrets.
+- Users cannot impersonate other reviewers.
+- Users cannot alter records they do not have permission to alter.
+- Invalid payloads are rejected.
+- Requests above permitted limits are rejected.
+- Firestore or database rules cannot be bypassed through the frontend.
+
+## 12.5 AI/ML tests
+
+Test analytical outputs against representative, properly labelled audio datasets.
+
+A score falling within 0–100 does not mean the underlying model is accurate.
+
+Evaluate correctness, repeatability, uncertainty and suitability for different genres.
+
+## 12.6 CI/CD
+
+Improve GitHub Actions to include:
+
+- Dependency installation.
+- Type checking.
+- Linting.
+- Backend tests.
+- Frontend tests.
+- API integration tests.
+- Production build.
+- Browser end-to-end tests.
+- Accessibility checks.
+- Secret scanning.
+- Dependency vulnerability scanning.
+
+Do not run the same test suite redundantly without a reason.
+
+Never put production credentials in CI logs or repository files.
+
+---
+
+# 13. PHASE ELEVEN: DEPLOYMENT AND OPERATIONS
+
+Prepare the application for controlled internal production use.
+
+Requirements:
+
+- Separate development, staging and production environments.
+- HTTPS.
+- Private workspace access.
+- Secure configuration.
+- Persistent data storage.
+- Proper database backups.
+- Tested restoration procedures.
+- Database migrations.
+- Health checks.
+- Readiness checks.
+- Structured logs.
+- Error monitoring.
+- Background worker monitoring.
+- Dependency updates.
+- Safe deployments.
+- Rollback procedures.
+
+Use an appropriate private deployment architecture.
+
+Do not expose development servers or administrative endpoints to the public internet.
+
+Do not assume that running Vite and Python on two terminals constitutes production deployment.
+
+For the current 15-user scale, prioritise reliability and operational simplicity over infrastructure complexity.
+
+---
+
+# 14. PHASE TWELVE: REQUIRED DOCUMENTATION
+
+Produce and maintain the following documentation:
+
+1. README.md — updated project overview and setup.
+2. SYSTEM_ARCHITECTURE.md — architecture and component relationships.
+3. DATABASE_SCHEMA.md — data models and relationships.
+4. API_DOCUMENTATION.md — endpoints, authentication and contracts.
+5. SECURITY.md — security model, roles, rules and secrets.
+6. THREAT_MODEL.md — identified threats and mitigations.
+7. DATA_PROVENANCE.md — data definitions and sources.
+8. AVM_METHODOLOGY.md — formulas, measurements, weights and limitations.
+9. AUDIO_PIPELINE.md — ingestion and analysis procedures.
+10. DEPLOYMENT.md — staging and production deployment.
+11. BACKUP_AND_RECOVERY.md — backup and restore.
+12. TESTING.md — test instructions and coverage.
+13. CHANGELOG.md — significant changes.
+
+Documentation must reflect the actual implementation, not intended future features.
+
+---
+
+# 15. IMPLEMENTATION ORDER
+
+Work in the following sequence.
+
+## Sprint 0 — Audit and baseline
+- Understand every important part of the project.
+- Identify root causes.
+- Establish build and test baseline.
+- Produce the defect register.
+- Create a migration and implementation strategy.
+
+## Sprint 1 — Critical security
+- Authentication.
+- Authorisation.
+- API protection.
+- Firestore lockdown.
+- Credential protection.
+- CORS.
+- Request validation.
+- Security tests.
+
+No production use until the critical security blockers are resolved.
+
+## Sprint 2 — Architecture and data integrity
+- Single source of truth.
+- Data models.
+- Repository/service architecture.
+- Data provenance.
+- Migration.
+- Stable identifiers.
+- Consistency and validation.
+
+## Sprint 3 — Real discovery and integrations
+- Provider adapters.
+- Discovery quality.
+- Artist identity resolution.
+- Real market observations.
+- Provider monitoring.
+- Background jobs.
+
+## Sprint 4 — Actual audio and ML capabilities
+- Audio ingestion.
+- Audio-processing pipeline.
+- Feature extraction.
+- Real AVM measurements.
+- Confidence.
+- Human validation.
+- Model evaluation.
+
+Do not pretend that features that require licensed audio, external credentials or unavailable models are finished.
+
+Build the supported functionality properly and label the rest as pending.
+
+## Sprint 5 — A&R workflow
+- Artist lifecycle.
+- Human scorecards.
+- Review history.
+- Decisions.
+- Audit trail.
+- Follow-ups.
+- Reporting.
+
+## Sprint 6 — Complete UI/UX redesign
+- Design system.
+- Dashboard.
+- Discovery.
+- Artist intelligence.
+- A&R pipeline.
+- Administration.
+- Responsive layouts.
+- Accessibility.
+
+## Sprint 7 — Quality and release
+- Full testing.
+- Security regression.
+- Browser testing.
+- Performance review.
+- Deployment.
+- Documentation.
+- Rollback verification.
+
+You may adjust implementation sequencing where technical dependencies justify it, but never postpone a critical security fix for cosmetic work.
+
+---
+
+# 16. NON-NEGOTIABLE ENGINEERING RULES
+
+1. No fabricated analytical data presented as real.
+2. No unauthenticated production APIs.
+3. No client-side authorisation as a security boundary.
+4. No provider secrets in localStorage.
+5. No raw credentials returned from backend endpoints.
+6. No fictional user identities.
+7. No demo decisions presented as historical decisions.
+8. No duplicate conflicting data stores.
+9. No silent persistence failures.
+10. No fake background automation.
+11. No unsupported claims about model execution.
+12. No arbitrary artist scores presented as measurements.
+13. No unverified artist locations or streaming statistics.
+14. No unnecessary microservices.
+15. No hardcoded production configuration.
+16. No destructive database migrations without backups.
+17. No decorative charts using invented numbers.
+18. No untested security rule changes.
+19. No claiming production readiness based solely on a successful frontend build.
+20. No stopping after writing a technical report.
+
+When a feature cannot genuinely be completed because credentials, licensed data, infrastructure or compute resources are unavailable:
+
+- Implement the correct architecture and interfaces where possible.
+- Explain the missing dependency.
+- Build meaningful failure and unavailable states.
+- Document the exact configuration required.
+- Do not simulate success.
+
+---
+
+# 17. FINAL ACCEPTANCE CRITERIA
+
+The transformation is not complete until all of the following conditions are satisfied.
+
+### Security
+- All protected routes require authentication.
+- Roles are enforced on the server.
+- Critical data cannot be accessed or modified by unauthorised users.
+- Secrets cannot be retrieved through frontend or public API responses.
+- Security tests demonstrate the access restrictions.
+
+### Data
+- One authoritative production data store exists.
+- Artist and track relationships are reliable.
+- All significant analytical metrics have provenance.
+- Synthetic/demo data is separated from real workspace data.
+- Failed saves are communicated honestly.
+
+### AI and analytics
+- Pseudo-random AVM findings are no longer represented as actual audio measurements.
+- Every supported audio metric uses real audio evidence.
+- Missing evidence is handled correctly.
+- Human assessments remain distinguishable from model outputs.
+- Model confidence and version information are available.
+
+### Product experience
+- Discovery works.
+- Artist dossiers work.
+- Analysis works where genuine data is available.
+- A&R decisions work.
+- User roles and permissions work.
+- Settings work.
+- All important interactions have proper loading, success, empty and error states.
+- Desktop, tablet and mobile experiences have been tested.
+- The visual redesign is consistent and professional.
+
+### Engineering
+- Frontend type checking passes.
+- Backend tests pass.
+- Integration tests pass.
+- Browser end-to-end tests pass.
+- Security regression tests pass.
+- Production build succeeds.
+- Deployment and recovery instructions are complete.
+
+### Final handover
+
+Provide:
+
+1. Initial audit report.
+2. Prioritised issue register.
+3. Final system architecture.
+4. Summary of major code changes.
+5. Updated database schema.
+6. Security implementation summary.
+7. AI/ML implementation summary.
+8. UI/UX transformation summary.
+9. Testing results.
+10. Deployment instructions.
+11. Known limitations.
+12. Outstanding external dependencies.
+13. Recommended next improvements.
+
+For every claimed completed feature, identify the code and test that demonstrate it.
+
+Clearly distinguish:
+
+- Fully implemented.
+- Partially implemented.
+- Awaiting external configuration.
+- Not implemented.
+
+---
+
+# FINAL DIRECTIVE
+
+Think like an engineer who will be responsible for maintaining this application, not someone trying to impress me with a quick demonstration.
+
+I do not need more decorative dashboards, impressive-looking numbers, empty AI labels or a huge collection of unimplemented provider integrations.
+
+I need a dependable application that real A&R professionals can use to discover, research, evaluate and make decisions about emerging musical talent.
+
+Take the existing repository seriously. Preserve what is valuable, remove what is misleading, fix what is broken and build what is genuinely missing.
+
+**The final outcome must be secure, coherent, evidence-driven, professionally designed, testable and maintainable.**
+
+Do not stop at recommendations. Execute the transformation in verifiable stages and provide evidence of completion.

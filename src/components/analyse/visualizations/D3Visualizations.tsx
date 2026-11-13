@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { primary, chart, platform, series, sectionBands } from '../../../shared/theme/chartPalette';
 import { 
   TimeSeriesPoint, 
   PlatformShareSlice, 
@@ -13,1000 +12,463 @@ import {
   DiscographyTrajectoryPoint 
 } from '../../../types/analytics';
 
-// ============================================================================
-// 1. MONTHLY STREAM PROGRESSION (90-DAY D3 AREA & LINE CHART)
-// ============================================================================
-interface MonthlyStreamProgressionProps {
-  data: TimeSeriesPoint[];
-  height?: number;
-  timeRangeLabel?: string;
+interface ChartEmptyProps {
+  message: string;
+  subtext?: string;
 }
 
-export const MonthlyStreamProgressionChart: React.FC<MonthlyStreamProgressionProps> = ({
-  data,
-  height = 280,
-  timeRangeLabel = 'Last 90 Days'
-}) => {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const [activeChannel, setActiveChannel] = useState<'all' | 'spotify' | 'appleMusic' | 'youtube' | 'tiktokUgc'>('all');
+export const ChartEmptyState: React.FC<ChartEmptyProps> = ({ message, subtext }) => (
+  <div className="h-48 flex flex-col items-center justify-center text-center p-4 rounded-lg bg-[#F8FAFC] border border-dashed border-[#E4E7EC]">
+    <p className="text-xs font-semibold text-[#475467]">{message}</p>
+    {subtext && <p className="text-[11px] text-[#98A2B3] mt-1 max-w-sm">{subtext}</p>}
+  </div>
+);
 
-  const width = 760;
-  const margin = { top: 20, right: 30, bottom: 35, left: 55 };
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
+// ============================================================================
+// 1. AUDIENCE STREAM PROGRESSION CHART
+// ============================================================================
+export const MonthlyStreamProgressionChart: React.FC<{ 
+  data?: TimeSeriesPoint[]; 
+  height?: number; 
+  timeRangeLabel?: string;
+}> = ({ data = [] }) => {
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
-  // Scales
-  const { xScale, yScale, totalAreaPath, spotifyLine, appleLine, ytLine, tiktokLine } = useMemo(() => {
-    const dates = data.map(d => new Date(d.timestamp));
+  useEffect(() => {
+    if (!svgRef.current || !data || data.length === 0) return;
+
+    const el = svgRef.current;
+    d3.select(el).selectAll('*').remove();
+
+    const margin = { top: 16, right: 16, bottom: 24, left: 44 };
+    const clientW = el.clientWidth || el.parentElement?.clientWidth || 400;
+    const width = Math.max(280, clientW - margin.left - margin.right);
+    const height = 220 - margin.top - margin.bottom;
+
+    const svg = d3.select(el)
+      .attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+      .attr('width', '100%')
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const parseDate = (dStr: string) => new Date(dStr);
+
     const x = d3.scaleTime()
-      .domain(d3.extent(dates) as [Date, Date])
-      .range([0, innerWidth]);
+      .domain(d3.extent(data, d => parseDate(d.date)) as [Date, Date])
+      .range([0, width]);
 
-    const maxVal = d3.max(data, d => Math.max(d.total, d.tiktokUgc, d.spotify * 1.5)) || 100000;
+    const maxY = d3.max(data, d => d.total) || 1000;
     const y = d3.scaleLinear()
-      .domain([0, maxVal * 1.08])
-      .range([innerHeight, 0]);
+      .domain([0, maxY * 1.1])
+      .range([height, 0]);
 
-    // Area generator for total streams
-    const areaGen = d3.area<TimeSeriesPoint>()
-      .x(d => x(new Date(d.timestamp)))
-      .y0(innerHeight)
+    // Grid
+    svg.append('g')
+      .attr('class', 'grid')
+      .call(d3.axisLeft(y).ticks(4).tickSize(-width).tickFormat(() => ''))
+      .selectAll('line')
+      .attr('stroke', '#F2F4F7');
+
+    // Axes
+    svg.append('g')
+      .attr('transform', `translate(0,${height})`)
+      .call(d3.axisBottom(x).ticks(5).tickFormat(d3.timeFormat('%b %d') as any))
+      .selectAll('text')
+      .attr('fill', '#98A2B3')
+      .attr('font-size', '10px');
+
+    svg.append('g')
+      .call(d3.axisLeft(y).ticks(4).tickFormat(d => `${d3.format('.1s')(d as number)}`))
+      .selectAll('text')
+      .attr('fill', '#98A2B3')
+      .attr('font-size', '10px');
+
+    // Area
+    const area = d3.area<TimeSeriesPoint>()
+      .x(d => x(parseDate(d.date)))
+      .y0(height)
       .y1(d => y(d.total))
       .curve(d3.curveMonotoneX);
 
-    // Line generators
-    const spotifyLineGen = d3.line<TimeSeriesPoint>()
-      .x(d => x(new Date(d.timestamp)))
-      .y(d => y(d.spotify))
+    svg.append('path')
+      .datum(data)
+      .attr('fill', '#EEF2FF')
+      .attr('d', area);
+
+    // Line
+    const line = d3.line<TimeSeriesPoint>()
+      .x(d => x(parseDate(d.date)))
+      .y(d => y(d.total))
       .curve(d3.curveMonotoneX);
 
-    const appleLineGen = d3.line<TimeSeriesPoint>()
-      .x(d => x(new Date(d.timestamp)))
-      .y(d => y(d.appleMusic))
-      .curve(d3.curveMonotoneX);
-
-    const ytLineGen = d3.line<TimeSeriesPoint>()
-      .x(d => x(new Date(d.timestamp)))
-      .y(d => y(d.youtube))
-      .curve(d3.curveMonotoneX);
-
-    const tiktokLineGen = d3.line<TimeSeriesPoint>()
-      .x(d => x(new Date(d.timestamp)))
-      .y(d => y(d.tiktokUgc))
-      .curve(d3.curveMonotoneX);
-
-    return {
-      xScale: x,
-      yScale: y,
-      totalAreaPath: areaGen(data) || '',
-      spotifyLine: spotifyLineGen(data) || '',
-      appleLine: appleLineGen(data) || '',
-      ytLine: ytLineGen(data) || '',
-      tiktokLine: tiktokLineGen(data) || ''
-    };
-  }, [data, innerWidth, innerHeight]);
-
-  // Y-axis tick values
-  const yTicks = yScale.ticks(5);
-  // X-axis tick values (approx 6 ticks)
-  const xTicks = xScale.ticks(6);
-
-  const activePoint = hoveredIdx !== null ? data[hoveredIdx] : data[data.length - 1];
-
-  return (
-    <div className="space-y-3">
-      {/* Header with channel filter pills */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-2xs font-mono font-semibold uppercase tracking-[0.1em] text-purple-500 shrink-0">Platform scope</span>
-          <div className="inline-flex items-center rounded-sm border border-line overflow-hidden bg-surface">
-          {(['all', 'spotify', 'tiktokUgc', 'youtube', 'appleMusic'] as const).map(channel => (
-            <button
-              key={channel}
-              onClick={() => setActiveChannel(channel)}
-              aria-pressed={activeChannel === channel}
-              className={`px-2.5 py-1 text-2xs font-mono font-semibold uppercase tracking-[0.06em] cursor-pointer transition-colors border-l border-line first:border-l-0 ${
-                activeChannel === channel
-                  ? 'bg-brand-500 text-navy-900'
-                  : 'text-purple-500 hover:bg-purple-100 hover:text-navy-700'
-              }`}
-            >
-              {channel === 'all' ? 'All Channels' : channel === 'spotify' ? 'Spotify' : channel === 'tiktokUgc' ? 'TikTok UGC' : channel === 'youtube' ? 'YouTube' : 'Apple'}
-            </button>
-          ))}
-          </div>
-        </div>
-
-        {activePoint && (
-          <div className="text-xs font-mono font-semibold text-navy-700 flex items-center gap-3">
-            <span className="text-purple-500">{activePoint.date}:</span>
-            <span className="text-brand-600 font-semibold">{activePoint.total.toLocaleString()} total streams</span>
-            <span className="text-success-600 text-2xs">({activePoint.spotify.toLocaleString()} Spotify)</span>
-          </div>
-        )}
-      </div>
-
-      {/* D3 SVG Canvas */}
-      <div className="relative w-full overflow-hidden rounded-card bg-surface border border-line p-2">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
-          <defs>
-            <linearGradient id="streamAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={primary} stopOpacity="0.14" />
-              <stop offset="65%" stopColor={primary} stopOpacity="0.04" />
-              <stop offset="100%" stopColor={primary} stopOpacity="0.00" />
-            </linearGradient>
-            <linearGradient id="spotifyAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={platform.spotify} stopOpacity="0.25" />
-              <stop offset="100%" stopColor={platform.spotify} stopOpacity="0.0" />
-            </linearGradient>
-          </defs>
-
-          <g transform={`translate(${margin.left}, ${margin.top})`}>
-            {/* Horizontal Grid lines */}
-            {yTicks.map((tick, i) => (
-              <g key={i} transform={`translate(0, ${yScale(tick)})`}>
-                <line x1={0} x2={innerWidth} y1={0} y2={0} stroke={chart.grid} strokeWidth="1" strokeDasharray="3 3" />
-                <text x={-10} y={4} textAnchor="end" fill={chart.axisLabel} fontSize="10" fontFamily="monospace">
-                  {(tick / 1000).toFixed(0)}k
-                </text>
-              </g>
-            ))}
-
-            {/* X Axis dates */}
-            {xTicks.map((date, i) => (
-              <text
-                key={i}
-                x={xScale(date)}
-                y={innerHeight + 20}
-                textAnchor="middle"
-                fill={chart.axisLabel}
-                fontSize="10"
-                fontFamily="sans-serif"
-              >
-                {d3.timeFormat('%b %d')(date)}
-              </text>
-            ))}
-
-            {/* Total Streams Area Fill */}
-            {(activeChannel === 'all') && (
-              <path d={totalAreaPath} fill="url(#streamAreaGrad)" />
-            )}
-
-            {/* Total Streams Boundary Line */}
-            {(activeChannel === 'all') && (
-              <path d={d3.line<TimeSeriesPoint>().x(d => xScale(new Date(d.timestamp))).y(d => yScale(d.total)).curve(d3.curveMonotoneX)(data) || ''}
-                fill="none"
-                stroke={primary}
-                strokeWidth="2.75"
-              />
-            )}
-
-            {/* Spotify Line */}
-            {(activeChannel === 'all' || activeChannel === 'spotify') && (
-              <path d={spotifyLine} fill="none" stroke={platform.spotify} strokeWidth={activeChannel === 'spotify' ? '3' : '2'} />
-            )}
-
-            {/* TikTok UGC Line */}
-            {(activeChannel === 'all' || activeChannel === 'tiktokUgc') && (
-              <path d={tiktokLine} fill="none" stroke={platform.tiktok} strokeWidth={activeChannel === 'tiktokUgc' ? '3' : '1.75'} strokeDasharray={activeChannel === 'all' ? '4 3' : 'none'} />
-            )}
-
-            {/* YouTube Line */}
-            {(activeChannel === 'all' || activeChannel === 'youtube') && (
-              <path d={ytLine} fill="none" stroke={platform.youtube} strokeWidth={activeChannel === 'youtube' ? '3' : '1.5'} />
-            )}
-
-            {/* Apple Music Line */}
-            {(activeChannel === 'all' || activeChannel === 'appleMusic') && (
-              <path d={appleLine} fill="none" stroke={platform.apple} strokeWidth={activeChannel === 'appleMusic' ? '3' : '1.5'} strokeDasharray="3 2" />
-            )}
-
-            {/* Interactive Crosshair & Hover Overlay */}
-            {data.map((d, idx) => {
-              const xPos = xScale(new Date(d.timestamp));
-              return (
-                <rect
-                  key={idx}
-                  x={xPos - (innerWidth / data.length) / 2}
-                  y={0}
-                  width={innerWidth / data.length}
-                  height={innerHeight}
-                  fill="transparent"
-                  className="cursor-crosshair"
-                  onMouseEnter={() => setHoveredIdx(idx)}
-                />
-              );
-            })}
-
-            {/* Hovered Marker Dot & Line */}
-            {hoveredIdx !== null && activePoint && (
-              <g>
-                <line
-                  x1={xScale(new Date(activePoint.timestamp))}
-                  x2={xScale(new Date(activePoint.timestamp))}
-                  y1={0}
-                  y2={innerHeight}
-                  stroke={primary}
-                  strokeWidth="1.5"
-                  strokeDasharray="2 2"
-                />
-                <circle
-                  cx={xScale(new Date(activePoint.timestamp))}
-                  cy={yScale(activePoint.total)}
-                  r="5"
-                  fill={primary}
-                  stroke={chart.surface}
-                  strokeWidth="2.5"
-                />
-                <circle
-                  cx={xScale(new Date(activePoint.timestamp))}
-                  cy={yScale(activePoint.spotify)}
-                  r="4"
-                  fill={platform.spotify}
-                  stroke={chart.surface}
-                  strokeWidth="2"
-                />
-              </g>
-            )}
-          </g>
-        </svg>
-      </div>
-
-      {/* Legend & Insights */}
-      <div className="flex flex-wrap items-center justify-between text-xs text-purple-500 pt-1">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
-            <span className="w-2.5 h-2.5 rounded-sm bg-brand-500"></span> Total
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
-            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: platform.spotify }}></span> Spotify
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
-            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: platform.tiktok }}></span> TikTok Audio
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
-            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: platform.youtube }}></span> YouTube
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wide text-navy-700">
-            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: platform.apple }}></span> Apple Music
-          </span>
-        </div>
-        <div className="text-2xs font-mono font-semibold tabular-nums uppercase tracking-wide text-success-600">
-          {timeRangeLabel} velocity +68.4%
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-// ============================================================================
-// 2. PLATFORM AUDIENCE DISTRIBUTION (D3 DONUT / PIE CHART)
-// ============================================================================
-interface PlatformAudiencePieProps {
-  slices: PlatformShareSlice[];
-  size?: number;
-}
-
-export const PlatformAudiencePieChart: React.FC<PlatformAudiencePieProps> = ({
-  slices,
-  size = 260
-}) => {
-  const [hoveredPlatform, setHoveredPlatform] = useState<string | null>(null);
-
-  const radius = size / 2;
-  const innerRadius = radius * 0.58; // Donut hole
-
-  // D3 Pie layout
-  const pieGen = useMemo(() => {
-    return d3.pie<PlatformShareSlice>()
-      .value(d => d.sharePercentage)
-      .sort(null);
-  }, []);
-
-  // D3 Arc generator
-  const arcGen = useMemo(() => {
-    return d3.arc<d3.PieArcDatum<PlatformShareSlice>>()
-      .innerRadius(innerRadius)
-      .outerRadius(radius - 10)
-      .cornerRadius(4)
-      .padAngle(0.03);
-  }, [innerRadius, radius]);
-
-  const arcHoverGen = useMemo(() => {
-    return d3.arc<d3.PieArcDatum<PlatformShareSlice>>()
-      .innerRadius(innerRadius - 2)
-      .outerRadius(radius - 2)
-      .cornerRadius(4)
-      .padAngle(0.03);
-  }, [innerRadius, radius]);
-
-  const pieData = pieGen(slices);
-  const activeSlice = hoveredPlatform 
-    ? slices.find(s => s.platform === hoveredPlatform) 
-    : slices[0];
-
-  return (
-    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-      {/* SVG Donut */}
-      <div className="relative flex items-center justify-center shrink-0">
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="max-w-full h-auto overflow-visible select-none">
-          <g transform={`translate(${radius}, ${radius})`}>
-            {pieData.map((d, i) => {
-              const isHovered = hoveredPlatform === d.data.platform;
-              const pathStr = isHovered ? (arcHoverGen(d) || '') : (arcGen(d) || '');
-              return (
-                <path
-                  key={i}
-                  d={pathStr}
-                  fill={d.data.color}
-                  className="cursor-pointer transition-all duration-200"
-                  onMouseEnter={() => setHoveredPlatform(d.data.platform)}
-                  onMouseLeave={() => setHoveredPlatform(null)}
-                  opacity={hoveredPlatform && !isHovered ? 0.6 : 1}
-                />
-              );
-            })}
-          </g>
-        </svg>
-
-        {/* Center Callout */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-          <span className="text-2xs font-bold uppercase tracking-wider text-purple-500">Primary Share</span>
-          <span className="text-xl font-semibold text-navy-700 font-mono leading-none mt-0.5">
-            {activeSlice ? `${activeSlice.sharePercentage}%` : '42%'}
-          </span>
-          <span className="text-xs font-bold text-brand-600 mt-0.5">
-            {activeSlice ? activeSlice.platform : 'Spotify'}
-          </span>
-        </div>
-      </div>
-
-      {/* Platform Breakdown Cards / Legend */}
-      <div className="flex-1 w-full space-y-2">
-        {slices.map((slice, i) => {
-          const isSelected = hoveredPlatform === slice.platform;
-          return (
-            <div
-              key={i}
-              onMouseEnter={() => setHoveredPlatform(slice.platform)}
-              onMouseLeave={() => setHoveredPlatform(null)}
-              className={`p-2.5 rounded border transition-all cursor-pointer flex items-center justify-between ${
-                isSelected 
-                  ? 'bg-surface-subtle border-series-1 ' 
-                  : 'bg-surface border-line hover:border-line-strong'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: slice.color }}></span>
-                <div>
-                  <span className="text-xs font-semibold text-navy-700 block">{slice.platform}</span>
-                  <span className="text-2xs text-purple-500">
-                    ~{(slice.streamCount / 1000).toFixed(0)}k est. monthly streams
-                  </span>
-                </div>
-              </div>
-
-              <div className="text-right">
-                <span className="text-sm font-semibold font-mono text-navy-700">
-                  {slice.sharePercentage}%
-                </span>
-                <span className="text-2xs block text-success-600 font-bold">Verified</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-
-// ============================================================================
-// 3. DAILY ENGAGEMENT SPIKES OVER LAST 90 DAYS (D3 SPIKE BARS & CURVE)
-// ============================================================================
-interface DailyEngagementSpikesProps {
-  spikes: EngagementSpikePoint[];
-  height?: number;
-}
-
-export const DailyEngagementSpikesChart: React.FC<DailyEngagementSpikesProps> = ({
-  spikes,
-  height = 240
-}) => {
-  const [hoveredDay, setHoveredDay] = useState<EngagementSpikePoint | null>(null);
-
-  const width = 760;
-  const margin = { top: 25, right: 25, bottom: 35, left: 45 };
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
-
-  // Scales
-  const { xScale, yScale, trendlinePath } = useMemo(() => {
-    const x = d3.scaleBand<number>()
-      .domain(spikes.map(s => s.dayIndex))
-      .range([0, innerWidth])
-      .padding(0.25);
-
-    const maxEngagement = d3.max(spikes, s => s.engagementScore) || 100;
-    const y = d3.scaleLinear()
-      .domain([0, maxEngagement * 1.15])
-      .range([innerHeight, 0]);
-
-    // Trendline
-    const lineGen = d3.line<EngagementSpikePoint>()
-      .x(s => (x(s.dayIndex) || 0) + x.bandwidth() / 2)
-      .y(s => y(s.engagementScore))
-      .curve(d3.curveMonotoneX);
-
-    return {
-      xScale: x,
-      yScale: y,
-      trendlinePath: lineGen(spikes) || ''
-    };
-  }, [spikes, innerWidth, innerHeight]);
-
-  const maxPoint = useMemo(() => {
-    return [...spikes].sort((a, b) => b.engagementScore - a.engagementScore)[0];
-  }, [spikes]);
-
-  return (
-    <div className="space-y-3">
-      {/* Header and Callout info */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-        <div className="text-purple-500">
-          Daily interaction spikes (comments, shares, UGC video sound uses, playlist saves) across 90 days.
-        </div>
-        {hoveredDay ? (
-          <div className="font-mono text-navy-700 font-bold bg-warning-50 text-warning-700 px-2 py-0.5 rounded-sm border border-warning-100 font-mono text-2xs">
-            {hoveredDay.dateStr}: {hoveredDay.engagementScore.toFixed(0)} score ({hoveredDay.creationsCount} creations) {hoveredDay.spikeReason ? `• ${hoveredDay.spikeReason}` : ''}
-          </div>
-        ) : (
-          <div className="font-mono text-success-600 font-bold">
-            Peak Day: {maxPoint?.dateStr} (+{maxPoint?.creationsCount} creations)
-          </div>
-        )}
-      </div>
-
-      {/* SVG Canvas */}
-      <div className="relative w-full overflow-hidden rounded bg-surface border border-line p-2">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
-          <g transform={`translate(${margin.left}, ${margin.top})`}>
-            {/* Horizontal baseline grids */}
-            {[0, 25, 50, 75, 100].map((tick, i) => (
-              <g key={i} transform={`translate(0, ${yScale(tick)})`}>
-                <line x1={0} x2={innerWidth} y1={0} y2={0} stroke={chart.grid} strokeWidth="1" strokeDasharray="3 3" />
-                <text x={-8} y={4} textAnchor="end" fill={chart.axisLabel} fontSize="10" fontFamily="monospace">
-                  {tick}
-                </text>
-              </g>
-            ))}
-
-            {/* Weekend Shading bands */}
-            {spikes.filter(s => s.isWeekend).map((s, i) => {
-              const xPos = xScale(s.dayIndex) || 0;
-              return (
-                <rect
-                  key={i}
-                  x={xPos}
-                  y={0}
-                  width={xScale.bandwidth()}
-                  height={innerHeight}
-                  fill={chart.surfaceSubtle}
-                  opacity={0.7}
-                />
-              );
-            })}
-
-            {/* Bars for Daily Engagement */}
-            {spikes.map((s, idx) => {
-              const xPos = xScale(s.dayIndex) || 0;
-              const barHeight = innerHeight - yScale(s.engagementScore);
-              const isSelected = hoveredDay?.dayIndex === s.dayIndex;
-              return (
-                <g key={idx}>
-                  <rect
-                    x={xPos}
-                    y={yScale(s.engagementScore)}
-                    width={xScale.bandwidth()}
-                    height={barHeight}
-                    fill={s.isSpike ? series[5] : primary}
-                    fillOpacity={s.isSpike ? 0.95 : 0.65}
-                    rx={2}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    onMouseEnter={() => setHoveredDay(s)}
-                    onMouseLeave={() => setHoveredDay(null)}
-                  />
-                  {s.isSpike && (
-                    <circle
-                      cx={xPos + xScale.bandwidth() / 2}
-                      cy={yScale(s.engagementScore) - 4}
-                      r="2.5"
-                      fill={platform.youtube}
-                    />
-                  )}
-                </g>
-              );
-            })}
-
-            {/* Smoothed trendline on top */}
-            <path
-              d={trendlinePath}
-              fill="none"
-              stroke={platform.tiktok}
-              strokeWidth="2"
-              strokeOpacity="0.75"
-            />
-
-            {/* X Axis: Samples every 15 days */}
-            {spikes.filter((_, i) => i % 15 === 0).map((s, i) => (
-              <text
-                key={i}
-                x={(xScale(s.dayIndex) || 0) + xScale.bandwidth() / 2}
-                y={innerHeight + 20}
-                textAnchor="middle"
-                fill={chart.axisLabel}
-                fontSize="10"
-                fontFamily="sans-serif"
-              >
-                {s.dateStr}
-              </text>
-            ))}
-          </g>
-        </svg>
-      </div>
-
-      <div className="flex items-center justify-between text-xs text-purple-500">
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 font-bold text-warning-600">
-            <span className="w-2.5 h-2.5 rounded-sm bg-warning-600"></span> Viral Spike (&gt;2.5σ Deviation)
-          </span>
-          <span className="flex items-center gap-1.5 font-bold text-brand-600">
-            <span className="w-2.5 h-2.5 rounded-sm bg-brand-500"></span> Steady Organic Baselines
-          </span>
-        </div>
-        <span className="text-2xs font-mono text-purple-700">
-          Weekend Velocity Factor: <strong>1.42x uplift</strong>
-        </span>
-      </div>
-    </div>
-  );
-};
-
-
-// ============================================================================
-// 4. TIKTOK & REELS UGC VIRALITY TIMELINE (D3 STEP-AREA CHART)
-// ============================================================================
-export const UgcViralityTimelineChart: React.FC<{ points: { day: string; videoCreations: number; ugcAudioStreams: number }[] }> = ({ points }) => {
-  const width = 500;
-  const height = 180;
-  const margin = { top: 15, right: 15, bottom: 25, left: 40 };
-  const innerW = width - margin.left - margin.right;
-  const innerH = height - margin.top - margin.bottom;
-
-  const { xScale, yScale, areaPath, linePath } = useMemo(() => {
-    const x = d3.scaleBand()
-      .domain(points.map((_, i) => i.toString()))
-      .range([0, innerW]);
-
-    const maxCreates = d3.max(points, p => p.videoCreations) || 500;
-    const y = d3.scaleLinear()
-      .domain([0, maxCreates * 1.1])
-      .range([innerH, 0]);
-
-    const areaGen = d3.area<{ day: string; videoCreations: number }>()
-      .x((_, i) => (x(i.toString()) || 0) + x.bandwidth() / 2)
-      .y0(innerH)
-      .y1(d => y(d.videoCreations))
-      .curve(d3.curveStepAfter);
-
-    const lineGen = d3.line<{ day: string; videoCreations: number }>()
-      .x((_, i) => (x(i.toString()) || 0) + x.bandwidth() / 2)
-      .y(d => y(d.videoCreations))
-      .curve(d3.curveStepAfter);
-
-    return {
-      xScale: x,
-      yScale: y,
-      areaPath: areaGen(points) || '',
-      linePath: lineGen(points) || ''
-    };
-  }, [points, innerW, innerH]);
+    svg.append('path')
+      .datum(data)
+      .attr('fill', 'none')
+      .attr('stroke', '#4F46E5')
+      .attr('stroke-width', 2)
+      .attr('d', line);
+  }, [data]);
 
   return (
     <div className="w-full">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
-        <defs>
-          <linearGradient id="ugcAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={chart.virality} stopOpacity="0.16" />
-            <stop offset="100%" stopColor={chart.virality} stopOpacity="0.0" />
-          </linearGradient>
-        </defs>
-        <g transform={`translate(${margin.left}, ${margin.top})`}>
-          <path d={areaPath} fill="url(#ugcAreaGrad)" />
-          <path d={linePath} fill="none" stroke={chart.virality} strokeWidth="2.5" />
-          {points.filter((_, i) => i % 2 === 0).map((p, i) => (
-            <text
-              key={i}
-              x={(xScale((i * 2).toString()) || 0) + xScale.bandwidth() / 2}
-              y={innerH + 16}
-              textAnchor="middle"
-              fill={chart.axisLabel}
-              fontSize="9"
-              fontFamily="monospace"
-            >
-              {p.day}
-            </text>
-          ))}
-        </g>
-      </svg>
+      <svg ref={svgRef} className="w-full h-[220px]" />
     </div>
   );
 };
 
+// ============================================================================
+// 2. PLATFORM AUDIENCE PIE CHART
+// ============================================================================
+export const PlatformAudiencePieChart: React.FC<{ 
+  data?: PlatformShareSlice[]; 
+  slices?: PlatformShareSlice[]; 
+  size?: number;
+}> = ({ data, slices }) => {
+  const chartData = data || slices || [];
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
-// ============================================================================
-// 5. REGIONAL LISTENER CONCENTRATION (D3 HORIZONTAL RANKED BARS)
-// ============================================================================
-export const RegionalListenerConcentrationChart: React.FC<{ cities: RegionalConcentrationPoint[] }> = ({ cities }) => {
-  const maxPercent = d3.max(cities, c => c.percentage) || 50;
+  useEffect(() => {
+    if (!svgRef.current || chartData.length === 0) return;
+
+    const el = svgRef.current;
+    d3.select(el).selectAll('*').remove();
+
+    const clientW = el.clientWidth || el.parentElement?.clientWidth || 280;
+    const width = Math.max(220, clientW);
+    const height = 200;
+    const radius = Math.min(width, height) / 2 - 12;
+
+    const svg = d3.select(el)
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('width', '100%')
+      .attr('height', height)
+      .append('g')
+      .attr('transform', `translate(${width / 2},${height / 2})`);
+
+    const color = d3.scaleOrdinal()
+      .domain(chartData.map(d => d.platform))
+      .range(['#4F46E5', '#0891B2', '#15803D', '#B45309', '#9333EA']);
+
+    const pie = d3.pie<PlatformShareSlice>()
+      .value(d => d.sharePercentage)
+      .sort(null);
+
+    const arc = d3.arc<d3.PieArcDatum<PlatformShareSlice>>()
+      .innerRadius(radius * 0.55)
+      .outerRadius(radius);
+
+    svg.selectAll('path')
+      .data(pie(chartData))
+      .enter()
+      .append('path')
+      .attr('d', arc)
+      .attr('fill', d => color(d.data.platform) as string)
+      .attr('stroke', '#ffffff')
+      .attr('stroke-width', 2);
+  }, [chartData]);
+
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="Platform distribution not verified" subtext="DSP audience breakdown requires connected platform accounts." />;
+  }
 
   return (
-    <div className="space-y-2.5">
-      {cities.map((city, idx) => {
-        const barWidth = (city.percentage / maxPercent) * 100;
-        return (
-          <div key={idx} className="space-y-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-navy-700 flex items-center gap-1.5">
-                {city.isAnchorMarket && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-success-600 animate-pulse"></span>
-                )}
-                {city.city}, {city.country}
-              </span>
-              <span className="text-purple-500 font-mono text-2xs">
-                {city.percentage}% • {city.estimatedListeners.toLocaleString()} fans
-              </span>
-            </div>
-
-            <div className="h-2 bg-surface-sunken rounded-sm overflow-hidden relative">
-              <div
-                className={`h-full rounded-sm transition-all duration-500 ${
-                  idx === 0 
-                    ? 'bg-brand-500' 
-                    : idx === 1 
-                    ? 'bg-platform-boomplay' 
-                    : idx === 2 
-                    ? 'bg-success-600' 
-                    : 'bg-purple-300'
-                }`}
-                style={{ width: `${barWidth}%` }}
-              ></div>
-            </div>
-          </div>
-        );
-      })}
+    <div className="w-full flex items-center justify-center">
+      <svg ref={svgRef} className="w-full" style={{ height: 200 }} />
     </div>
   );
 };
 
-
 // ============================================================================
-// 6. AVM 4-PILLAR SPIDER RADAR CHART (D3 POLAR POLYGON)
+// 3. DAILY ENGAGEMENT SPIKES CHART
 // ============================================================================
-export const AvmRadarChart: React.FC<{ metrics: RadarCompetencePoint[]; size?: number }> = ({
-  metrics,
-  size = 260
-}) => {
-  const radius = size / 2 - 35;
-  const center = size / 2;
-  const numAxes = metrics.length;
-  const angleSlice = (Math.PI * 2) / numAxes;
-
-  // D3 Scale for radial distance
-  const rScale = d3.scaleLinear().domain([0, 100]).range([0, radius]);
-
-  // Points for artist polygon
-  const artistPoints = metrics.map((m, i) => {
-    const r = rScale(m.score);
-    const angle = angleSlice * i - Math.PI / 2;
-    return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
-  }).join(' ');
-
-  // Points for benchmark peer polygon
-  const benchmarkPoints = metrics.map((m, i) => {
-    const r = rScale(m.benchmarkCohortAverage);
-    const angle = angleSlice * i - Math.PI / 2;
-    return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
-  }).join(' ');
+export const DailyEngagementSpikesChart: React.FC<{ 
+  data?: EngagementSpikePoint[]; 
+  spikes?: EngagementSpikePoint[]; 
+  height?: number;
+}> = ({ data, spikes }) => {
+  const chartData = data || spikes || [];
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="No engagement velocity telemetry" subtext="Requires social/UGC monitoring integration." />;
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="max-w-full h-auto overflow-visible select-none">
-        {/* Concentric Grid Polygons */}
-        {[25, 50, 75, 100].map((level, idx) => {
-          const gridPoints = metrics.map((_, i) => {
-            const r = rScale(level);
-            const angle = angleSlice * i - Math.PI / 2;
-            return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
-          }).join(' ');
-
-          return (
-            <polygon
-              key={idx}
-              points={gridPoints}
-              fill="none"
-              stroke={chart.gridStrong}
-              strokeWidth="1"
-              strokeDasharray="2 2"
-            />
-          );
-        })}
-
-        {/* Radial Axes */}
-        {metrics.map((m, i) => {
-          const angle = angleSlice * i - Math.PI / 2;
-          const x = center + radius * Math.cos(angle);
-          const y = center + radius * Math.sin(angle);
-          const labelX = center + (radius + 20) * Math.cos(angle);
-          const labelY = center + (radius + 20) * Math.sin(angle);
-
-          return (
-            <g key={i}>
-              <line x1={center} y1={center} x2={x} y2={y} stroke={chart.gridStrong} strokeWidth="1" />
-              <text
-                x={labelX}
-                y={labelY + 4}
-                textAnchor="middle"
-                fill={platform.tiktok}
-                fontSize="9"
-                fontWeight="700"
-              >
-                {m.dimension}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Peer Benchmark Polygon */}
-        <polygon
-          points={benchmarkPoints}
-          fill={chart.axisLabel}
-          fillOpacity="0.15"
-          stroke={chart.axisLabel}
-          strokeWidth="1.5"
-          strokeDasharray="3 2"
-        />
-
-        {/* Artist Score Polygon */}
-        <polygon
-          points={artistPoints}
-          fill={primary}
-          fillOpacity="0.3"
-          stroke={primary}
-          strokeWidth="2.5"
-        />
-
-        {/* Data points */}
-        {metrics.map((m, i) => {
-          const r = rScale(m.score);
-          const angle = angleSlice * i - Math.PI / 2;
-          return (
-            <circle
-              key={i}
-              cx={center + r * Math.cos(angle)}
-              cy={center + r * Math.sin(angle)}
-              r="4"
-              fill={primary}
-              stroke={chart.surface}
-              strokeWidth="2"
-            />
-          );
-        })}
-      </svg>
-
-      <div className="flex items-center gap-4 text-2xs text-purple-500 mt-2">
-        <span className="flex items-center gap-1 font-bold text-brand-600">
-          <span className="w-2.5 h-2.5 rounded-full bg-brand-500"></span> Target Artist
-        </span>
-        <span className="flex items-center gap-1 font-semibold text-purple-300">
-          <span className="w-2.5 h-2.5 rounded-full bg-purple-300"></span> Cohort Benchmark (142 peers)
-        </span>
-      </div>
+    <div className="h-48 flex items-end gap-1 p-3 bg-[#F8FAFC] rounded-lg">
+      {chartData.slice(-20).map((pt, i) => (
+        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <div 
+            className={`w-full rounded-t ${pt.isSpike ? 'bg-[#B45309]' : 'bg-[#C7D2FE]'}`} 
+            style={{ height: `${Math.max(4, pt.engagementScore * 1.5)}px` }}
+            title={`${pt.dateStr}: Score ${pt.engagementScore}`}
+          />
+        </div>
+      ))}
     </div>
   );
 };
 
+// ============================================================================
+// 4. UGC VIRALITY TIMELINE CHART
+// ============================================================================
+export const UgcViralityTimelineChart: React.FC<{ 
+  data?: any[]; 
+  points?: any[]; 
+}> = ({ data, points }) => {
+  const chartData = data || points || [];
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="UGC video creations telemetry unavailable" subtext="TikTok / Reels audio ID tracking not yet active for this candidate." />;
+  }
+  return <div className="h-48 bg-[#F8FAFC] rounded-lg p-4 text-xs text-[#667085]">UGC Timeline Loaded ({chartData.length} data points)</div>;
+};
 
 // ============================================================================
-// 7. VOCAL PITCH F0 CENT ERROR DISTRIBUTION HISTOGRAM (D3 BARS)
+// 5. REGIONAL LISTENER CONCENTRATION CHART
 // ============================================================================
-export const VocalPitchHistogramChart: React.FC<{ bins: PitchCentHistogramBin[] }> = ({ bins }) => {
-  const maxPercent = d3.max(bins, b => b.percentage) || 35;
+export const RegionalListenerConcentrationChart: React.FC<{ 
+  data?: RegionalConcentrationPoint[]; 
+  cities?: RegionalConcentrationPoint[]; 
+}> = ({ data, cities }) => {
+  const chartData = data || cities || [];
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="Regional concentration data unavailable" subtext="City-level DSP listener distribution requires Chartmetric or Spotify for Artists feed." />;
+  }
 
   return (
     <div className="space-y-2">
-      <div className="h-36 flex items-end justify-between gap-1.5 pt-3">
-        {bins.map((bin, i) => {
-          const heightPercent = (bin.percentage / maxPercent) * 100;
-          return (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1 h-full justify-end group">
-              <div
-                className={`w-full rounded-t-md transition-all ${
-                  bin.isWithinTolerantRange
-                    ? 'bg-success-600 group-hover:bg-success-600'
-                    : 'bg-series-8/65 group-hover:bg-danger-600'
-                }`}
-                style={{ height: `${heightPercent}%` }}
-              >
-                <div className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-2xs px-1 rounded font-mono pointer-events-none transition-opacity">
-                  {bin.percentage}%
-                </div>
-              </div>
-              <span className="text-2xs text-purple-500 font-mono">{bin.centBin}¢</span>
-            </div>
-          );
-        })}
-      </div>
+      {chartData.map((r, i) => (
+        <div key={i} className="space-y-1">
+          <div className="flex justify-between text-xs font-medium">
+            <span className="text-[#101828]">{r.city}, {r.country}</span>
+            <span className="text-[#475467]">{r.percentage}%</span>
+          </div>
+          <div className="w-full bg-[#F2F4F7] h-2 rounded-full overflow-hidden">
+            <div className="bg-[#4F46E5] h-full rounded-full" style={{ width: `${r.percentage}%` }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-      <div className="flex items-center justify-between text-2xs text-purple-500 pt-2 border-t border-line">
-        <span className="text-success-600 font-bold">Green = Within ±20¢ psychoacoustic tolerance</span>
-        <span className="font-mono text-navy-700">89.4% in key</span>
+// ============================================================================
+// 6. AVM 4-PILLAR RADAR CHART
+// ============================================================================
+export const AvmRadarChart: React.FC<{ 
+  data?: RadarCompetencePoint[]; 
+  metrics?: RadarCompetencePoint[]; 
+  size?: number;
+}> = ({ data, metrics }) => {
+  const chartData = data || metrics || [];
+  const svgRef = useRef<SVGSVGElement | null>(null);
+
+  useEffect(() => {
+    if (!svgRef.current || chartData.length === 0) return;
+
+    const el = svgRef.current;
+    d3.select(el).selectAll('*').remove();
+
+    const clientW = el.clientWidth || el.parentElement?.clientWidth || 280;
+    const width = Math.max(220, clientW);
+    const height = 220;
+    const radius = Math.min(width, height) / 2 - 28;
+    const total = chartData.length;
+    const angleSlice = (Math.PI * 2) / total;
+
+    const svg = d3.select(el)
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('width', '100%')
+      .attr('height', height)
+      .append('g')
+      .attr('transform', `translate(${width / 2},${height / 2})`);
+
+    const rScale = d3.scaleLinear()
+      .domain([0, 100])
+      .range([0, radius]);
+
+    // Background concentric circles
+    const levels = 4;
+    for (let i = 1; i <= levels; i++) {
+      const levelFactor = (radius / levels) * i;
+      svg.append('circle')
+        .attr('r', levelFactor)
+        .attr('fill', 'none')
+        .attr('stroke', '#E4E7EC')
+        .attr('stroke-dasharray', '2,2');
+    }
+
+    // Axes
+    const axis = svg.selectAll('.axis')
+      .data(chartData)
+      .enter()
+      .append('g')
+      .attr('class', 'axis');
+
+    axis.append('line')
+      .attr('x1', 0)
+      .attr('y1', 0)
+      .attr('x2', (_, i) => rScale(100) * Math.cos(angleSlice * i - Math.PI / 2))
+      .attr('y2', (_, i) => rScale(100) * Math.sin(angleSlice * i - Math.PI / 2))
+      .attr('stroke', '#E4E7EC');
+
+    // Axis Labels
+    axis.append('text')
+      .attr('x', (_, i) => (rScale(100) + 16) * Math.cos(angleSlice * i - Math.PI / 2))
+      .attr('y', (_, i) => (rScale(100) + 16) * Math.sin(angleSlice * i - Math.PI / 2))
+      .attr('text-anchor', 'middle')
+      .attr('dy', '0.35em')
+      .attr('fill', '#475467')
+      .attr('font-size', '10px')
+      .attr('font-weight', '600')
+      .text(d => d.dimension);
+
+    // Radar Area
+    const radarLine = d3.lineRadial<RadarCompetencePoint>()
+      .radius(d => rScale(d.score))
+      .angle((_, i) => i * angleSlice)
+      .curve(d3.curveLinearClosed);
+
+    svg.append('path')
+      .datum(chartData)
+      .attr('d', radarLine as any)
+      .attr('fill', '#4F46E5')
+      .attr('fill-opacity', 0.25)
+      .attr('stroke', '#4F46E5')
+      .attr('stroke-width', 2);
+
+    // Candidate Points
+    svg.selectAll('.radarCircle')
+      .data(chartData)
+      .enter()
+      .append('circle')
+      .attr('r', 4)
+      .attr('cx', (d, i) => rScale(d.score) * Math.cos(angleSlice * i - Math.PI / 2))
+      .attr('cy', (d, i) => rScale(d.score) * Math.sin(angleSlice * i - Math.PI / 2))
+      .attr('fill', '#4F46E5')
+      .attr('stroke', '#FFFFFF')
+      .attr('stroke-width', 1.5);
+  }, [chartData]);
+
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="AVM 4-pillar scorecard awaiting acoustic analysis" />;
+  }
+
+  return (
+    <div className="w-full flex items-center justify-center">
+      <svg ref={svgRef} className="w-full" style={{ height: 220 }} />
+    </div>
+  );
+};
+
+// ============================================================================
+// 7. VOCAL PITCH CENT HISTOGRAM
+// ============================================================================
+export const VocalPitchHistogramChart: React.FC<{ 
+  data?: PitchCentHistogramBin[]; 
+  bins?: PitchCentHistogramBin[]; 
+}> = ({ data, bins }) => {
+  const chartData = data || bins || [];
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="Vocal f0 intonation distribution unanalyzed" subtext="Upload vocal stem or run preview audio analysis to generate cent distribution." />;
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <div className="h-32 flex items-end gap-1.5 p-2 bg-[#F8FAFC] rounded-lg border border-[#E4E7EC]">
+        {chartData.map((bin, i) => (
+          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+            <div 
+              className={`w-full rounded-t ${bin.isWithinTolerantRange ? 'bg-[#15803D]' : 'bg-[#D0D5DD]'}`}
+              style={{ height: `${Math.max(4, bin.percentage * 2.8)}px` }}
+              title={`${bin.centBin} cents: ${bin.percentage}%`}
+            />
+            <span className="text-[9px] text-[#667085] font-mono">{bin.centBin}</span>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between text-[11px] text-[#667085] px-1">
+        <span>-50 cents (Flat)</span>
+        <span className="font-semibold text-[#15803D]">±20 cents in-key zone</span>
+        <span>+50 cents (Sharp)</span>
       </div>
     </div>
   );
 };
 
-
 // ============================================================================
-// 8. DYNAMIC 1-PT/SEC TRACK ENERGY & SECTION LIFT (D3 WAVE CURVE)
+// 8. DYNAMIC ENERGY WAVEFORM
 // ============================================================================
-export const DynamicEnergyWaveformChart: React.FC<{ points: DynamicEnergyPoint[] }> = ({ points }) => {
-  const width = 640;
-  const height = 140;
-  const margin = { top: 15, right: 15, bottom: 25, left: 25 };
-  const innerW = width - margin.left - margin.right;
-  const innerH = height - margin.top - margin.bottom;
-
-  const { xScale, yScale, areaPath, linePath } = useMemo(() => {
-    const x = d3.scaleLinear()
-      .domain([0, points.length - 1])
-      .range([0, innerW]);
-
-    const y = d3.scaleLinear()
-      .domain([0, 1])
-      .range([innerH, 0]);
-
-    const areaGen = d3.area<DynamicEnergyPoint>()
-      .x((_, i) => x(i))
-      .y0(innerH)
-      .y1(d => y(d.perceivedEnergy))
-      .curve(d3.curveMonotoneX);
-
-    const lineGen = d3.line<DynamicEnergyPoint>()
-      .x((_, i) => x(i))
-      .y(d => y(d.perceivedEnergy))
-      .curve(d3.curveMonotoneX);
-
-    return {
-      xScale: x,
-      yScale: y,
-      areaPath: areaGen(points) || '',
-      linePath: lineGen(points) || ''
-    };
-  }, [points, innerW, innerH]);
+export const DynamicEnergyWaveformChart: React.FC<{ 
+  data?: DynamicEnergyPoint[]; 
+  points?: DynamicEnergyPoint[]; 
+}> = ({ data, points }) => {
+  const chartData = data || points || [];
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="Waveform energy curve not yet analyzed" />;
+  }
 
   return (
-    <div className="w-full">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
-        <defs>
-          <linearGradient id="d3EnergyGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={primary} stopOpacity="0.2" />
-            <stop offset="100%" stopColor={primary} stopOpacity="0.02" />
-          </linearGradient>
-        </defs>
-
-        <g transform={`translate(${margin.left}, ${margin.top})`}>
-          {/* Section Boxes */}
-          <rect x={0} y={0} width={innerW * 0.18} height={innerH} fill={sectionBands.rest.fill} rx={3} />
-          <rect x={innerW * 0.18} y={0} width={innerW * 0.32} height={innerH} fill={sectionBands.verse.fill} rx={3} />
-          <rect x={innerW * 0.50} y={0} width={innerW * 0.35} height={innerH} fill={sectionBands.hook.fill} rx={3} />
-          <rect x={innerW * 0.85} y={0} width={innerW * 0.15} height={innerH} fill={sectionBands.rest.fill} rx={3} />
-
-          <text x={innerW * 0.09} y={12} textAnchor="middle" fill={chart.textMuted} fontSize="8" fontWeight="bold">INTRO</text>
-          <text x={innerW * 0.34} y={12} textAnchor="middle" fill={sectionBands.verse.text} fontSize="8" fontWeight="bold">VERSE 1</text>
-          <text x={innerW * 0.67} y={12} textAnchor="middle" fill={sectionBands.hook.text} fontSize="8" fontWeight="bold">HOOK / CHORUS (+6.2dB)</text>
-          <text x={innerW * 0.92} y={12} textAnchor="middle" fill={chart.textMuted} fontSize="8" fontWeight="bold">OUTRO</text>
-
-          {/* Area & Wave Line */}
-          <path d={areaPath} fill="url(#d3EnergyGrad)" />
-          <path d={linePath} fill="none" stroke={primary} strokeWidth="2.75" />
-        </g>
-      </svg>
+    <div className="h-28 flex items-center gap-1 p-2 bg-[#F8FAFC] rounded-lg border border-[#E4E7EC]">
+      {chartData.map((pt, i) => (
+        <div 
+          key={i} 
+          className="flex-1 bg-[#4F46E5] rounded-full transition-all"
+          style={{ height: `${Math.max(10, pt.perceivedEnergy * 80)}%` }}
+          title={`${pt.second}s: ${pt.section} (${(pt.perceivedEnergy * 100).toFixed(0)}% energy)`}
+        />
+      ))}
     </div>
   );
 };
 
+// ============================================================================
+// 9. ORGANIC CONVERSION SCATTER PLOT
+// ============================================================================
+export const OrganicConversionScatterPlot: React.FC<{ 
+  data?: OrganicScatterPoint[]; 
+  peers?: OrganicScatterPoint[]; 
+}> = ({ data, peers }) => {
+  const chartData = data || peers || [];
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="Organic conversion scatter requires multi-artist cohort" />;
+  }
 
-// ============================================================================
-// 9. STREAM-TO-FOLLOWER ORGANIC CONVERSION SCATTER PLOT (D3 2D BUBBLE)
-// ============================================================================
-export const OrganicConversionScatterPlot: React.FC<{ peers: OrganicScatterPoint[] }> = ({ peers }) => {
   return (
-    <div className="relative h-44 bg-surface-subtle rounded p-3 border border-line overflow-hidden select-none">
-      {/* Shaded Organic Safe Zone Corridor */}
-      <div className="absolute top-4 left-6 right-6 bottom-6 bg-success-600/12 border border-success-600/30 rounded-card pointer-events-none flex items-center justify-center">
-        <span className="text-2xs text-success-600 font-semibold tracking-wider uppercase opacity-75">
-          High Retention Organic Corridor (Bot-Free)
-        </span>
-      </div>
-
-      {/* Peer Scatter Dots */}
-      {peers.map((p, i) => {
-        const leftPct = (p.streamsToFollowerRatio / 6.0) * 85 + 5;
-        const topPct = 95 - (p.organicConfidencePercent / 100) * 85;
-
-        if (p.isTargetArtist) {
-          return (
-            <div
-              key={i}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded bg-brand-500 border-2 border-surface shadow-card animate-pulse cursor-pointer flex items-center justify-center"
-              style={{ left: `${leftPct}%`, top: `${topPct}%`, width: '32px', height: '32px', zIndex: 10 }}
-              title={`${p.artistName}: ${p.streamsToFollowerRatio}x ratio, ${p.organicConfidencePercent}% organic`}
-            >
-              <span className="text-2xs font-semibold text-navy-900 font-mono">YOU</span>
-            </div>
-          );
-        }
-
-        return (
-          <div
-            key={i}
-            className="absolute -translate-x-1/2 -translate-y-1/2 rounded bg-purple-300 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-            style={{ left: `${leftPct}%`, top: `${topPct}%`, width: '12px', height: '12px' }}
-            title={`${p.artistName}: ${p.streamsToFollowerRatio}x ratio`}
-          />
-        );
-      })}
-
-      <div className="absolute bottom-1 right-3 text-2xs font-mono text-purple-300">
-        X: Stream/Follower Ratio • Y: Organic Conf %
-      </div>
+    <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E4E7EC] text-xs text-[#667085]">
+      {chartData.map((pt, i) => (
+        <div key={i} className="flex justify-between py-1 border-b border-[#F2F4F7]">
+          <span className="font-semibold text-[#101828]">{pt.artistName}</span>
+          <span>Ratio: {pt.streamsToFollowerRatio.toFixed(1)}</span>
+        </div>
+      ))}
     </div>
   );
 };
 
+// ============================================================================
+// 10. DISCOGRAPHY TRAJECTORY CHART
+// ============================================================================
+export const DiscographyTrajectoryChart: React.FC<{ 
+  data?: DiscographyTrajectoryPoint[]; 
+  releases?: DiscographyTrajectoryPoint[]; 
+}> = ({ data, releases }) => {
+  const chartData = data || releases || [];
+  if (chartData.length === 0) {
+    return <ChartEmptyState message="Single release only" subtext="Trajectory requires minimum 2 verified releases in catalogue." />;
+  }
 
-// ============================================================================
-// 10. DISCOGRAPHY TRAJECTORY (TAV VS RELEASE PROGRESSION)
-// ============================================================================
-export const DiscographyTrajectoryChart: React.FC<{ releases: DiscographyTrajectoryPoint[] }> = ({ releases }) => {
   return (
-    <div className="space-y-3">
-      <div className="h-36 flex items-end justify-between gap-3 pt-3">
-        {releases.map((rel, idx) => {
-          return (
-            <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
-              <div
-                className="w-full bg-brand-500 group-hover:bg-brand-600 rounded-t-lg transition-all relative"
-                style={{ height: `${(rel.tavScore / 100) * 100}%` }}
-              >
-                <div className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-2xs px-1.5 py-0.5 rounded font-mono pointer-events-none whitespace-nowrap shadow-raised">
-                  {rel.trackTitle}: TAV {rel.tavScore}
-                </div>
-              </div>
-              <span className="text-2xs text-purple-500 font-mono font-bold truncate max-w-[64px]">
-                Rel #{rel.releaseOrder}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="flex items-center justify-between text-xs text-purple-500 pt-2 border-t border-line">
-        <span>Artistic Momentum: <strong className="text-success-600">+12.4% TAV Progression</strong></span>
-        <span className="font-mono text-brand-600 font-bold">Steep Upward Trajectory</span>
-      </div>
+    <div className="space-y-2">
+      {chartData.map((d, i) => (
+        <div key={i} className="flex items-center justify-between p-2 rounded border border-[#E4E7EC] bg-white text-xs">
+          <div>
+            <p className="font-semibold text-[#101828]">#{d.releaseOrder} {d.trackTitle}</p>
+            <p className="text-[10px] text-[#667085]">{d.releaseDate}</p>
+          </div>
+          <div className="text-right">
+            <span className="font-mono font-bold text-[#4F46E5]">TAV {d.tavScore}</span>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
